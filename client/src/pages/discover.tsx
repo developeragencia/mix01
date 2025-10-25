@@ -95,12 +95,13 @@ export default function Discover() {
 
     try {
       console.log('🔴 FAZENDO REQUISIÇÃO para /api/swipes');
+      console.log('🔴 Profile dados:', { profileId: currentProfile.id, userId: currentProfile.userId });
       const response = await fetch('/api/swipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          swipedId: currentProfile.id,
+          swipedId: currentProfile.userId, // ✅ CORRIGIDO: usar userId ao invés de profileId
           type: swipeType
         })
       });
