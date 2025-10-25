@@ -51,6 +51,7 @@ export interface IStorage {
   // Match methods
   createMatch(user1Id: number, user2Id: number): Promise<Match>;
   getUserMatches(userId: number): Promise<(Match & { profile: Profile })[]>;
+  getMatchBetweenUsers?(user1Id: number, user2Id: number): Promise<Match | undefined>; // ✅ Novo método
   deleteMatch?(matchId: number): Promise<void>; // ✅ Novo método
   
   // Report methods
@@ -590,6 +591,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Match methods
+  async getMatchBetweenUsers(user1Id: number, user2Id: number): Promise<Match | undefined> {
+    try {
+      const [match] = await db.select().from(matches)
+        .where(
+          or(
+            and(eq(matches.user1Id, user1Id), eq(matches.user2Id, user2Id)),
+            and(eq(matches.user1Id, user2Id), eq(matches.user2Id, user1Id))
+          )
+        )
+        .limit(1);
+      
+      return match;
+    } catch (error) {
+      console.error('Error getting match between users:', error);
+      return undefined;
+    }
+  }
+
   async createMatch(user1Id: number, user2Id: number): Promise<Match> {
     try {
       // ✅ CRÍTICO: Verificar se match já existe (evitar duplicatas)

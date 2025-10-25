@@ -118,13 +118,21 @@ export default function Discover() {
       console.log('🔴 RESPOSTA recebida:', response);
       const res = await response.json();
       console.log('🔴 DADOS da resposta:', res);
+      console.log('🔴 Verificando match:', {
+        hasMatch: !!res.match,
+        hasMatchId: !!res.matchId,
+        matchId: res.matchId,
+        matchProfile: res.matchProfile
+      });
 
       if (res.match && res.matchId) {
-        console.log('🔴 É MATCH! Redirecionando...');
+        console.log('🎉🎉🎉 É MATCH! Redirecionando para match-celebration...');
+        console.log('🎉 Match ID:', res.matchId);
+        console.log('🎉 Match Profile:', res.matchProfile);
         window.location.href = `/match-celebration/${res.matchId}`;
         return;
       } else if (swipeType === "like") {
-        console.log('🔴 Like registrado, mas sem match');
+        console.log('🔴 Like registrado, mas sem match ainda');
         toast({
           title: `❤️ Você curtiu ${profileName}!`,
           description: "Vamos torcer para que seja recíproco!",

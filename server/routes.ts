@@ -1194,16 +1194,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let matchProfile = null;
       if (swipeData.isLike) {
         try {
-          console.log(`🔍 Verificando swipe recíproco: ${swipeData.swipedId} curtiu ${swipeData.swiperId}?`);
-          const reciprocalSwipe = await storage.getSwipe(swipeData.swipedId, swipeData.swiperId);
-          console.log("🔍 Swipe recíproco encontrado:", reciprocalSwipe ? "SIM" : "NÃO");
+          // ✅ PRIMEIRO: Verificar se JÁ EXISTE um match entre esses usuários
+          console.log(`🔍 PASSO 1: Verificando se já existe match entre ${swipeData.swiperId} e ${swipeData.swipedId}`);
+          const existingMatch = await storage.getMatchBetweenUsers?.(swipeData.swiperId, swipeData.swipedId);
           
-          if (reciprocalSwipe && reciprocalSwipe.isLike) {
-            // Create a match
-            console.log("✅ Ambos curtiram! Criando match...");
-            match = await storage.createMatch(swipeData.swiperId, swipeData.swipedId);
+          if (existingMatch) {
+            console.log("✅ JÁ EXISTE MATCH! ID:", existingMatch.id);
+            match = existingMatch;
             
-            // Buscar dados completos do perfil do match (incluindo fotos)
+            // Buscar dados completos do perfil
             const matchedProfile = await storage.getProfile(swipeData.swipedId);
             if (matchedProfile) {
               matchProfile = {
@@ -1214,19 +1213,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 bio: matchedProfile.bio || ""
               };
             }
-            
-            if (matchProfile) {
-              console.log("🎉 MATCH CRIADO! ID:", match.id, "- Perfil:", {
-                id: matchProfile.id,
-                name: matchProfile.name,
-                age: matchProfile.age,
-                photos: matchProfile.photos?.length || 0
-              });
-            }
-          } else if (reciprocalSwipe) {
-            console.log("❌ Swipe encontrado mas não é like (é dislike)");
           } else {
-            console.log("⏳ Swipe recíproco não existe ainda - aguardando retribuição");
+            // ✅ SEGUNDO: Se não existe match, verificar swipe recíproco
+            console.log(`🔍 PASSO 2: Não há match. Verificando swipe recíproco: ${swipeData.swipedId} curtiu ${swipeData.swiperId}?`);
+            const reciprocalSwipe = await storage.getSwipe(swipeData.swipedId, swipeData.swiperId);
+            console.log("🔍 Swipe recíproco encontrado:", reciprocalSwipe ? "SIM" : "NÃO");
+            
+            if (reciprocalSwipe && reciprocalSwipe.isLike) {
+              // Create a match
+              console.log("✅ Ambos curtiram! Criando match...");
+              match = await storage.createMatch(swipeData.swiperId, swipeData.swipedId);
+              
+              // Buscar dados completos do perfil do match (incluindo fotos)
+              const matchedProfile = await storage.getProfile(swipeData.swipedId);
+              if (matchedProfile) {
+                matchProfile = {
+                  id: matchedProfile.userId,
+                  name: matchedProfile.name,
+                  age: matchedProfile.age,
+                  photos: matchedProfile.photos || [],
+                  bio: matchedProfile.bio || ""
+                };
+              }
+              
+              if (matchProfile) {
+                console.log("🎉 MATCH CRIADO! ID:", match.id, "- Perfil:", {
+                  id: matchProfile.id,
+                  name: matchProfile.name,
+                  age: matchProfile.age,
+                  photos: matchProfile.photos?.length || 0
+                });
+              }
+            } else if (reciprocalSwipe) {
+              console.log("❌ Swipe encontrado mas não é like (é dislike)");
+            } else {
+              console.log("⏳ Swipe recíproco não existe ainda - aguardando retribuição");
+            }
           }
         } catch (error) {
           console.log("❌ Erro ao verificar swipe recíproco:", error);
@@ -1253,11 +1275,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           photos: matchProfile.photos?.length || 0,
           bio: matchProfile.bio
         });
+        console.log("🎊 RESPOSTA JSON:", JSON.stringify(matchResponse, null, 2));
         console.log("🎊 ========================================");
-        res.json(matchResponse);
+        return res.json(matchResponse);
       } else {
         console.log("❌ Sem match - retornando match: false");
-        res.json({ swipe, match: false });
+        console.log("❌ Debug:", { 
+          hasMatch: !!match, 
+          hasMatchProfile: !!matchProfile,
+          matchData: match,
+          profileData: matchProfile
+        });
+        return res.json({ swipe, match: false });
       }
     } catch (error) {
       console.error("Error creating swipe:", error);
