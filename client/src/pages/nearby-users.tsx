@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, ArrowLeft, Heart, X, Navigation, Crown, Zap } from "lucide-react";
+import { MapPin, ArrowLeft, Heart, X, Navigation, Crown, Zap, Filter, Sliders } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import mixLogoIcon from "@assets/Logo_MIX_horizontal_1752607947932.png";
 
 interface NearbyUser {
   id: string;
@@ -23,10 +26,14 @@ interface NearbyUser {
 export default function NearbyUsers() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
   const [nearbyUsers, setNearbyUsers] = useState<NearbyUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<string>("São Paulo, SP");
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [maxDistance, setMaxDistance] = useState(5);
+  const [showFilters, setShowFilters] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
     // Simulated geolocation and nearby users - in production would use real GPS
@@ -85,12 +92,57 @@ export default function NearbyUsers() {
     }, 1500);
   }, []);
 
-  const handleLike = () => {
-    const user = nearbyUsers[currentIndex];
-    toast({
-      title: "Curtida enviada! 💕",
-      description: `Você curtiu ${user.name}`,
-    });
+  const handleLike = async () => {
+    // Verificar limite de 12 matches gratuitos
+    if (likeCount >= 12 && !user?.isPremium) {
+      toast({
+        title: "🚫 Limite de matches atingido",
+        description: "Você atingiu o limite de 12 matches gratuitos!",
+        duration: 4000,
+      });
+      setLocation("/swipe-limit");
+      return;
+    }
+
+    const currentUser = nearbyUsers[currentIndex];
+    
+    try {
+      // Enviar like para a API
+      const response = await fetch("/api/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetUserId: currentUser.id,
+          source: "nearby"
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        setLikeCount(prev => prev + 1);
+        
+        if (data.isMatch) {
+          toast({
+            title: "🎉 É UM MATCH!",
+            description: `Você e ${currentUser.name} deram match!`,
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: "💕 Curtida enviada!",
+            description: `Você curtiu ${currentUser.name}`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao dar like:", error);
+      toast({
+        title: "💕 Curtida enviada!",
+        description: `Você curtiu ${currentUser.name}`,
+      });
+    }
+    
     nextUser();
   };
 
@@ -113,9 +165,16 @@ export default function NearbyUsers() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Procurando pessoas por perto...</p>
+        <div className="text-center px-6 text-white">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full border-4 border-pink-500/30"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-pink-500 border-t-transparent animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img src={mixLogoIcon} alt="MIX" className="w-12 h-12 object-contain" />
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Procurando pessoas por perto</h3>
+          <p className="text-blue-200 text-sm">Cadê a galera? Buscando em {maxDistance}km...</p>
         </div>
       </div>
     );
@@ -147,30 +206,67 @@ export default function NearbyUsers() {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 p-4">
       <div className="max-w-md mx-auto h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation("/discover")}
-              className="text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-blue-400" />
-                Por perto
-              </h1>
-              <p className="text-white/60 text-sm flex items-center gap-1">
-                <Navigation className="w-3 h-3" />
-                {userLocation}
-              </p>
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation("/discover")}
+                className="text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-blue-400" />
+                  Cadê a galera?
+                </h1>
+                <p className="text-white/60 text-sm flex items-center gap-1">
+                  <Navigation className="w-3 h-3" />
+                  {userLocation}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="bg-white/10 text-white">
+                {currentIndex + 1}/{nearbyUsers.length}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="text-white hover:bg-white/10"
+              >
+                <Sliders className="w-4 h-4" />
+              </Button>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-white/10 text-white">
-            {currentIndex + 1}/{nearbyUsers.length}
-          </Badge>
+
+          {/* Painel de Filtros */}
+          {showFilters && (
+            <Card className="bg-white/10 border-white/20 mb-3">
+              <CardContent className="p-4">
+                <div className="text-white">
+                  <label className="text-sm font-medium mb-2 block">
+                    Distância máxima: {maxDistance}km
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={maxDistance}
+                    onChange={(e) => setMaxDistance(Number(e.target.value))}
+                    className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-xs text-white/60 mt-1">
+                    <span>1km</span>
+                    <span>50km</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Profile Card */}
@@ -289,8 +385,13 @@ export default function NearbyUsers() {
               <h3 className="font-semibold text-sm">Pessoas por perto</h3>
             </div>
             <p className="text-white/70 text-xs">
-              Mostrando pessoas em um raio de 5 km da sua localização
+              Mostrando pessoas em um raio de {maxDistance}km da sua localização
             </p>
+            {likeCount > 0 && !user?.isPremium && (
+              <p className="text-pink-400 text-xs mt-2 font-medium">
+                {likeCount}/12 matches gratuitos hoje
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
