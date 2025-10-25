@@ -33,6 +33,7 @@ export const users = pgTable("users", {
   interests: text("interests").array().default([]),
   bio: text("bio"),
   photos: text("photos").array().default([]),
+  isProfileComplete: boolean("is_profile_complete").default(false), // ✅ NOVO: Flag de perfil completo
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

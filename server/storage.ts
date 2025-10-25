@@ -1,4 +1,4 @@
-import { eq, and, gt, sql, inArray } from "drizzle-orm";
+import { eq, and, or, gt, sql, inArray } from "drizzle-orm";
 import { db } from "./db";
 import { users, profiles, swipes, matches, messages, subscriptionPlans, subscriptions, payments, checkIns, establishments, boosts, rewinds, verifications, profileViews, blocks } from "@shared/schema";
 import type { 
@@ -592,7 +592,24 @@ export class DatabaseStorage implements IStorage {
   // Match methods
   async createMatch(user1Id: number, user2Id: number): Promise<Match> {
     try {
+      // ✅ CRÍTICO: Verificar se match já existe (evitar duplicatas)
+      const existingMatch = await db.select().from(matches)
+        .where(
+          or(
+            and(eq(matches.user1Id, user1Id), eq(matches.user2Id, user2Id)),
+            and(eq(matches.user1Id, user2Id), eq(matches.user2Id, user1Id))
+          )
+        )
+        .limit(1);
+
+      if (existingMatch && existingMatch.length > 0) {
+        console.log(`✅ Match já existe entre ${user1Id} e ${user2Id}, retornando existente`);
+        return existingMatch[0];
+      }
+
+      // Criar novo match
       const [newMatch] = await db.insert(matches).values({ user1Id, user2Id }).returning();
+      console.log(`✅ Novo match criado entre ${user1Id} e ${user2Id}`);
       return newMatch;
     } catch (error) {
       console.error('Error creating match:', error);
