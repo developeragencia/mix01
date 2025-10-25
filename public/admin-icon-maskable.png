@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="24" fill="url(#gradient)"/>
+  <path d="M96 32C87.2 32 80 39.2 80 48C80 56.8 87.2 64 96 64C104.8 64 112 56.8 112 48C112 39.2 104.8 32 96 32ZM96 40C100.4 40 104 43.6 104 48C104 52.4 100.4 56 96 56C91.6 56 88 52.4 88 48C88 43.6 91.6 40 96 40Z" fill="white"/>
+  <path d="M128 80H64C59.6 80 56 83.6 56 88V144C56 148.4 59.6 152 64 152H128C132.4 152 136 148.4 136 144V88C136 83.6 132.4 80 128 80ZM128 144H64V88H128V144Z" fill="white"/>
+  <path d="M72 104H120V112H72V104ZM72 120H104V128H72V120Z" fill="white"/>
+  <circle cx="48" cy="48" r="8" fill="#ec4899"/>
+  <circle cx="144" cy="48" r="8" fill="#a855f7"/>
+  <circle cx="48" cy="144" r="8" fill="#3b82f6"/>
+  <circle cx="144" cy="144" r="8" fill="#10b981"/>
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e40af"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+</svg>

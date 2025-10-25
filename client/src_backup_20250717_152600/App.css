@@ -1,0 +1,207 @@
+/* MIX Dating App Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #FF1B7E 0%, #4B9EFF 100%);
+  min-height: 100vh;
+}
+
+.mix-gradient {
+  background: linear-gradient(135deg, #FF1B7E 0%, #4B9EFF 100%);
+}
+
+.mix-gradient-reverse {
+  background: linear-gradient(135deg, #4B9EFF 0%, #FF1B7E 100%);
+}
+
+.mix-gradient-purple {
+  background: linear-gradient(135deg, #9B59B6 0%, #3498DB 100%);
+}
+
+.mix-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+}
+
+.mix-button {
+  background: linear-gradient(135deg, #FF1B7E 0%, #4B9EFF 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 27, 126, 0.3);
+}
+
+.mix-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 27, 126, 0.4);
+}
+
+.mix-button:active {
+  transform: translateY(0);
+}
+
+.mix-button-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.mix-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.mix-logo {
+  font-size: 48px;
+  font-weight: 700;
+  background: linear-gradient(45deg, #FF1B7E, #4B9EFF, #9B59B6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .mix-logo {
+    font-size: 36px;
+  }
+  
+  .mix-button, .mix-button-secondary {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}
+
+/* Navigation styles */
+.bottom-nav {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-item {
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.nav-item.active {
+  color: #FF1B7E;
+}
+
+.nav-item:hover {
+  color: #FF1B7E;
+  transform: translateY(-2px);
+}
+
+/* Swipe card styles */
+.swipe-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile card styles */
+.profile-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Message bubble styles */
+.message-sent {
+  background: linear-gradient(135deg, #FF1B7E 0%, #4B9EFF 100%);
+  color: white;
+  border-radius: 20px 20px 5px 20px;
+  margin-left: auto;
+  max-width: 70%;
+}
+
+.message-received {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 20px 20px 20px 5px;
+  margin-right: auto;
+  max-width: 70%;
+  backdrop-filter: blur(10px);
+}
+
+/* Loading animation */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #FF1B7E;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FF1B7E 0%, #4B9EFF 100%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #4B9EFF 0%, #FF1B7E 100%);
+}

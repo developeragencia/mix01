@@ -1,0 +1,112 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    VARIÁVEIS DE AMBIENTE - VERCEL                         ║
+║                         MIX APP DIGITAL                                   ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+📝 INSTRUÇÕES:
+1. Acesse: https://vercel.com/dashboard
+2. Selecione seu projeto
+3. Vá em: Settings → Environment Variables
+4. Adicione cada variável abaixo (copie nome e valor)
+5. Selecione em qual ambiente aplicar (Production, Preview, Development)
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔴 OBRIGATÓRIAS (Essenciais para o app funcionar)
+
+DATABASE_URL
+postgresql://seu_usuario:sua_senha@ep-exemplo-123456.us-east-1.aws.neon.tech/neondb?sslmode=require
+
+⚠️ IMPORTANTE: Substitua pela URL do seu banco Neon PostgreSQL
+⚠️ Obtenha em: https://console.neon.tech → Connection Details
+
+
+SESSION_SECRET
+15300192c627734f2acf6dc6830918edc9e0f701c6cce095c39f90f83d39008d
+
+⚠️ CHAVE GERADA AUTOMATICAMENTE - MANTENHA EM SEGREDO!
+
+
+NODE_ENV
+production
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🟡 RECOMENDADAS (Para login com Google funcionar)
+
+GOOGLE_CLIENT_ID
+853566020139-jqljs5sf7didb7tc35shj73s8snldhdr.apps.googleusercontent.com
+
+⚠️ Substitua pelo seu Google Client ID
+⚠️ Obtenha em: https://console.cloud.google.com/apis/credentials
+
+
+GOOGLE_CLIENT_SECRET
+GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx
+
+⚠️ Substitua pelo seu Google Client Secret
+⚠️ Obtenha em: https://console.cloud.google.com/apis/credentials
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🟢 OPCIONAIS (Apenas se usar pagamentos Stripe)
+
+STRIPE_SECRET_KEY
+sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+⚠️ Substitua pela sua chave secreta do Stripe
+⚠️ Obtenha em: https://dashboard.stripe.com/apikeys
+⚠️ Use sk_test_... para testes, sk_live_... para produção
+
+
+VITE_STRIPE_PUBLISHABLE_KEY
+pk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+⚠️ Substitua pela sua chave pública do Stripe
+⚠️ Obtenha em: https://dashboard.stripe.com/apikeys
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 CHECKLIST DE CONFIGURAÇÃO
+
+□ DATABASE_URL configurada (Neon PostgreSQL)
+□ SESSION_SECRET configurada (usar a gerada acima)
+□ NODE_ENV = production
+□ GOOGLE_CLIENT_ID configurada
+□ GOOGLE_CLIENT_SECRET configurada
+□ STRIPE_SECRET_KEY (se usar pagamentos)
+□ VITE_STRIPE_PUBLISHABLE_KEY (se usar pagamentos)
+
+═══════════════════════════════════════════════════════════════════════════
+
+🚀 APÓS CONFIGURAR AS VARIÁVEIS:
+
+1. Faça o deploy na Vercel:
+   vercel --prod
+
+2. Restaure o backup do banco de dados:
+   npm run db:restore backups/mixapp-backup-2025-10-24T21-23-31-107Z.json
+
+3. Teste o usuário de teste:
+   Email: teste@mixapp.com
+   Senha: 123456
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔒 SEGURANÇA:
+
+⚠️ NUNCA compartilhe este arquivo publicamente
+⚠️ NUNCA commite no Git
+⚠️ Mantenha SESSION_SECRET em segredo
+⚠️ Use diferentes credenciais para dev/prod
+
+═══════════════════════════════════════════════════════════════════════════
+
+📅 Gerado em: 24 de Outubro de 2025
+🔑 SESSION_SECRET gerada automaticamente (única e segura)
+📦 Backup disponível: backups/mixapp-backup-2025-10-24T21-23-31-107Z.json
+
+═══════════════════════════════════════════════════════════════════════════

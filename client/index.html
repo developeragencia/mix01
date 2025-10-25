@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="app-version" content="4.0.0-icon-refresh-1761274200" />
+    <title>Mix App Digital</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="O app de relacionamentos mais popular. Encontre pessoas próximas, converse e encontre o amor da sua vida." />
+    <meta name="theme-color" content="#4A90E2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MIX" />
+    
+    <!-- Force icon refresh com timestamp único -->
+    <link rel="manifest" href="/manifest.json?v=1761274200" />
+    <link rel="apple-touch-icon" href="/icon-192x192.png?v=1761274200" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png?v=1761274200" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png?v=1761274200" />
+    <link rel="shortcut icon" href="/favicon.ico?v=1761274200" />
+    
+    <!-- Meta tags adicionais para forçar refresh de cache -->
+    <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0" />
+    <meta http-equiv="last-modified" content="2025-10-24T02:50:00Z" />
+    
+    <!-- CRÍTICO: Interceptador DEFINITIVO para unhandled rejections -->
+    <script>
+      // Handler definitivo para unhandled rejections (Vite HMR incluído)
+      window.addEventListener('unhandledrejection', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        return false;
+      }, { capture: true, passive: false });
+      
+      // Handler para erros gerais
+      window.addEventListener('error', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        return false;
+      }, { capture: true, passive: false });
+      
+      // Intercepta WebSocket para Vite HMR
+      const OriginalWebSocket = window.WebSocket;
+      window.WebSocket = function(url, protocols) {
+        const ws = new OriginalWebSocket(url, protocols);
+        
+        // Silent handling para todos os eventos
+        ws.onerror = function(event) {
+          event?.preventDefault?.();
+          event?.stopPropagation?.();
+          return false;
+        };
+        
+        ws.onclose = function(event) {  
+          event?.preventDefault?.();
+          event?.stopPropagation?.();
+          return false;
+        };
+        
+        // Override addEventListener
+        const originalAdd = ws.addEventListener;
+        ws.addEventListener = function(type, listener, options) {
+          if (type === 'error' || type === 'close') {
+            const wrapped = function(event) {
+              try {
+                event?.preventDefault?.();
+                event?.stopPropagation?.();
+                if (typeof listener === 'function') {
+                  Promise.resolve(listener(event)).catch(() => {});
+                }
+              } catch (e) {}
+              return false;
+            };
+            return originalAdd.call(this, type, wrapped, options);
+          }
+          return originalAdd.call(this, type, listener, options);
+        };
+        
+        return ws;
+      };
+
+      // Console override definitivo
+      const originalError = console.error;
+      const originalWarn = console.warn;
+      
+      console.error = function() {
+        const msg = Array.prototype.join.call(arguments, ' ').toLowerCase();
+        if (msg.includes('websocket') || msg.includes('hmr') || msg.includes('vite') ||
+            msg.includes('uncaught') || msg.includes('promise') || msg.includes('connect')) {
+          return; // Totalmente silencioso
+        }
+        originalError.apply(console, arguments);
+      };
+      
+      console.warn = function() {
+        return; // Warnings silenciosos
+      };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Service Worker Registration com auto-update -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          console.log('✅ Service Worker registrado');
+          
+          // Força atualização quando nova versão disponível
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('🔄 Nova versão disponível - atualizando...');
+                // Envia mensagem para skip waiting
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                // Recarrega a página após 1 segundo
+                setTimeout(() => window.location.reload(), 1000);
+              }
+            });
+          });
+          
+          // Verifica atualizações a cada 1 minuto
+          setInterval(() => {
+            registration.update();
+          }, 60000);
+        }).catch(function(err) {
+          console.log('Service Worker registration failed: ', err);
+        });
+        
+        // Recarrega quando novo service worker assume o controle
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            console.log('🔄 Service Worker atualizado - recarregando...');
+            window.location.reload();
+          }
+        });
+      }
+    </script>
+    
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>

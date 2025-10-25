@@ -1,0 +1,207 @@
+import { useQuery } from "@tanstack/react-query";
+import { User, LogOut, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+import BottomNavigation from "@/components/BottomNavigation";
+
+interface Profile {
+  id: number;
+  userId: number;
+  name: string;
+  age: number;
+  location?: string;
+  bio?: string;
+  profession?: string;
+  interests?: string[];
+  photos?: string[];
+  isVerified?: boolean;
+}
+
+export default function Profile() {
+  const [, setLocation] = useLocation();
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
+
+  // Fetch profile when user is authenticated
+  const { data: profile, isLoading: profileLoading } = useQuery<Profile>({
+    queryKey: ['/api/profiles', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const res = await fetch(`/api/profiles/${user?.id}`, {
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Profile not found');
+      return res.json();
+    }
+  });
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      setLocation('/login');
+    }
+  }, [isLoading, isAuthenticated, setLocation]);
+
+  if (isLoading || profileLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-xl">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return null;
+  }
+
+  const displayName = profile.name || `${user.firstName} ${user.lastName}` || user.username;
+  const profilePhoto = profile.photos?.[0] || user.profileImage;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
+      {/* Header */}
+      <div className="bg-white/10 backdrop-blur-md border-b border-white/20 p-4">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-white">Meu Perfil</h1>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="text-white hover:bg-white/20"
+            data-testid="button-logout"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Profile Content */}
+      <div className="max-w-md mx-auto p-4 space-y-4">
+        {/* Profile Card */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+          <div className="flex items-center space-x-4">
+            {/* Profile Photo */}
+            <div className="relative">
+              {profilePhoto ? (
+                <img
+                  src={profilePhoto}
+                  alt={displayName}
+                  className="w-20 h-20 rounded-full object-cover border-2 border-white/30"
+                  data-testid="img-profile-photo"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30">
+                  <User className="w-10 h-10 text-white" />
+                </div>
+              )}
+              {profile.isVerified && (
+                <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Info */}
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-white" data-testid="text-profile-name">
+                {displayName}
+              </h2>
+              <p className="text-white/70" data-testid="text-profile-age">
+                {profile.age} anos
+              </p>
+              {profile.location && (
+                <p className="text-white/60 text-sm" data-testid="text-profile-location">
+                  {profile.location}
+                </p>
+              )}
+            </div>
+
+            {/* Edit Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/edit-profile')}
+              className="text-white hover:bg-white/20"
+              data-testid="button-edit-profile"
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Bio */}
+          {profile.bio && (
+            <div className="mt-4 pt-4 border-t border-white/20">
+              <p className="text-white/80 text-sm" data-testid="text-profile-bio">
+                {profile.bio}
+              </p>
+            </div>
+          )}
+
+          {/* Profession */}
+          {profile.profession && (
+            <div className="mt-2">
+              <p className="text-white/60 text-sm" data-testid="text-profile-profession">
+                {profile.profession}
+              </p>
+            </div>
+          )}
+
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <div className="mt-4">
+              <p className="text-white/60 text-xs mb-2">Interesses:</p>
+              <div className="flex flex-wrap gap-2">
+                {profile.interests.map((interest, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-white/20 rounded-full text-white text-xs"
+                    data-testid={`tag-interest-${index}`}
+                  >
+                    {interest}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Account Info */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+          <h3 className="text-white font-semibold mb-3">Informações da Conta</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-white/60">Email:</span>
+              <span className="text-white" data-testid="text-user-email">{user.email}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-white/60">Username:</span>
+              <span className="text-white" data-testid="text-user-username">{user.username}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-white/60">Plano:</span>
+              <span className="text-white capitalize" data-testid="text-user-plan">
+                {user.subscriptionType || 'Free'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+          <Button
+            onClick={() => setLocation('/premium')}
+            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-semibold"
+            data-testid="button-upgrade-premium"
+          >
+            ⭐ Upgrade para Premium
+          </Button>
+        </div>
+      </div>
+
+      <BottomNavigation />
+    </div>
+  );
+}

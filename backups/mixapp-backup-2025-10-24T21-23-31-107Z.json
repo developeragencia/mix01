@@ -1,0 +1,628 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2025-10-24T21:23:30.991Z",
+  "database": "mixapp",
+  "tables": {
+    "users": [
+      {
+        "id": 1,
+        "username": "teste",
+        "email": "teste@mixapp.com",
+        "password": "$2b$10$uHkBvjkqYW0F4kZ.dxgKBuaLA5FoYpTeTlhXn/63q.lRzzMyFzZdu",
+        "resetToken": null,
+        "resetTokenExpiry": null,
+        "isOnline": true,
+        "lastSeen": "2025-10-24T21:21:01.639Z",
+        "subscriptionType": "free",
+        "dailyLikes": 0,
+        "lastLikeReset": "2025-10-24T21:21:01.639Z",
+        "stripeCustomerId": null,
+        "stripeSubscriptionId": null,
+        "firstName": "Usuário",
+        "lastName": "Teste",
+        "profileImage": null,
+        "phone": null,
+        "birthDate": "1995-05-15",
+        "gender": "male",
+        "sexualOrientation": [
+          "heterosexual"
+        ],
+        "interestedIn": [
+          "female"
+        ],
+        "city": "São Paulo",
+        "location": "São Paulo, SP",
+        "education": null,
+        "company": null,
+        "school": null,
+        "interests": [
+          "Música",
+          "Viagens",
+          "Tecnologia",
+          "Gastronomia",
+          "Cinema"
+        ],
+        "bio": "Perfil de teste completo do MIX App - Pronto para explorar todas as funcionalidades!",
+        "photos": [
+          "https://i.pravatar.cc/500?img=12",
+          "https://i.pravatar.cc/500?img=13",
+          "https://i.pravatar.cc/500?img=14"
+        ],
+        "createdAt": "2025-10-24T21:21:01.639Z"
+      },
+      {
+        "id": 2,
+        "username": "maria.silva",
+        "email": "maria.silva@example.com",
+        "password": "$2b$10$uHkBvjkqYW0F4kZ.dxgKBuaLA5FoYpTeTlhXn/63q.lRzzMyFzZdu",
+        "resetToken": null,
+        "resetTokenExpiry": null,
+        "isOnline": true,
+        "lastSeen": "2025-10-24T21:21:27.614Z",
+        "subscriptionType": "premium",
+        "dailyLikes": 0,
+        "lastLikeReset": "2025-10-24T21:21:27.614Z",
+        "stripeCustomerId": null,
+        "stripeSubscriptionId": null,
+        "firstName": "Maria",
+        "lastName": "Silva",
+        "profileImage": null,
+        "phone": null,
+        "birthDate": "1996-08-20",
+        "gender": "female",
+        "sexualOrientation": [
+          "heterosexual"
+        ],
+        "interestedIn": [
+          "male"
+        ],
+        "city": "São Paulo",
+        "location": "São Paulo, SP",
+        "education": null,
+        "company": null,
+        "school": null,
+        "interests": [
+          "Viagens",
+          "Fotografia",
+          "Yoga"
+        ],
+        "bio": "Adoro viajar e conhecer lugares novos! ✈️",
+        "photos": [
+          "https://i.pravatar.cc/500?img=47",
+          "https://i.pravatar.cc/500?img=48"
+        ],
+        "createdAt": "2025-10-24T21:21:27.614Z"
+      },
+      {
+        "id": 3,
+        "username": "ana.costa",
+        "email": "ana.costa@example.com",
+        "password": "$2b$10$uHkBvjkqYW0F4kZ.dxgKBuaLA5FoYpTeTlhXn/63q.lRzzMyFzZdu",
+        "resetToken": null,
+        "resetTokenExpiry": null,
+        "isOnline": true,
+        "lastSeen": "2025-10-24T21:21:27.614Z",
+        "subscriptionType": "free",
+        "dailyLikes": 0,
+        "lastLikeReset": "2025-10-24T21:21:27.614Z",
+        "stripeCustomerId": null,
+        "stripeSubscriptionId": null,
+        "firstName": "Ana",
+        "lastName": "Costa",
+        "profileImage": null,
+        "phone": null,
+        "birthDate": "1998-03-12",
+        "gender": "female",
+        "sexualOrientation": [
+          "heterosexual"
+        ],
+        "interestedIn": [
+          "male"
+        ],
+        "city": "São Paulo",
+        "location": "São Paulo, SP",
+        "education": null,
+        "company": null,
+        "school": null,
+        "interests": [
+          "Arte",
+          "Música",
+          "Dança"
+        ],
+        "bio": "Designer apaixonada por arte e música 🎨🎵",
+        "photos": [
+          "https://i.pravatar.cc/500?img=49",
+          "https://i.pravatar.cc/500?img=50"
+        ],
+        "createdAt": "2025-10-24T21:21:27.614Z"
+      },
+      {
+        "id": 4,
+        "username": "julia.santos",
+        "email": "julia.santos@example.com",
+        "password": "$2b$10$uHkBvjkqYW0F4kZ.dxgKBuaLA5FoYpTeTlhXn/63q.lRzzMyFzZdu",
+        "resetToken": null,
+        "resetTokenExpiry": null,
+        "isOnline": true,
+        "lastSeen": "2025-10-24T21:21:27.614Z",
+        "subscriptionType": "vip",
+        "dailyLikes": 0,
+        "lastLikeReset": "2025-10-24T21:21:27.614Z",
+        "stripeCustomerId": null,
+        "stripeSubscriptionId": null,
+        "firstName": "Julia",
+        "lastName": "Santos",
+        "profileImage": null,
+        "phone": null,
+        "birthDate": "1997-11-05",
+        "gender": "female",
+        "sexualOrientation": [
+          "heterosexual"
+        ],
+        "interestedIn": [
+          "male"
+        ],
+        "city": "São Paulo",
+        "location": "São Paulo, SP",
+        "education": null,
+        "company": null,
+        "school": null,
+        "interests": [
+          "Tecnologia",
+          "Cinema",
+          "Corrida"
+        ],
+        "bio": "Engenheira e entusiasta de tecnologia! 💻",
+        "photos": [
+          "https://i.pravatar.cc/500?img=45",
+          "https://i.pravatar.cc/500?img=46"
+        ],
+        "createdAt": "2025-10-24T21:21:27.614Z"
+      },
+      {
+        "id": 5,
+        "username": "alexmoura-2015jea",
+        "email": "alexmoura-2015@hotmail.com",
+        "password": "$2b$10$BTHSqgcOLLBLtt6P77JHSOZ4arTH9VTLXZ3YiQaR0FHauBbl9WUk2",
+        "resetToken": null,
+        "resetTokenExpiry": null,
+        "isOnline": false,
+        "lastSeen": "2025-10-24T21:22:54.250Z",
+        "subscriptionType": "free",
+        "dailyLikes": 0,
+        "lastLikeReset": "2025-10-24T21:22:54.250Z",
+        "stripeCustomerId": null,
+        "stripeSubscriptionId": null,
+        "firstName": "",
+        "lastName": "",
+        "profileImage": "",
+        "phone": "",
+        "birthDate": "",
+        "gender": "",
+        "sexualOrientation": [],
+        "interestedIn": [],
+        "city": "",
+        "location": "",
+        "education": "",
+        "company": "",
+        "school": "",
+        "interests": [],
+        "bio": "",
+        "photos": [],
+        "createdAt": "2025-10-24T21:22:54.250Z"
+      }
+    ],
+    "profiles": [
+      {
+        "id": 1,
+        "userId": 1,
+        "name": "Usuário Teste",
+        "age": 29,
+        "bio": "Perfil de teste completo do MIX App - Pronto para explorar todas as funcionalidades! 🎉",
+        "profession": "Desenvolvedor de Software",
+        "photos": [
+          "https://i.pravatar.cc/500?img=12",
+          "https://i.pravatar.cc/500?img=13",
+          "https://i.pravatar.cc/500?img=14"
+        ],
+        "location": "São Paulo, SP",
+        "interests": [
+          "Música",
+          "Viagens",
+          "Tecnologia",
+          "Gastronomia",
+          "Cinema"
+        ],
+        "job": "Desenvolvedor Full Stack",
+        "company": "MIX App Digital",
+        "school": "USP - Universidade de São Paulo",
+        "height": 175,
+        "relationshipGoals": "long-term",
+        "languages": [
+          "Português",
+          "Inglês",
+          "Espanhol"
+        ],
+        "starSign": null,
+        "educationLevel": "Superior Completo",
+        "familyPlans": null,
+        "personalityType": null,
+        "communicationStyle": null,
+        "loveStyle": null,
+        "instagram": null,
+        "spotify": null,
+        "pronouns": "ele/dele",
+        "pets": "Tem cachorro",
+        "drinking": "Socialmente",
+        "smoking": "Não fuma",
+        "exercise": "Regularmente",
+        "diet": "Vegetariano",
+        "sleepSchedule": null,
+        "maxDistance": 50,
+        "ageRangeMin": 21,
+        "ageRangeMax": 35,
+        "isActive": true,
+        "isVerified": true,
+        "createdAt": "2025-10-24T21:21:11.920Z"
+      },
+      {
+        "id": 2,
+        "userId": 2,
+        "name": "Maria Silva",
+        "age": 28,
+        "bio": "Adoro viajar e conhecer lugares novos! ✈️",
+        "profession": "Fotógrafa",
+        "photos": [
+          "https://i.pravatar.cc/500?img=47",
+          "https://i.pravatar.cc/500?img=48"
+        ],
+        "location": "São Paulo, SP",
+        "interests": [
+          "Viagens",
+          "Fotografia",
+          "Yoga"
+        ],
+        "job": "Fotógrafa Freelancer",
+        "company": "Estúdio Próprio",
+        "school": "PUC-SP",
+        "height": 165,
+        "relationshipGoals": "long-term",
+        "languages": [
+          "Português",
+          "Inglês"
+        ],
+        "starSign": null,
+        "educationLevel": "Superior Completo",
+        "familyPlans": null,
+        "personalityType": null,
+        "communicationStyle": null,
+        "loveStyle": null,
+        "instagram": null,
+        "spotify": null,
+        "pronouns": "ela/dela",
+        "pets": "Tem gato",
+        "drinking": "Socialmente",
+        "smoking": "Não fuma",
+        "exercise": "Frequentemente",
+        "diet": "Flexível",
+        "sleepSchedule": null,
+        "maxDistance": 50,
+        "ageRangeMin": 25,
+        "ageRangeMax": 35,
+        "isActive": true,
+        "isVerified": true,
+        "createdAt": "2025-10-24T21:21:55.804Z"
+      },
+      {
+        "id": 3,
+        "userId": 3,
+        "name": "Ana Costa",
+        "age": 26,
+        "bio": "Designer apaixonada por arte e música 🎨🎵",
+        "profession": "Designer Gráfica",
+        "photos": [
+          "https://i.pravatar.cc/500?img=49",
+          "https://i.pravatar.cc/500?img=50"
+        ],
+        "location": "São Paulo, SP",
+        "interests": [
+          "Arte",
+          "Música",
+          "Dança"
+        ],
+        "job": "Designer UI/UX",
+        "company": "Agência Digital",
+        "school": "FAAP",
+        "height": 168,
+        "relationshipGoals": "figuring-out",
+        "languages": [
+          "Português",
+          "Inglês",
+          "Francês"
+        ],
+        "starSign": null,
+        "educationLevel": "Superior Completo",
+        "familyPlans": null,
+        "personalityType": null,
+        "communicationStyle": null,
+        "loveStyle": null,
+        "instagram": null,
+        "spotify": null,
+        "pronouns": "ela/dela",
+        "pets": "Não tem",
+        "drinking": "Às vezes",
+        "smoking": "Não fuma",
+        "exercise": "Às vezes",
+        "diet": "Vegana",
+        "sleepSchedule": null,
+        "maxDistance": 40,
+        "ageRangeMin": 24,
+        "ageRangeMax": 32,
+        "isActive": true,
+        "isVerified": true,
+        "createdAt": "2025-10-24T21:21:55.804Z"
+      },
+      {
+        "id": 4,
+        "userId": 4,
+        "name": "Julia Santos",
+        "age": 27,
+        "bio": "Engenheira e entusiasta de tecnologia! 💻",
+        "profession": "Engenheira de Software",
+        "photos": [
+          "https://i.pravatar.cc/500?img=45",
+          "https://i.pravatar.cc/500?img=46"
+        ],
+        "location": "São Paulo, SP",
+        "interests": [
+          "Tecnologia",
+          "Cinema",
+          "Corrida"
+        ],
+        "job": "Backend Engineer",
+        "company": "Tech Startup",
+        "school": "UNICAMP",
+        "height": 170,
+        "relationshipGoals": "short-term",
+        "languages": [
+          "Português",
+          "Inglês"
+        ],
+        "starSign": null,
+        "educationLevel": "Superior Completo",
+        "familyPlans": null,
+        "personalityType": null,
+        "communicationStyle": null,
+        "loveStyle": null,
+        "instagram": null,
+        "spotify": null,
+        "pronouns": "ela/dela",
+        "pets": "Tem cachorro",
+        "drinking": "Regularmente",
+        "smoking": "Não fuma",
+        "exercise": "Diariamente",
+        "diet": "Sem restrições",
+        "sleepSchedule": null,
+        "maxDistance": 60,
+        "ageRangeMin": 26,
+        "ageRangeMax": 34,
+        "isActive": true,
+        "isVerified": true,
+        "createdAt": "2025-10-24T21:21:55.804Z"
+      },
+      {
+        "id": 5,
+        "userId": 5,
+        "name": "User",
+        "age": 18,
+        "bio": null,
+        "profession": null,
+        "photos": [],
+        "location": null,
+        "interests": [],
+        "job": null,
+        "company": null,
+        "school": null,
+        "height": null,
+        "relationshipGoals": null,
+        "languages": [],
+        "starSign": null,
+        "educationLevel": null,
+        "familyPlans": null,
+        "personalityType": null,
+        "communicationStyle": null,
+        "loveStyle": null,
+        "instagram": null,
+        "spotify": null,
+        "pronouns": null,
+        "pets": null,
+        "drinking": null,
+        "smoking": null,
+        "exercise": null,
+        "diet": null,
+        "sleepSchedule": null,
+        "maxDistance": 50,
+        "ageRangeMin": 18,
+        "ageRangeMax": 99,
+        "isActive": true,
+        "isVerified": false,
+        "createdAt": "2025-10-24T21:23:20.633Z"
+      }
+    ],
+    "swipes": [
+      {
+        "id": 1,
+        "swiperId": 1,
+        "swipedId": 2,
+        "isLike": true,
+        "isSuperLike": false,
+        "createdAt": "2025-10-24T21:21:57.498Z"
+      },
+      {
+        "id": 2,
+        "swiperId": 2,
+        "swipedId": 1,
+        "isLike": true,
+        "isSuperLike": false,
+        "createdAt": "2025-10-24T21:21:57.498Z"
+      },
+      {
+        "id": 3,
+        "swiperId": 1,
+        "swipedId": 3,
+        "isLike": true,
+        "isSuperLike": false,
+        "createdAt": "2025-10-24T21:21:57.498Z"
+      },
+      {
+        "id": 4,
+        "swiperId": 3,
+        "swipedId": 1,
+        "isLike": true,
+        "isSuperLike": false,
+        "createdAt": "2025-10-24T21:21:57.498Z"
+      },
+      {
+        "id": 5,
+        "swiperId": 1,
+        "swipedId": 4,
+        "isLike": true,
+        "isSuperLike": false,
+        "createdAt": "2025-10-24T21:21:57.498Z"
+      }
+    ],
+    "matches": [
+      {
+        "id": 1,
+        "user1Id": 1,
+        "user2Id": 2,
+        "createdAt": "2025-10-24T21:22:02.641Z"
+      },
+      {
+        "id": 2,
+        "user1Id": 1,
+        "user2Id": 3,
+        "createdAt": "2025-10-24T21:22:02.641Z"
+      }
+    ],
+    "messages": [
+      {
+        "id": 1,
+        "matchId": 1,
+        "senderId": 2,
+        "content": "Oi! Tudo bem? Vi que você também curte tecnologia! 😊",
+        "imageUrl": null,
+        "isRead": true,
+        "createdAt": "2025-10-24T21:22:08.293Z"
+      },
+      {
+        "id": 2,
+        "matchId": 1,
+        "senderId": 1,
+        "content": "Oi Maria! Tudo ótimo! Sim, sou dev. E você é fotógrafa, que legal!",
+        "imageUrl": null,
+        "isRead": true,
+        "createdAt": "2025-10-24T21:22:08.293Z"
+      },
+      {
+        "id": 3,
+        "matchId": 1,
+        "senderId": 2,
+        "content": "Sim! Adoro capturar momentos especiais. Já fotografei vários eventos tech!",
+        "imageUrl": null,
+        "isRead": false,
+        "createdAt": "2025-10-24T21:22:08.293Z"
+      },
+      {
+        "id": 4,
+        "matchId": 2,
+        "senderId": 3,
+        "content": "Olá! Adorei seu perfil! Também curto arte e design 🎨",
+        "imageUrl": null,
+        "isRead": true,
+        "createdAt": "2025-10-24T21:22:08.293Z"
+      },
+      {
+        "id": 5,
+        "matchId": 2,
+        "senderId": 1,
+        "content": "Oi Ana! Obrigado! Vi que você é designer, deve ter um olhar super criativo!",
+        "imageUrl": null,
+        "isRead": true,
+        "createdAt": "2025-10-24T21:22:08.293Z"
+      },
+      {
+        "id": 6,
+        "matchId": 2,
+        "senderId": 3,
+        "content": "Com certeza! Trabalho com UI/UX. E você, o que faz?",
+        "imageUrl": null,
+        "isRead": false,
+        "createdAt": "2025-10-24T21:22:08.293Z"
+      }
+    ],
+    "subscriptionPlans": [
+      {
+        "id": 1,
+        "name": "Premium",
+        "description": null,
+        "stripePriceId": "price_1234567890premium",
+        "price": 2990,
+        "currency": "brl",
+        "interval": "month",
+        "features": {
+          "unlimitedLikes": true,
+          "superLikes": 5,
+          "boost": 1,
+          "seeWhoLikedYou": true,
+          "advancedFilters": true,
+          "noAds": true
+        },
+        "paymentMethods": [
+          "card",
+          "pix"
+        ],
+        "isActive": true,
+        "createdAt": "2025-10-24T21:17:00.644Z"
+      },
+      {
+        "id": 2,
+        "name": "VIP",
+        "description": null,
+        "stripePriceId": "price_1234567890vip",
+        "price": 4990,
+        "currency": "brl",
+        "interval": "month",
+        "features": {
+          "unlimitedLikes": true,
+          "superLikes": 20,
+          "boost": 5,
+          "seeWhoLikedYou": true,
+          "advancedFilters": true,
+          "noAds": true,
+          "prioritySupport": true,
+          "exclusiveFeatures": true
+        },
+        "paymentMethods": [
+          "card",
+          "pix"
+        ],
+        "isActive": true,
+        "createdAt": "2025-10-24T21:17:00.689Z"
+      }
+    ],
+    "subscriptions": [],
+    "payments": [],
+    "favorites": [],
+    "checkIns": [],
+    "establishments": [],
+    "boosts": [],
+    "rewinds": [],
+    "verifications": [],
+    "profileViews": [],
+    "reports": [],
+    "appSettings": [],
+    "adminUsers": [],
+    "notifications": []
+  }
+}

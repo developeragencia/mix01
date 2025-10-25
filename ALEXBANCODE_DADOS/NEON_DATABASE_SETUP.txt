@@ -1,0 +1,239 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    CONFIGURAÇÃO NEON POSTGRESQL                           ║
+║                         MIX APP DIGITAL                                   ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+🌐 ACESSE: https://console.neon.tech
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 1: CRIAR PROJETO NEON
+
+1. Login em: https://console.neon.tech
+2. Clique em "Create a project" ou "New Project"
+3. Configure:
+   
+   Nome do Projeto: MIX App Digital
+   Região: US East (Ohio) - us-east-2
+   PostgreSQL Version: 16 (recomendado)
+   Compute Size: Free tier (0.5 CU)
+
+4. Clique em "Create Project"
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 2: OBTER CREDENCIAIS DE CONEXÃO
+
+Após criar o projeto, você verá a Connection String:
+
+DATABASE_URL (Pooled Connection - RECOMENDADO):
+postgresql://usuario:senha@ep-xxxxx-xxxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+
+Exemplo real:
+postgresql://alex_mix_owner:AbTp9K2mN8xQ@ep-tiny-sunset-12345678.us-east-2.aws.neon.tech/alex_mix_db?sslmode=require
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 3: COMPONENTES DA CONNECTION STRING
+
+postgresql://[USUARIO]:[SENHA]@[HOST]/[DATABASE]?sslmode=require
+
+USUARIO:     alex_mix_owner
+SENHA:       AbTp9K2mN8xQ (gerada automaticamente)
+HOST:        ep-tiny-sunset-12345678.us-east-2.aws.neon.tech
+PORTA:       5432 (padrão PostgreSQL)
+DATABASE:    alex_mix_db (ou neondb)
+SSL:         require (obrigatório)
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 4: CONFIGURAÇÕES RECOMENDADAS
+
+No painel do Neon, configure:
+
+1. COMPUTE SETTINGS:
+   ✓ Auto-suspend: 5 minutes (economizar recursos)
+   ✓ Autoscaling: Enabled
+   ✓ Min compute: 0.25 CU
+   ✓ Max compute: 0.5 CU (Free tier)
+
+2. STORAGE:
+   ✓ Automatic backup: Enabled
+   ✓ Point-in-time restore: 7 days
+
+3. POOLER (Connection Pooling):
+   ✓ Enable pooling: Yes
+   ✓ Pool mode: Transaction
+   ✓ Pool size: 15 (padrão)
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 5: VARIÁVEIS NEON PARA CONFIGURAÇÃO LOCAL
+
+Copie estas informações do painel Neon:
+
+PGHOST
+ep-tiny-sunset-12345678.us-east-2.aws.neon.tech
+
+PGDATABASE
+alex_mix_db
+
+PGUSER
+alex_mix_owner
+
+PGPASSWORD
+AbTp9K2mN8xQ
+
+PGPORT
+5432
+
+DATABASE_URL (COMPLETA - USE ESTA!)
+postgresql://alex_mix_owner:AbTp9K2mN8xQ@ep-tiny-sunset-12345678.us-east-2.aws.neon.tech/alex_mix_db?sslmode=require
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 6: SINCRONIZAR SCHEMA DO BANCO
+
+Após configurar a DATABASE_URL, execute:
+
+1. Sincronizar schema (criar todas as tabelas):
+   npm run db:push
+
+2. Se houver conflito, forçar sincronização:
+   npm run db:push --force
+
+3. Restaurar backup com dados de teste:
+   npm run db:restore backups/mixapp-backup-2025-10-24T21-23-31-107Z.json
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO 7: VERIFICAR CONEXÃO
+
+Teste a conexão com o banco:
+
+npm run dev
+
+Você deve ver:
+✅ "Mix App Digital Server successfully started!"
+✅ "Server running on 0.0.0.0:5000"
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔧 CONFIGURAÇÃO DO .env LOCAL
+
+Crie arquivo .env na raiz do projeto:
+
+# Neon PostgreSQL
+DATABASE_URL=postgresql://alex_mix_owner:AbTp9K2mN8xQ@ep-tiny-sunset-12345678.us-east-2.aws.neon.tech/alex_mix_db?sslmode=require
+
+# Sessão
+SESSION_SECRET=15300192c627734f2acf6dc6830918edc9e0f701c6cce095c39f90f83d39008d
+
+# Google OAuth (opcional)
+GOOGLE_CLIENT_ID=853566020139-jqljs5sf7didb7tc35shj73s8snldhdr.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx
+
+# Ambiente
+NODE_ENV=development
+PORT=5000
+
+═══════════════════════════════════════════════════════════════════════════
+
+💡 DICAS NEON
+
+1. FREE TIER LIMITS:
+   ✓ 3 projetos gratuitos
+   ✓ 0.5 GB de armazenamento por projeto
+   ✓ 100 horas de computação ativa por mês
+   ✓ Connections ilimitadas (com pooling)
+
+2. PERFORMANCE:
+   ✓ Use "Pooled connection" para melhor performance
+   ✓ Ative auto-suspend para economizar recursos
+   ✓ Configure índices nas colunas mais consultadas
+
+3. BACKUP:
+   ✓ Backups automáticos incluídos
+   ✓ Point-in-time recovery (7 dias)
+   ✓ Use também o backup local: npm run db:backup
+
+4. MONITORAMENTO:
+   ✓ Dashboard Neon mostra uso de recursos
+   ✓ Logs de queries
+   ✓ Alertas de uso
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔐 SEGURANÇA
+
+✅ SEMPRE use sslmode=require
+✅ NUNCA exponha credenciais no código
+✅ Use variáveis de ambiente (.env)
+✅ Adicione .env ao .gitignore
+✅ Rotacione senhas periodicamente
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 ESTRUTURA DO BANCO CRIADA
+
+Ao executar npm run db:push, serão criadas 19 tabelas:
+
+✓ users - Usuários do app
+✓ profiles - Perfis detalhados
+✓ swipes - Histórico de swipes
+✓ matches - Matches entre usuários
+✓ messages - Mensagens entre matches
+✓ subscription_plans - Planos de assinatura
+✓ subscriptions - Assinaturas ativas
+✓ payments - Histórico de pagamentos
+✓ favorites - Perfis favoritos
+✓ check_ins - Check-ins em estabelecimentos
+✓ establishments - Estabelecimentos cadastrados
+✓ boosts - Impulsos de perfil
+✓ rewinds - Rewind de ações
+✓ verifications - Verificações de perfil
+✓ profile_views - Visualizações de perfil
+✓ reports - Denúncias
+✓ app_settings - Configurações do app
+✓ admin_users - Usuários administradores
+✓ notifications - Notificações push
+
+═══════════════════════════════════════════════════════════════════════════
+
+🆘 TROUBLESHOOTING
+
+Erro: "password authentication failed"
+→ Verifique se copiou a senha corretamente
+→ Senha não pode conter espaços
+
+Erro: "connection timeout"
+→ Verifique sua conexão com internet
+→ Confirme que sslmode=require está na URL
+
+Erro: "database does not exist"
+→ Confirme o nome do database na URL
+→ Crie um novo database no painel Neon
+
+Erro ao executar npm run db:push
+→ Use: npm run db:push --force
+→ Verifique se DATABASE_URL está configurada
+
+═══════════════════════════════════════════════════════════════════════════
+
+📞 SUPORTE NEON
+
+Documentação: https://neon.tech/docs
+Discord: https://discord.gg/neon
+GitHub: https://github.com/neondatabase
+Status: https://neonstatus.com
+
+═══════════════════════════════════════════════════════════════════════════
+
+📅 Documento gerado: 24 de Outubro de 2025
+🔑 SESSION_SECRET gerada: 15300192c627734f2acf6dc6830918edc9e0f701c6cce095c39f90f83d39008d
+📦 Backup disponível: backups/mixapp-backup-2025-10-24T21-23-31-107Z.json
+👤 Usuário teste: teste@mixapp.com / 123456
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Tudo pronto para conectar o MIX App Digital ao Neon PostgreSQL!

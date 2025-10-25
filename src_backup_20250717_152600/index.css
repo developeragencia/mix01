@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* MIX PRIMARY BRAND COLORS - Gradient Scheme */
+  --mix-primary-blue: #4A90E2;      /* Azul inicial do gradiente */
+  --mix-primary-purple: #8E44AD;    /* Roxo central do gradiente */
+  --mix-primary-pink: #E91E63;      /* Rosa final do gradiente */
+  
+  /* Secondary colors derived from primary */
+  --mix-blue: #4A90E2;
+  --mix-light-blue: #7BB3F0;
+  --mix-purple: #8E44AD;
+  --mix-dark-purple: #6C2C91;
+  --mix-pink: #E91E63;
+  --mix-light-pink: #F06292;
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .gradient-bg {
+    background: linear-gradient(135deg, var(--mix-primary-blue) 0%, var(--mix-primary-purple) 50%, var(--mix-primary-pink) 100%);
+  }
+  
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--mix-primary-blue) 0%, var(--mix-primary-purple) 50%, var(--mix-primary-pink) 100%);
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, var(--mix-primary-blue) 0%, var(--mix-primary-purple) 50%, var(--mix-primary-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .border-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box, 
+                linear-gradient(135deg, var(--mix-primary-blue) 0%, var(--mix-primary-purple) 50%, var(--mix-primary-pink) 100%) border-box;
+  }
+  
+  .card-shadow {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .swipe-card {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .swipe-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .btn-like {
+    background: linear-gradient(45deg, hsl(142, 71%, 45%), hsl(142, 69%, 58%));
+  }
+  
+  .btn-dislike {
+    background: linear-gradient(45deg, hsl(0, 84%, 60%), hsl(0, 91%, 71%));
+  }
+  
+  .btn-super-like {
+    background: linear-gradient(45deg, hsl(217, 91%, 60%), hsl(213, 93%, 68%));
+  }
+  
+  .mix-logo {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+}

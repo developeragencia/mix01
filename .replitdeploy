@@ -1,0 +1,13 @@
+[build]
+cmd = "npm run build"
+ignorePorts = true
+
+[run]
+cmd = "npm start"
+
+[env]
+NODE_ENV = "production"
+
+[deployment]
+autoDeploy = true
+productionBranch = "main"

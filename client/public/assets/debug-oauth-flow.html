@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔥 DEBUG OAUTH - MIX</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .btn { padding: 20px 30px; margin: 10px; text-decoration: none; border-radius: 8px; display: inline-block; color: white; font-weight: bold; }
+        .google { background: #4285f4; }
+        .facebook { background: #1877f2; }
+        .test { background: #28a745; }
+        .logs { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 20px 0; border: 1px solid #ddd; }
+        .error { color: red; }
+        .success { color: green; }
+        .warning { color: orange; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 DEBUG OAUTH FLOW - MIX</h1>
+        
+        <div class="logs">
+            <h3>🔍 ANÁLISE DO PROBLEMA:</h3>
+            <p class="error">❌ Usuário reporta: "aparece página de erro após login Google"</p>
+            <p class="warning">⚠️ Teste simulado funciona, mas OAuth real falha</p>
+            <p class="success">✅ Sistema de sessão configurado corretamente</p>
+        </div>
+        
+        <h2>🧪 TESTES DISPONÍVEIS:</h2>
+        
+        <div style="margin: 20px 0;">
+            <h3>1. Teste Sistema OAuth (Simulado):</h3>
+            <a href="/oauth-test-result" class="btn test">🧪 TESTAR SISTEMA OAUTH</a>
+            <p><small>Testa endpoints, sessão, e criação de conta</small></p>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h3>2. Teste Google OAuth Real:</h3>
+            <a href="/api/auth/google" class="btn google">🟢 GOOGLE OAUTH REAL</a>
+            <p><small>Vai para Google, faz login, volta para app</small></p>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h3>3. Teste Facebook OAuth Real:</h3>
+            <a href="/api/auth/facebook" class="btn facebook">🔵 FACEBOOK OAUTH REAL</a>
+            <p><small>Vai para Facebook, faz login, volta para app</small></p>
+        </div>
+        
+        <div class="logs">
+            <h3>📋 INSTRUÇÕES PARA TESTE:</h3>
+            <ol>
+                <li><strong>Primeiro:</strong> Teste o sistema OAuth simulado</li>
+                <li><strong>Segundo:</strong> Se passar, teste Google OAuth real</li>
+                <li><strong>Terceiro:</strong> Observe console do navegador e logs do servidor</li>
+                <li><strong>Quarto:</strong> Reporte exatamente onde falhou</li>
+            </ol>
+        </div>
+        
+        <div class="logs">
+            <h3>🔧 LOGS DO SERVIDOR:</h3>
+            <p>Monitore no terminal:</p>
+            <pre>
+🔵 Google OAuth callback route accessed
+🔵 Query params: { code: '...' }
+🔵 GOOGLE OAUTH CALLBACK AUTHENTICATE RESULT:
+🔵 Error: null
+🔵 User: test@gmail.com (NEW)
+🔵 ✅ USER LOGGED IN SUCCESSFULLY
+🔵 ✅ NEW USER DETECTED - redirecting to oauth-welcome
+            </pre>
+        </div>
+        
+        <div class="logs">
+            <h3>🎯 POSSÍVEIS PROBLEMAS:</h3>
+            <ul>
+                <li class="error">❌ Credentials inválidas do Google</li>
+                <li class="warning">⚠️ Callback URL incorreta</li>
+                <li class="warning">⚠️ Domínio não autorizado</li>
+                <li class="warning">⚠️ Sessão não persistindo</li>
+                <li class="error">❌ Página oauth-welcome com erro</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <p><strong>🚨 TESTE AGORA E REPORTE LOGS</strong></p>
+            <a href="/login" class="btn" style="background: #6c757d;">Voltar para Login</a>
+        </div>
+    </div>
+</body>
+</html>

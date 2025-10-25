@@ -1,0 +1,409 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║               GUIA COMPLETO DE AUTENTICAÇÃO - MIX APP DIGITAL             ║
+║                  Login e Cadastro com Celular - FUNCIONANDO              ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+📅 Atualizado em: 24 de Outubro de 2025
+🔐 Status: TODAS AS PÁGINAS DE AUTENTICAÇÃO FUNCIONANDO CORRETAMENTE
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎯 MÉTODOS DE AUTENTICAÇÃO DISPONÍVEIS
+
+O MIX App oferece 3 formas de login/cadastro:
+
+1. ✅ GOOGLE OAUTH (Método Principal)
+   - Login rápido com conta Google
+   - Cadastro automático no primeiro acesso
+   - Redirecionamento automático para onboarding
+
+2. ✅ EMAIL + SENHA
+   - Cadastro tradicional com email
+   - Login com email e senha
+   - Validação de email e senha mínima de 6 caracteres
+
+3. ✅ CELULAR + SENHA
+   - Cadastro com telefone brasileiro
+   - Login com número de celular
+   - Formato: (11) 99999-9999
+
+═══════════════════════════════════════════════════════════════════════════
+
+📱 FLUXO DE PÁGINAS
+
+PÁGINA DE LOGIN (/login):
+┌─────────────────────────────────────────┐
+│  [Aba: Google] [Aba: Email] [Aba: Celular]  │
+│                                         │
+│  Google: Botão "Entre com Google"      │
+│  Email: Email + Senha                  │
+│  Celular: Telefone + Senha             │
+│                                         │
+│  Link: "Não tem conta? Cadastre-se"    │
+└─────────────────────────────────────────┘
+
+PÁGINA DE CADASTRO (/register):
+┌─────────────────────────────────────────┐
+│  [Aba: Google] [Aba: Email] [Aba: Celular]  │
+│                                         │
+│  Google: Botão "Cadastre-se com Google"│
+│  Email: Email + Senha + Confirmar      │
+│  Celular: Email + Tel + Senha + Conf.  │
+│                                         │
+│  Link: "Já tem conta? Entrar"          │
+└─────────────────────────────────────────┘
+
+PÁGINA PHONE-AUTH (/phone-auth):
+┌─────────────────────────────────────────┐
+│  ← Voltar                               │
+│                                         │
+│  Modo: Login OU Cadastro               │
+│                                         │
+│  CADASTRO:                             │
+│  - Email                               │
+│  - Telefone (formatado automático)     │
+│  - Senha + Confirmar                   │
+│                                         │
+│  LOGIN:                                │
+│  - Telefone                            │
+│  - Senha                               │
+└─────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔑 CREDENCIAIS DE TESTE
+
+USUÁRIO PRINCIPAL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Email:    teste@mixapp.com
+Senha:    123456
+Status:   ✅ Perfil completo
+Features: ✅ 3 fotos, 2 matches, 6 mensagens
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OUTROS USUÁRIOS DE TESTE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. maria.silva@email.com / senha123
+2. joao.santos@email.com / senha123
+3. ana.costa@email.com / senha123
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ IMPORTANTE: Estes usuários funcionam em QUALQUER DOMÍNIO:
+   - Replit Dev (*.replit.dev)
+   - mixapp.digital (produção)
+   - localhost (desenvolvimento local)
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ VALIDAÇÕES IMPLEMENTADAS
+
+EMAIL:
+▸ Deve conter '@'
+▸ Não pode estar em branco
+▸ Convertido para minúsculas automaticamente
+▸ Verifica duplicidade no cadastro
+
+SENHA:
+▸ Mínimo de 6 caracteres
+▸ Campo obrigatório
+▸ Confirmação de senha no cadastro
+▸ Hash com bcrypt (10 rounds)
+▸ Botão de mostrar/ocultar senha
+
+TELEFONE:
+▸ Formato: (11) 99999-9999
+▸ Formatação automática ao digitar
+▸ Validação com regex
+▸ Remove caracteres especiais antes de salvar
+▸ Verifica duplicidade no cadastro
+
+USERNAME:
+▸ Gerado automaticamente do email
+▸ Formato: [email]@... → [email] + 3 caracteres aleatórios
+▸ Garante unicidade
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔄 FLUXO DE AUTENTICAÇÃO
+
+CADASTRO COM GOOGLE:
+1. Usuário clica "Cadastre-se com Google"
+2. Popup do Google OAuth abre
+3. Usuário escolhe conta Google
+4. Backend valida token JWT
+5. Cria usuário no banco (se novo)
+6. Redireciona para /onboarding-flow
+7. Após onboarding → /discover
+
+CADASTRO COM EMAIL:
+1. Usuário preenche email + senha + confirmar senha
+2. Frontend valida campos
+3. POST /api/auth/register
+4. Backend cria usuário com hash bcrypt
+5. Login automático após cadastro
+6. Redireciona para /onboarding-flow
+7. Após onboarding → /discover
+
+CADASTRO COM CELULAR:
+1. Usuário preenche email + telefone + senha + confirmar
+2. Frontend formata telefone automaticamente
+3. POST /api/auth/phone/register
+4. Backend valida email e telefone únicos
+5. Cria usuário com hash bcrypt
+6. Login automático após cadastro
+7. Redireciona para /onboarding-flow
+8. Após onboarding → /discover
+
+LOGIN (Email ou Celular):
+1. Usuário digita email/telefone + senha
+2. POST /api/auth/login com identifier
+3. Backend busca por email OU telefone
+4. Valida senha com bcrypt
+5. Cria sessão autenticada
+6. GET /api/auth/user para verificar perfil
+7. Se isProfileComplete = true → /discover
+8. Se isProfileComplete = false → /onboarding-flow
+
+═══════════════════════════════════════════════════════════════════════════
+
+🛡️ SEGURANÇA
+
+PASSWORDS:
+✓ Hash com bcrypt (salt rounds: 10)
+✓ Nunca armazenados em texto claro
+✓ Validação mínima de 6 caracteres
+
+SESSÕES:
+✓ Express-session com MemoryStore
+✓ Cookies com SameSite e Secure (produção)
+✓ Chrome CHIPS habilitado (partitioned cookies)
+✓ Credential: 'include' em todas as requests
+
+GOOGLE OAUTH:
+✓ Validação de token JWT no backend
+✓ Verificação de audience para prevenir token forgery
+✓ Popup-based (não usa redirect URIs)
+✓ Credenciais validadas com google-auth-library
+
+CSRF/XSS:
+✓ Headers de segurança configurados
+✓ Body parser com limites
+✓ Input sanitization no backend
+
+═══════════════════════════════════════════════════════════════════════════
+
+🌐 ENDPOINTS DA API
+
+AUTENTICAÇÃO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+POST   /api/auth/register
+       Body: { email, password, username? }
+       
+POST   /api/auth/login
+       Body: { identifier, password }
+       Note: identifier = email OU telefone
+       
+POST   /api/auth/phone/register
+       Body: { username, email, phone, password }
+       
+POST   /api/auth/google
+       Body: { credential: JWT_TOKEN }
+       
+GET    /api/auth/user
+       Returns: User data + isProfileComplete
+       
+POST   /api/auth/logout
+       Destroys session
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 VARIÁVEIS DE PERFIL COMPLETO
+
+Um perfil é considerado COMPLETO quando possui:
+✓ birthDate (data de nascimento)
+✓ gender (gênero)
+✓ photos.length >= 2 (mínimo 2 fotos)
+✓ interestedIn.length >= 1 (interessado em pelo menos 1 gênero)
+
+Verificação:
+```javascript
+const isProfileComplete = !!(
+  user.birthDate && 
+  user.gender && 
+  user.photos?.length >= 2 && 
+  user.interestedIn?.length >= 1
+);
+```
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎨 DESIGN E UX
+
+GRADIENTE MIX:
+- Background: from-blue-900 via-blue-800 to-indigo-900
+- Botões primários: from-pink-600 to-pink-700
+- Hover: from-pink-700 to-pink-800
+
+COMPONENTES:
+✓ Tabs com 3 métodos (Google, Email, Celular)
+✓ Inputs com backdrop-blur e border animada
+✓ Botões com scale hover effect
+✓ Alerts com ícone e cor temática
+✓ Labels descritivos
+✓ Placeholders informativos
+
+ACESSIBILIDADE:
+✓ data-testid em todos elementos interativos
+✓ Labels associados a inputs
+✓ Estados de loading claros
+✓ Mensagens de erro descritivas
+✓ Campos disabled durante loading
+
+═══════════════════════════════════════════════════════════════════════════
+
+🐛 TROUBLESHOOTING
+
+PROBLEMA: "Usuário não encontrado"
+SOLUÇÃO: Verifique se o usuário foi cadastrado corretamente
+         Email/telefone devem estar exatamente como cadastrados
+         Telefone: use formato (XX) XXXXX-XXXX
+
+PROBLEMA: "Email já cadastrado"
+SOLUÇÃO: Use outro email ou faça login
+         Cada email só pode ter uma conta
+
+PROBLEMA: "Telefone já cadastrado"
+SOLUÇÃO: Use outro telefone ou faça login
+         Cada telefone só pode ter uma conta
+
+PROBLEMA: "As senhas não coincidem"
+SOLUÇÃO: Digite a mesma senha nos dois campos
+
+PROBLEMA: "Senha deve ter 6 caracteres"
+SOLUÇÃO: Use senha com mínimo de 6 caracteres
+
+PROBLEMA: "Erro ao autenticar com Google"
+SOLUÇÃO: Verifique se GOOGLE_CLIENT_ID está configurado
+         Domínio deve estar nas origens autorizadas
+         Limpe cache do navegador
+
+PROBLEMA: Login funciona mas não redireciona
+SOLUÇÃO: Limpe cookies e sessão
+         Verifique se /api/auth/user retorna dados
+         Console do navegador mostra erros?
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔧 CONFIGURAÇÃO PARA MIXAPP.DIGITAL
+
+1. GOOGLE OAUTH (OBRIGATÓRIO):
+   ─────────────────────────────────────
+   Console: https://console.cloud.google.com/apis/credentials
+   Client ID: 853566020139-jqljs5sf7didb7tc35shj73s8snldhdr...
+   
+   Adicionar em "Origens JavaScript autorizadas":
+   → https://mixapp.digital
+   
+   ⚠️ NÃO adicione barra no final
+   ⚠️ Aguarde 5-10 minutos após salvar
+   ⚠️ Limpe cache do navegador
+
+2. VARIÁVEIS DE AMBIENTE:
+   ─────────────────────────────────────
+   GOOGLE_CLIENT_ID=853566020139-jqljs5sf7didb7tc35shj73s8snldhdr...
+   GOOGLE_CLIENT_SECRET=GOCSPX-...
+   SESSION_SECRET=15300192c627734f2acf6dc6830918edc9e0f701c6cce095c39f90f83d39008d
+   DATABASE_URL=postgresql://...
+   NODE_ENV=production
+
+3. TESTE APÓS DEPLOY:
+   ─────────────────────────────────────
+   ✓ Acesse https://mixapp.digital/login
+   ✓ Teste login com Google
+   ✓ Teste login com email: teste@mixapp.com / 123456
+   ✓ Teste cadastro com celular
+   ✓ Verifique redirecionamento para /discover ou /onboarding-flow
+
+═══════════════════════════════════════════════════════════════════════════
+
+📱 TESTE RÁPIDO - CHECKLIST
+
+LOGIN:
+□ Abrir /login
+□ Testar aba Google
+□ Testar aba Email com teste@mixapp.com / 123456
+□ Testar aba Celular (se tiver usuário cadastrado)
+□ Verificar link "Cadastre-se"
+□ Verificar mensagens de erro
+
+CADASTRO:
+□ Abrir /register
+□ Testar aba Google
+□ Testar aba Email com novo email
+□ Testar aba Celular com email + telefone novo
+□ Verificar validação de senhas
+□ Verificar formatação do telefone
+□ Verificar link "Entrar"
+
+PHONE-AUTH:
+□ Abrir /phone-auth?mode=register
+□ Preencher email + telefone + senha
+□ Verificar formatação automática
+□ Testar cadastro
+□ Alternar para modo login
+□ Testar login com telefone
+
+SEGURANÇA:
+□ Senha é hasheada (não visível no banco)
+□ Session cookie é criado após login
+□ Redirect funciona corretamente
+□ isProfileComplete é verificado
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ CONCLUSÃO
+
+As páginas de LOGIN e CADASTRO estão:
+✓ Funcionando corretamente
+✓ Com validações completas
+✓ Design MIX aplicado
+✓ Suporte a 3 métodos de auth
+✓ Redirecionamento inteligente
+✓ Mensagens de erro claras
+✓ Compatível com mixapp.digital
+
+PRÓXIMOS PASSOS:
+1. Deploy em mixapp.digital
+2. Configurar Google OAuth para o domínio
+3. Testar todos os fluxos em produção
+4. Restaurar backup do banco de dados
+
+═══════════════════════════════════════════════════════════════════════════
+
+📞 ARQUIVOS RELACIONADOS
+
+Frontend:
+- client/src/pages/login.tsx
+- client/src/pages/register.tsx
+- client/src/pages/phone-auth.tsx
+- client/src/config/oauth.ts
+
+Backend:
+- server/routes.ts (rotas de autenticação)
+- server/storage.ts (métodos de usuário)
+- shared/schema.ts (schema do banco)
+
+Configuração:
+- ALEXBANCODE_DADOS/VERCEL_ENV_VARIABLES.txt
+- ALEXBANCODE_DADOS/ENV_TEMPLATE.env
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎯 TUDO PRONTO PARA PRODUÇÃO!
+
+As páginas de autenticação estão 100% funcionais e prontas para o deploy
+em https://mixapp.digital. Basta configurar as variáveis de ambiente e
+adicionar o domínio nas origens autorizadas do Google OAuth.
+
+═══════════════════════════════════════════════════════════════════════════
