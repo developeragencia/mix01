@@ -92,10 +92,10 @@ export default function AdminLogin() {
             </div>
             
             <div className="relative flex flex-col items-center justify-center space-y-6">
-              {/* Logo com fundo da mesma cor */}
+              {/* Logo com fundo transparente */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-2xl blur-xl"></div>
-                <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl p-5 shadow-2xl border border-white/10 transform hover:scale-105 transition-all duration-300 group">
+                <div className="relative bg-transparent rounded-2xl p-5 transform hover:scale-105 transition-all duration-300 group">
                   <img 
                     src="/mix-logo-horizontal.png" 
                     alt="Mix Logo" 
@@ -157,8 +157,8 @@ export default function AdminLogin() {
 
               {/* Campo de email */}
               <div className="space-y-3">
-                <label className="block text-sm font-bold text-gray-700 flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-blue-600" />
+                <label className="block text-sm font-bold text-white flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-white" />
                   Email do Administrador
                 </label>
                 <div className="relative group">
@@ -177,8 +177,8 @@ export default function AdminLogin() {
 
               {/* Campo de senha */}
               <div className="space-y-3">
-                <label className="block text-sm font-bold text-gray-700 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-blue-600" />
+                <label className="block text-sm font-bold text-white flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-white" />
                   Senha
                 </label>
                 <div className="relative group">
