@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft, Camera, CheckCircle, Upload, Shield, AlertCircle, X, Clock, FileText, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,10 +27,15 @@ export default function Verification() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<'document' | 'selfie' | 'review'>('document');
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isCameraLoading, setIsCameraLoading] = useState(false);
 
   const { data: verification, isLoading, error } = useQuery<Verification>({
     queryKey: ['/api/verification/status'],
@@ -105,6 +110,73 @@ export default function Verification() {
       setSelectedImage(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  // ✅ Abrir câmera
+  const openCamera = async () => {
+    try {
+      setIsCameraLoading(true);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: 1280, height: 720 }
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        setIsCameraOpen(true);
+      }
+    } catch (error) {
+      console.error('Erro ao acessar câmera:', error);
+      toast({
+        title: "Erro ao acessar câmera",
+        description: "Permita o acesso à câmera para tirar a selfie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCameraLoading(false);
+    }
+  };
+
+  // ✅ Fechar câmera
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setIsCameraOpen(false);
+  };
+
+  // ✅ Cleanup: Fechar câmera ao desmontar componente ou mudar de step
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [currentStep]);
+
+  // ✅ Tirar foto
+  const takePicture = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        setSelectedImage(imageData);
+        closeCamera();
+        
+        toast({
+          title: "Foto capturada!",
+          description: "Selfie tirada com sucesso.",
+        });
+      }
+    }
   };
 
   const handleNextStep = () => {
@@ -374,7 +446,7 @@ export default function Verification() {
             )}
 
             {/* ✅ Step: Selfie */}
-            {currentStep === 'selfie' && !selectedImage && (
+            {currentStep === 'selfie' && !selectedImage && !isCameraOpen && (
               <div className="space-y-4">
                 <input
                   ref={fileInputRef}
@@ -385,11 +457,12 @@ export default function Verification() {
                   className="hidden"
                 />
                 <Button
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={openCamera}
+                  disabled={isCameraLoading}
                   className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
                 >
                   <Camera className="w-5 h-5 mr-2" />
-                  Tirar Selfie
+                  {isCameraLoading ? 'Abrindo Câmera...' : 'Abrir Câmera'}
                 </Button>
                 <Button
                   onClick={() => {
@@ -412,6 +485,67 @@ export default function Verification() {
                 >
                   Voltar ao Documento
                 </Button>
+              </div>
+            )}
+
+            {/* ✅ Câmera Aberta */}
+            {currentStep === 'selfie' && isCameraOpen && !selectedImage && (
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-white font-bold">📸 Posicione seu rosto</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={closeCamera}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
+                
+                {/* Video Preview */}
+                <div className="relative aspect-square bg-black rounded-xl overflow-hidden mb-4">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Canvas oculto para captura */}
+                  <canvas ref={canvasRef} className="hidden" />
+                  
+                  {/* Overlay de guia */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="border-4 border-white/30 rounded-full w-64 h-64"></div>
+                  </div>
+                </div>
+
+                {/* Instruções */}
+                <div className="bg-blue-900/30 rounded-xl p-3 mb-4">
+                  <p className="text-white text-sm text-center">
+                    ✅ Posicione seu rosto dentro do círculo<br />
+                    ✅ Remova óculos escuros e acessórios<br />
+                    ✅ Mantenha o ambiente bem iluminado
+                  </p>
+                </div>
+
+                {/* Botões */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={takePicture}
+                    className="w-full h-14 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-full text-lg shadow-lg"
+                  >
+                    📸 Capturar Selfie
+                  </Button>
+                  <Button
+                    onClick={closeCamera}
+                    variant="outline"
+                    className="w-full border-red-500 text-red-400 hover:bg-red-900/20"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </div>
             )}
 
