@@ -53,11 +53,11 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-purple-950 via-purple-900 to-pink-900">
+    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
       {/* Efeitos de fundo animados */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         
         {/* Estrelas decorativas */}
         {[...Array(20)].map((_, i) => (
@@ -82,7 +82,7 @@ export default function AdminLogin() {
           isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
         }`}>
           {/* Header com logo */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8 text-center relative overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-center relative overflow-hidden">
             {/* Efeito de brilho no header */}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/10 to-transparent"></div>
             
@@ -97,7 +97,7 @@ export default function AdminLogin() {
                     // Fallback se a logo não carregar - mostra texto
                     const parent = e.currentTarget.parentElement;
                     if (parent) {
-                      parent.innerHTML = '<span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">MIX</span>';
+                      parent.innerHTML = '<span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 text-transparent bg-clip-text">MIX</span>';
                     }
                   }}
                 />
@@ -111,7 +111,7 @@ export default function AdminLogin() {
                 </div>
                 <h1 className="text-3xl font-bold text-white drop-shadow-lg">Painel Admin</h1>
               </div>
-              <p className="text-purple-100 text-sm flex items-center gap-2">
+              <p className="text-blue-100 text-sm flex items-center gap-2">
                 <Lock className="w-4 h-4" />
                 Acesso restrito para administradores
               </p>
@@ -143,17 +143,17 @@ export default function AdminLogin() {
               {/* Campo de email */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-purple-600" />
+                  <Mail className="w-4 h-4 text-blue-600" />
                   Email do Administrador
                 </label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-600 transition-colors duration-200" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-200" />
                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@mixapp.com"
-                    className="w-full pl-11 h-12 bg-gray-50 border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 rounded-lg transition-all duration-200 hover:border-gray-300"
+                    className="w-full pl-11 h-12 bg-gray-50 border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200 hover:border-gray-300"
                     required
                     autoComplete="email"
                   />
@@ -163,24 +163,24 @@ export default function AdminLogin() {
               {/* Campo de senha */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-purple-600" />
+                  <Lock className="w-4 h-4 text-blue-600" />
                   Senha
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-600 transition-colors duration-200" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-200" />
                   <Input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Digite sua senha"
-                    className="w-full pl-11 pr-11 h-12 bg-gray-50 border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 rounded-lg transition-all duration-200 hover:border-gray-300"
+                    className="w-full pl-11 pr-11 h-12 bg-gray-50 border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200 hover:border-gray-300"
                     required
                     autoComplete="current-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors duration-200 hover:scale-110"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors duration-200 hover:scale-110"
                     aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -192,7 +192,7 @@ export default function AdminLogin() {
           <Button
             type="submit"
             disabled={isLoading}
-                className="w-full h-12 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-600 hover:from-purple-700 hover:via-purple-600 hover:to-pink-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
+                className="w-full h-12 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
           >
                 {/* Efeito de brilho ao passar o mouse */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
