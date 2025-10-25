@@ -120,8 +120,44 @@ export default function VerificationStatus() {
       </div>
 
       <div className="max-w-md mx-auto px-4 py-8">
-        {/* ✅ Status: Pendente */}
-        {verification?.status === 'pending' && (
+        {/* ✅ Status: Aprovado / Verificado - PRIORIDADE MÁXIMA */}
+        {(verification?.isVerified || verification?.status === 'approved') ? (
+          <div className="bg-green-900/50 backdrop-blur-sm rounded-3xl p-8 border-2 border-green-500/30 text-center animate-fade-in">
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              <div className="absolute inset-0 bg-green-400/20 rounded-full animate-ping"></div>
+              <div className="relative bg-green-900/50 rounded-full w-24 h-24 flex items-center justify-center">
+                <CheckCircle className="w-12 h-12 text-green-400" />
+              </div>
+            </div>
+            <h2 className="text-white text-3xl font-bold mb-4">✅ Verificado!</h2>
+            <p className="text-green-200 text-lg mb-6">
+              Parabéns! Seu perfil foi verificado com sucesso
+            </p>
+            <div className="bg-green-900/30 rounded-2xl p-4 mb-6 space-y-2">
+              <p className="text-green-100 text-sm">🎉 Você agora tem o selo azul</p>
+              <p className="text-green-100 text-sm">🔥 Mais visibilidade no app</p>
+              <p className="text-green-100 text-sm">💫 Maior confiança dos usuários</p>
+            </div>
+            {verification.verifiedAt && (
+              <p className="text-green-300 text-sm mb-6">
+                📅 Verificado em: {new Date(verification.verifiedAt).toLocaleString('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            )}
+            <Button
+              onClick={() => setLocation('/profile')}
+              className="w-full h-14 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-full text-lg shadow-lg"
+            >
+              Ver Meu Perfil Verificado
+            </Button>
+          </div>
+        ) : verification?.status === 'pending' ? (
+          /* ✅ Status: Pendente */
           <div className="bg-yellow-900/50 backdrop-blur-sm rounded-3xl p-8 border-2 border-yellow-500/30 text-center animate-fade-in">
             <div className="relative w-24 h-24 mx-auto mb-6">
               <div className="absolute inset-0 bg-yellow-400/20 rounded-full animate-ping"></div>
@@ -161,48 +197,8 @@ export default function VerificationStatus() {
               Voltar ao Perfil
             </Button>
           </div>
-        )}
-
-        {/* ✅ Status: Aprovado / Verificado */}
-        {(verification?.isVerified || verification?.status === 'approved') && (
-          <div className="bg-green-900/50 backdrop-blur-sm rounded-3xl p-8 border-2 border-green-500/30 text-center animate-fade-in">
-            <div className="relative w-24 h-24 mx-auto mb-6">
-              <div className="absolute inset-0 bg-green-400/20 rounded-full animate-ping"></div>
-              <div className="relative bg-green-900/50 rounded-full w-24 h-24 flex items-center justify-center">
-                <CheckCircle className="w-12 h-12 text-green-400" />
-              </div>
-            </div>
-            <h2 className="text-white text-3xl font-bold mb-4">✅ Verificado!</h2>
-            <p className="text-green-200 text-lg mb-6">
-              Parabéns! Seu perfil foi verificado com sucesso
-            </p>
-            <div className="bg-green-900/30 rounded-2xl p-4 mb-6 space-y-2">
-              <p className="text-green-100 text-sm">🎉 Você agora tem o selo azul</p>
-              <p className="text-green-100 text-sm">🔥 Mais visibilidade no app</p>
-              <p className="text-green-100 text-sm">💫 Maior confiança dos usuários</p>
-            </div>
-            {verification.verifiedAt && (
-              <p className="text-green-300 text-sm mb-6">
-                📅 Verificado em: {new Date(verification.verifiedAt).toLocaleString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
-            )}
-            <Button
-              onClick={() => setLocation('/profile')}
-              className="w-full h-14 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-full text-lg shadow-lg"
-            >
-              Ver Meu Perfil Verificado
-            </Button>
-          </div>
-        )}
-
-        {/* ✅ Status: Rejeitado */}
-        {verification?.status === 'rejected' && (
+        ) : verification?.status === 'rejected' ? (
+        /* ✅ Status: Rejeitado */
           <div className="bg-red-900/50 backdrop-blur-sm rounded-3xl p-8 border-2 border-red-500/30 text-center animate-fade-in">
             <div className="relative w-24 h-24 mx-auto mb-6">
               <div className="relative bg-red-900/50 rounded-full w-24 h-24 flex items-center justify-center">
@@ -244,10 +240,8 @@ export default function VerificationStatus() {
               </Button>
             </div>
           </div>
-        )}
-
-        {/* ✅ Status: Nenhum / None */}
-        {(!verification?.status || verification?.status === 'none') && !verification?.isVerified && (
+        ) : (
+          /* ✅ Status: Nenhum / None */
           <div className="bg-gray-900/50 backdrop-blur-sm rounded-3xl p-8 border border-white/10 text-center animate-fade-in">
             <div className="w-16 h-16 bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
               <Clock className="w-8 h-8 text-blue-400" />

@@ -293,8 +293,28 @@ export default function Verification() {
       </div>
 
       <div className="max-w-md mx-auto px-4 space-y-6 pt-6">
-        {/* ✅ Status: Pendente */}
-        {verification?.status === 'pending' && (
+        {/* ✅ Status: Verificado - PRIORIDADE MÁXIMA */}
+        {(verification?.isVerified || verification?.status === 'approved') ? (
+          <div className="bg-green-900/50 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 text-center" data-testid="card-verified">
+            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <h2 className="text-white text-2xl font-bold mb-2">Perfil Verificado!</h2>
+            <p className="text-green-200 mb-4">
+              Seu perfil foi verificado com sucesso.
+            </p>
+            {verification.verifiedAt && (
+              <p className="text-green-300 text-sm">
+                Verificado em: {new Date(verification.verifiedAt).toLocaleDateString('pt-BR')}
+              </p>
+            )}
+            <Button
+              onClick={() => setLocation('/profile')}
+              className="mt-4 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+            >
+              Voltar ao Perfil
+            </Button>
+          </div>
+        ) : verification?.status === 'pending' ? (
+          /* ✅ Status: Pendente */
           <div className="bg-yellow-900/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30 text-center" data-testid="card-pending">
             <Clock className="w-16 h-16 text-yellow-400 mx-auto mb-4 animate-pulse" />
             <h2 className="text-white text-2xl font-bold mb-2">Verificação em Análise</h2>
@@ -314,10 +334,8 @@ export default function Verification() {
               Voltar ao Perfil
             </Button>
           </div>
-        )}
-
-        {/* ✅ Status: Rejeitado */}
-        {verification?.status === 'rejected' && (
+        ) : verification?.status === 'rejected' ? (
+        /* ✅ Status: Rejeitado */
           <div className="bg-red-900/50 backdrop-blur-sm rounded-2xl p-6 border border-red-500/30 text-center" data-testid="card-rejected">
             <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
             <h2 className="text-white text-2xl font-bold mb-2">Verificação Rejeitada</h2>
@@ -342,23 +360,7 @@ export default function Verification() {
               Tentar Novamente
             </Button>
           </div>
-        )}
-
-        {/* ✅ Status: Verificado */}
-        {verification?.isVerified || verification?.status === 'approved' ? (
-          <div className="bg-green-900/50 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 text-center" data-testid="card-verified">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h2 className="text-white text-2xl font-bold mb-2">Perfil Verificado!</h2>
-            <p className="text-green-200 mb-4">
-              Seu perfil foi verificado com sucesso.
-            </p>
-            {verification.verifiedAt && (
-              <p className="text-green-300 text-sm">
-                Verificado em: {new Date(verification.verifiedAt).toLocaleDateString('pt-BR')}
-              </p>
-            )}
-          </div>
-        ) : verification?.status === 'none' || !verification ? (
+        ) : (
           <>
             <div className="bg-blue-900/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10" data-testid="card-info">
               <div className="flex items-start gap-4 mb-4">
@@ -675,7 +677,7 @@ export default function Verification() {
               </div>
             </div>
           </>
-        ) : null}
+        )}
 
         <div className="text-center">
           <button
