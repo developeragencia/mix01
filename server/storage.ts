@@ -619,12 +619,21 @@ export class DatabaseStorage implements IStorage {
 
   async getMatches(userId: number): Promise<(Match & { profile: Profile; lastMessage: Message | null })[]> {
     try {
+      // ⚡ OTIMIZADO: Buscar matches com DISTINCT para evitar duplicatas
       const userMatches = await db.select().from(matches)
         .where(sql`${matches.user1Id} = ${userId} OR ${matches.user2Id} = ${userId}`)
         .orderBy(sql`${matches.createdAt} DESC`);
       
-      const result = [];
+      // ✅ REMOVER DUPLICATAS: Criar um Map por ID para garantir unicidade
+      const uniqueMatches = new Map();
       for (const match of userMatches) {
+        if (!uniqueMatches.has(match.id)) {
+          uniqueMatches.set(match.id, match);
+        }
+      }
+      
+      const result = [];
+      for (const match of uniqueMatches.values()) {
         const otherUserId = match.user1Id === userId ? match.user2Id : match.user1Id;
         
         // Buscar perfil do match
@@ -644,6 +653,8 @@ export class DatabaseStorage implements IStorage {
           });
         }
       }
+      
+      console.log(`✅ getMatches retornou ${result.length} matches únicos para user ${userId}`);
       return result;
     } catch (error) {
       console.error('Error getting matches:', error);
