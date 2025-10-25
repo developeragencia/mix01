@@ -180,23 +180,23 @@ export default function PhoneAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex flex-col items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
         <button
           onClick={() => setLocation(mode === "register" ? '/register' : '/login')}
-          className="text-white/90 hover:text-white flex items-center gap-2 mb-8 transition-colors"
+          className="text-white/90 hover:text-white flex items-center gap-2 mb-6 sm:mb-8 transition-colors touch-manipulation"
           data-testid="button-back"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="text-sm font-medium">Voltar</span>
         </button>
 
-        <div className="flex justify-center mb-8">
-          <img src={mixLogo} alt="MIX" className="h-16 w-auto" data-testid="img-logo" />
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <img src={mixLogo} alt="MIX" className="h-12 w-auto sm:h-16" data-testid="img-logo" />
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2" data-testid="text-title">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2" data-testid="text-title">
             {mode === "register" ? "Cadastre-se com Celular" : "Entrar com Celular"}
           </h1>
           <p className="text-white/70 text-sm" data-testid="text-subtitle">
@@ -226,7 +226,7 @@ export default function PhoneAuth() {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-6"
+                  className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-4 sm:px-6 touch-manipulation"
                   disabled={isLoading}
                   data-testid="input-email"
                 />
@@ -244,7 +244,7 @@ export default function PhoneAuth() {
                 value={phone}
                 onChange={handlePhoneChange}
                 maxLength={15}
-                className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-6"
+                className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-4 sm:px-6 touch-manipulation"
                 disabled={isLoading}
                 data-testid="input-phone"
               />
@@ -261,16 +261,16 @@ export default function PhoneAuth() {
                   placeholder="Mínimo 6 caracteres"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-6 pr-14"
+                  className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-4 sm:px-6 pr-12 sm:pr-14 touch-manipulation"
                   disabled={isLoading}
                   data-testid="input-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white touch-manipulation"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                 </button>
               </div>
             </div>
@@ -287,16 +287,16 @@ export default function PhoneAuth() {
                     placeholder="Digite a senha novamente"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-6 pr-14"
+                    className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-full text-white placeholder:text-white/50 px-4 sm:px-6 pr-12 sm:pr-14 touch-manipulation"
                     disabled={isLoading}
                     data-testid="input-confirm-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white touch-manipulation"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                   </button>
                 </div>
               </div>
@@ -305,7 +305,7 @@ export default function PhoneAuth() {
 
           <Button 
             type="submit"
-            className="w-full h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-full shadow-lg text-base mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 sm:h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-full shadow-lg text-sm sm:text-base mt-4 sm:mt-6 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             disabled={isLoading}
             data-testid="button-submit"
           >
@@ -315,13 +315,13 @@ export default function PhoneAuth() {
           </Button>
         </form>
 
-        <div className="mt-8 text-center space-y-4">
+        <div className="mt-6 sm:mt-8 text-center space-y-3 sm:space-y-4">
           {mode === "register" && (
             <p className="text-white/50 text-sm">
               Ao continuar, você concorda com nossos{" "}
               <button 
                 onClick={() => setLocation('/terms')}
-                className="text-white/70 underline hover:text-white"
+                className="text-white/70 underline hover:text-white touch-manipulation"
                 data-testid="link-terms"
               >
                 Termos de Uso
@@ -333,7 +333,7 @@ export default function PhoneAuth() {
             {mode === "register" ? "Já tem uma conta?" : "Não tem uma conta?"}{" "}
             <button
               onClick={toggleMode}
-              className="text-pink-400 font-semibold hover:text-pink-300"
+              className="text-pink-400 font-semibold hover:text-pink-300 touch-manipulation"
               data-testid="link-toggle-mode"
             >
               {mode === "register" ? "Entrar" : "Cadastre-se"}

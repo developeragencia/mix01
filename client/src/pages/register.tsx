@@ -197,19 +197,19 @@ function RegisterContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center space-y-4">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
+        <div className="w-full max-w-md space-y-6 sm:space-y-8">
+          <div className="text-center space-y-3 sm:space-y-4">
             <img 
               src={mixLogo} 
               alt="MIX" 
-              className="h-16 w-auto mx-auto drop-shadow-2xl"
+              className="h-12 w-auto mx-auto drop-shadow-2xl sm:h-16"
               data-testid="img-logo"
             />
-            <h2 className="text-white text-2xl font-semibold">
+            <h2 className="text-white text-xl sm:text-2xl font-semibold">
               Crie sua conta
             </h2>
-            <p className="text-white/70 text-base">
+            <p className="text-white/70 text-sm sm:text-base">
               Comece sua jornada no MIX
             </p>
           </div>
@@ -221,11 +221,11 @@ function RegisterContent() {
             </Alert>
           )}
 
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-1.5 shadow-xl border border-white/10">
-            <div className="flex gap-1.5">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 sm:p-1.5 shadow-xl border border-white/10">
+            <div className="flex gap-1 sm:gap-1.5">
               <button
                 onClick={() => setRegisterMethod('google')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${
+                className={`flex-1 py-2.5 px-2 sm:py-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   registerMethod === 'google' 
                     ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg' 
                     : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -236,7 +236,7 @@ function RegisterContent() {
               </button>
               <button
                 onClick={() => setRegisterMethod('facebook')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${
+                className={`flex-1 py-2.5 px-2 sm:py-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   registerMethod === 'facebook' 
                     ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg' 
                     : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -247,7 +247,7 @@ function RegisterContent() {
               </button>
               <button
                 onClick={() => setRegisterMethod('phone')}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${
+                className={`flex-1 py-2.5 px-2 sm:py-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   registerMethod === 'phone' 
                     ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg' 
                     : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -264,10 +264,10 @@ function RegisterContent() {
               <Button
                 onClick={handleGoogleButtonClick}
                 disabled={isLoading}
-                className="w-full h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold rounded-full shadow-xl text-base transition-all hover:scale-105"
+                className="w-full h-12 sm:h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold rounded-full shadow-xl text-sm sm:text-base transition-all hover:scale-105 touch-manipulation"
                 data-testid="button-google-register"
               >
-                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -300,10 +300,10 @@ function RegisterContent() {
                     <Button
                       onClick={onClick}
                       disabled={isLoading}
-                      className="w-full h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold rounded-full shadow-xl text-base transition-all hover:scale-105"
+                      className="w-full h-12 sm:h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold rounded-full shadow-xl text-sm sm:text-base transition-all hover:scale-105 touch-manipulation"
                       data-testid="button-facebook-register"
                     >
-                      <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                       </svg>
                       Cadastre-se com Facebook
@@ -322,7 +322,7 @@ function RegisterContent() {
           )}
 
           {registerMethod === 'phone' && (
-            <form onSubmit={handlePhoneRegister} className="space-y-5">
+            <form onSubmit={handlePhoneRegister} className="space-y-4 sm:space-y-5">
               <div>
                 <Label htmlFor="phone-email" className="text-white/90 text-sm font-medium mb-2 block">
                   Email
@@ -333,7 +333,7 @@ function RegisterContent() {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-2xl text-white placeholder:text-white/50 px-5 backdrop-blur-sm"
+                  className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-xl sm:rounded-2xl text-white placeholder:text-white/50 px-4 sm:px-5 backdrop-blur-sm touch-manipulation"
                   disabled={isLoading}
                   required
                   data-testid="input-phone-email"
@@ -351,7 +351,7 @@ function RegisterContent() {
                   value={phone}
                   onChange={handlePhoneChange}
                   maxLength={15}
-                  className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-2xl text-white placeholder:text-white/50 px-5 backdrop-blur-sm"
+                  className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-xl sm:rounded-2xl text-white placeholder:text-white/50 px-4 sm:px-5 backdrop-blur-sm touch-manipulation"
                   disabled={isLoading}
                   required
                   data-testid="input-phone"
@@ -369,7 +369,7 @@ function RegisterContent() {
                     placeholder="Mínimo 6 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-2xl text-white placeholder:text-white/50 px-5 pr-14 backdrop-blur-sm"
+                    className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-xl sm:rounded-2xl text-white placeholder:text-white/50 px-4 sm:px-5 pr-12 sm:pr-14 backdrop-blur-sm touch-manipulation"
                     disabled={isLoading}
                     required
                     data-testid="input-phone-password"
@@ -377,10 +377,10 @@ function RegisterContent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors touch-manipulation"
                     data-testid="button-toggle-phone-password"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                   </button>
                 </div>
               </div>
@@ -396,7 +396,7 @@ function RegisterContent() {
                     placeholder="Digite a senha novamente"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="h-14 text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-2xl text-white placeholder:text-white/50 px-5 pr-14 backdrop-blur-sm"
+                    className="h-12 sm:h-14 text-sm sm:text-base bg-white/10 border-2 border-white/20 focus:border-pink-500/50 rounded-xl sm:rounded-2xl text-white placeholder:text-white/50 px-4 sm:px-5 pr-12 sm:pr-14 backdrop-blur-sm touch-manipulation"
                     disabled={isLoading}
                     required
                     data-testid="input-phone-confirm-password"
@@ -404,17 +404,17 @@ function RegisterContent() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors touch-manipulation"
                     data-testid="button-toggle-phone-confirm-password"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                   </button>
                 </div>
               </div>
 
               <Button 
                 type="submit"
-                className="w-full h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-bold rounded-full shadow-xl text-base disabled:opacity-50 transition-all hover:scale-105"
+                className="w-full h-12 sm:h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-bold rounded-full shadow-xl text-sm sm:text-base disabled:opacity-50 transition-all hover:scale-105 touch-manipulation"
                 disabled={isLoading}
                 data-testid="button-submit"
               >
@@ -423,12 +423,12 @@ function RegisterContent() {
             </form>
           )}
 
-          <div className="text-center space-y-4 pt-4">
+          <div className="text-center space-y-3 sm:space-y-4 pt-3 sm:pt-4">
             <p className="text-white/70 text-sm">
               Já tem uma conta?{' '}
               <button
                 onClick={() => setLocation('/login')}
-                className="text-pink-400 font-semibold hover:text-pink-300 transition-colors"
+                className="text-pink-400 font-semibold hover:text-pink-300 transition-colors touch-manipulation"
                 data-testid="link-login"
               >
                 Entrar
@@ -437,7 +437,7 @@ function RegisterContent() {
 
             <p className="text-white/50 text-xs">
               Ao continuar, você concorda com nossos{' '}
-              <a href="/terms" className="underline hover:text-white/70">Termos de Uso</a>
+              <a href="/terms" className="underline hover:text-white/70 touch-manipulation">Termos de Uso</a>
             </p>
           </div>
         </div>

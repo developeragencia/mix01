@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "render": {
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer rnd_oCxFaYHtfln3EoP6A0V4RxQxmGEB"
+      },
+      "description": "Servidor MCP para integração com Render",
+      "capabilities": [
+        "deployment",
+        "environment",
+        "logs",
+        "metrics"
+      ]
+    },
+    "neon": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://mcp.neon.tech/mcp"],
+      "description": "Servidor MCP para integração com Neon Database",
+      "capabilities": [
+        "database",
+        "queries",
+        "migrations",
+        "backups"
+      ]
+    }
+  },
+  "version": "1.0.0",
+  "description": "Configuração MCP para o projeto MixApp Digital - Render + Neon"
+}
