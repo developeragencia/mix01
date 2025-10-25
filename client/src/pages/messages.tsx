@@ -132,7 +132,7 @@ export default function Messages() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-white font-bold text-xl flex items-center gap-2">
                 Deu MIX
-                <span className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
+                <span className="bg-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                   {newMatches.length}
                 </span>
               </h2>
