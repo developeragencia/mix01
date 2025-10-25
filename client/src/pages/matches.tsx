@@ -30,8 +30,9 @@ export default function Matches() {
     retryDelay: 1000, // 1 segundo entre tentativas
   });
 
-  // Separar novos matches (sem mensagens) de conversas ativas (com mensagens)
-  const newMatches = matchesData.filter(conv => conv.lastMessage === null);
+  // TODOS os matches aparecem em "Deu MIX" (matches retribuídos)
+  const newMatches = matchesData;
+  // Conversas são apenas os que TÊM mensagens
   const conversations = matchesData.filter(conv => conv.lastMessage !== null);
   
   console.log("📊 Matches - Dados carregados:", {

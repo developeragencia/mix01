@@ -61,8 +61,9 @@ export default function Messages() {
   }
 
   const matchesData = data || [];
-  // Filtrar novos matches (sem mensagens) e conversas ativas (com mensagens)
-  const newMatches = matchesData.filter((m: any) => !m.lastMessage && m.profile);
+  // TODOS os matches aparecem em "Deu MIX" (matches retribuídos)
+  const newMatches = matchesData.filter((m: any) => m.profile);
+  // Conversas são apenas os que TÊM mensagens
   const conversations = matchesData.filter((m: any) => m.lastMessage && m.profile);
   
   console.log("📊 Messages - Dados carregados:", {
