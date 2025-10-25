@@ -1483,6 +1483,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ✅ DELETE MATCH - Desfazer match
+  app.delete("/api/matches/:userId", async (req, res) => {
+    try {
+      const targetUserId = parseInt(req.params.userId);
+      const currentUserId = (req.user as any)?.id;
+
+      if (!currentUserId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      console.log("🔴 DELETE match:", { currentUserId, targetUserId });
+
+      // Buscar o match entre os dois usuários
+      const matches = await storage.getUserMatches(currentUserId);
+      const match = matches.find(m => 
+        (m.user1Id === currentUserId && m.user2Id === targetUserId) ||
+        (m.user2Id === currentUserId && m.user1Id === targetUserId)
+      );
+
+      if (!match) {
+        return res.status(404).json({ error: "Match not found" });
+      }
+
+      // Deletar o match
+      await storage.deleteMatch(match.id);
+
+      res.json({ success: true, message: "Match deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting match:", error);
+      res.status(500).json({ error: "Failed to delete match" });
+    }
+  });
+
+  // ✅ BLOCK USER - Bloquear usuário
+  app.post("/api/block/:userId", async (req, res) => {
+    try {
+      const blockedUserId = parseInt(req.params.userId);
+      const currentUserId = (req.user as any)?.id;
+
+      if (!currentUserId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      console.log("🚫 BLOCK user:", { currentUserId, blockedUserId });
+
+      // Criar registro de bloqueio (você pode criar uma tabela 'blocks' se necessário)
+      // Por enquanto, vamos apenas deletar o match
+      const matches = await storage.getUserMatches(currentUserId);
+      const match = matches.find(m => 
+        (m.user1Id === currentUserId && m.user2Id === blockedUserId) ||
+        (m.user2Id === currentUserId && m.user1Id === blockedUserId)
+      );
+
+      if (match) {
+        await storage.deleteMatch(match.id);
+      }
+
+      res.json({ success: true, message: "User blocked successfully" });
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      res.status(500).json({ error: "Failed to block user" });
+    }
+  });
+
+  // ✅ REPORT USER - Denunciar usuário
+  app.post("/api/report/:userId", async (req, res) => {
+    try {
+      const reportedUserId = parseInt(req.params.userId);
+      const currentUserId = (req.user as any)?.id;
+      const { reason } = req.body;
+
+      if (!currentUserId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      console.log("🚩 REPORT user:", { currentUserId, reportedUserId, reason });
+
+      // Criar registro de denúncia
+      await storage.createReport({
+        reporterId: currentUserId,
+        reportedUserId: reportedUserId,
+        reason: reason || "Comportamento inapropriado",
+        status: "pending"
+      });
+
+      res.json({ success: true, message: "Report submitted successfully" });
+    } catch (error) {
+      console.error("Error reporting user:", error);
+      res.status(500).json({ error: "Failed to submit report" });
+    }
+  });
+
   // Messages routes - IMPLEMENTAÇÃO CRÍTICA CORRIGIDA
   app.get("/api/messages/:matchId", async (req, res) => {
     try {

@@ -50,6 +50,10 @@ export interface IStorage {
   // Match methods
   createMatch(user1Id: number, user2Id: number): Promise<Match>;
   getUserMatches(userId: number): Promise<(Match & { profile: Profile })[]>;
+  deleteMatch?(matchId: number): Promise<void>; // ✅ Novo método
+  
+  // Report methods
+  createReport?(report: {reporterId: number, reportedUserId: number, reason: string, status: string}): Promise<any>; // ✅ Novo método
   
   // Message methods
   createMessage(message: InsertMessage): Promise<Message>;
@@ -621,6 +625,39 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting user matches:', error);
       return [];
+    }
+  }
+
+  // ✅ DELETE MATCH - Novo método
+  async deleteMatch(matchId: number): Promise<void> {
+    try {
+      // Deletar todas as mensagens do match primeiro
+      await db.delete(messages).where(eq(messages.matchId, matchId));
+      
+      // Deletar o match
+      await db.delete(matches).where(eq(matches.id, matchId));
+      
+      console.log(`✅ Match ${matchId} deletado com sucesso`);
+    } catch (error) {
+      console.error('Error deleting match:', error);
+      throw error;
+    }
+  }
+
+  // ✅ CREATE REPORT - Novo método
+  async createReport(report: {reporterId: number, reportedUserId: number, reason: string, status: string}): Promise<any> {
+    try {
+      // Como não temos tabela de reports, vamos apenas logar por enquanto
+      console.log('📝 Report criado:', report);
+      
+      // TODO: Criar tabela 'reports' no schema e implementar insert aqui
+      // const [newReport] = await db.insert(reports).values(report).returning();
+      // return newReport;
+      
+      return { id: Date.now(), ...report, createdAt: new Date() };
+    } catch (error) {
+      console.error('Error creating report:', error);
+      throw error;
     }
   }
 

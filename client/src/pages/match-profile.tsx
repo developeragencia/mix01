@@ -44,7 +44,7 @@ export default function MatchProfile() {
   // Mutation para desfazer match
   const undoMatchMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/matches/${id}`, {
+      return await apiRequest(`/api/matches/${profile?.userId}`, {
         method: "DELETE",
       });
     },
@@ -68,7 +68,7 @@ export default function MatchProfile() {
   // Mutation para bloquear
   const blockMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/block/${id}`, {
+      return await apiRequest(`/api/block/${profile?.userId}`, {
         method: "POST",
       });
     },
@@ -92,7 +92,7 @@ export default function MatchProfile() {
   // Mutation para denunciar
   const reportMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/report/${id}`, {
+      return await apiRequest(`/api/report/${profile?.userId}`, {
         method: "POST",
         body: {
           reason: "Comportamento inapropriado",
