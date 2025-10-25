@@ -32,82 +32,45 @@ export default function AdminMatchDetail() {
     }
   }, [setLocation]);
 
-  const { data: match, isLoading } = useQuery({
+  const { data: match, isLoading, error } = useQuery({
     queryKey: ['/api/admin/matches', id],
     queryFn: async () => {
-      // TODO: Connect to real database
-      return {
-        id: parseInt(id || '1'),
-        user1: {
-          id: 1,
-          name: "Maria Silva",
-          age: 28,
-          profession: "Marketing Digital",
-          photo: "/api/placeholder/120/120",
-          location: "São Paulo, SP",
-          verified: true
+      const adminToken = localStorage.getItem("adminToken");
+      const res = await fetch(`/api/admin/matches/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
         },
-        user2: {
-          id: 2,
-          name: "João Santos",
-          age: 31,
-          profession: "Engenheiro de Software",
-          photo: "/api/placeholder/120/120",
-          location: "São Paulo, SP",
-          verified: true
-        },
-        matchedAt: "2024-01-25T14:30:00Z",
-        status: "active",
-        messages: [
-          {
-            id: 1,
-            senderId: 1,
-            senderName: "Maria Silva",
-            content: "Oi! Tudo bem?",
-            sentAt: "2024-01-25T14:35:00Z",
-            isRead: true
-          },
-          {
-            id: 2,
-            senderId: 2,
-            senderName: "João Santos",
-            content: "Oi Maria! Tudo ótimo, e você? Vi que também trabalha com tech!",
-            sentAt: "2024-01-25T14:37:00Z",
-            isRead: true
-          },
-          {
-            id: 3,
-            senderId: 1,
-            senderName: "Maria Silva",
-            content: "Sim! Trabalho com marketing digital focado em startups. E você?",
-            sentAt: "2024-01-25T14:40:00Z",
-            isRead: true
-          },
-          {
-            id: 4,
-            senderId: 2,
-            senderName: "João Santos",
-            content: "Que legal! Sou desenvolvedor full-stack. Adoro como a tech pode transformar negócios!",
-            sentAt: "2024-01-25T14:42:00Z",
-            isRead: false
-          }
-        ],
-        stats: {
-          totalMessages: 4,
-          lastActivity: "2024-01-25T14:42:00Z",
-          conversationStarted: "2024-01-25T14:35:00Z",
-          responseTime: "2m 15s"
-        },
-        reports: [],
-        compatibility: 89
-      };
-    }
+        credentials: 'include'
+      });
+      
+      if (!res.ok) {
+        throw new Error('Erro ao carregar match');
+      }
+      
+      return res.json();
+    },
+    enabled: !!id,
+    retry: 1
   });
 
   const deleteMatchMutation = useMutation({
     mutationFn: async () => {
-      // TODO: Connect to real API
-      return { success: true };
+      const adminToken = localStorage.getItem("adminToken");
+      const res = await fetch(`/api/admin/matches/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+      
+      if (!res.ok) {
+        throw new Error('Erro ao remover match');
+      }
+      
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/matches'] });
@@ -116,6 +79,13 @@ export default function AdminMatchDetail() {
         description: "Match removido com sucesso"
       });
       setLocation("/admin/matches");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível remover o match",
+        variant: "destructive"
+      });
     }
   });
 
@@ -165,6 +135,24 @@ export default function AdminMatchDetail() {
           <div className="h-8 bg-blue-800/50 rounded w-48"></div>
           <div className="h-64 bg-blue-800/50 rounded"></div>
         </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout title="Erro ao carregar match">
+        <Card className="p-8 bg-red-900/50 backdrop-blur-sm border-red-700/50 text-center">
+          <p className="text-red-200 mb-4">Erro ao carregar os detalhes do match.</p>
+          <p className="text-red-300 text-sm mb-4">{(error as Error).message}</p>
+          <Button
+            onClick={() => setLocation("/admin/matches")}
+            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar à lista
+          </Button>
+        </Card>
       </AdminLayout>
     );
   }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation, useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Heart, X, Star, ChevronLeft, ChevronRight, MapPin, Briefcase, GraduationCap, Globe, Baby, Users } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Briefcase, GraduationCap, Globe, Baby, Users } from "lucide-react";
 import type { Profile } from "@shared/schema";
 
 export default function ProfileDetail() {
@@ -41,24 +41,6 @@ export default function ProfileDetail() {
 
   const photos = profile.photos && profile.photos.length > 0 ? profile.photos : ['/placeholder-avatar.png'];
 
-  const handleSwipe = async (isLike: boolean, isSuperLike = false) => {
-    try {
-      await fetch('/api/swipes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          swipedId: profile.userId,
-          isLike,
-          isSuperLike,
-        }),
-      });
-      setLocation('/discover');
-    } catch (error) {
-      console.error('Error creating swipe:', error);
-    }
-  };
-
   const nextPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
   };
@@ -82,7 +64,7 @@ export default function ProfileDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-6">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-blue-900/80 backdrop-blur-md border-b border-white/10">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
@@ -318,37 +300,6 @@ export default function ProfileDetail() {
         )}
       </div>
 
-      {/* Action Buttons - Mix Style */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 p-6">
-        <div className="flex items-center justify-center space-x-6">
-          <Button
-            size="lg"
-            className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border-2 border-white/40"
-            onClick={() => handleSwipe(false)}
-            data-testid="button-reject"
-          >
-            <X className="w-8 h-8 text-white" />
-          </Button>
-          
-          <Button
-            size="lg"
-            className="w-20 h-20 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 shadow-lg"
-            onClick={() => handleSwipe(true, true)}
-            data-testid="button-super-like"
-          >
-            <Star className="w-10 h-10 text-white" />
-          </Button>
-          
-          <Button
-            size="lg"
-            className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 shadow-lg"
-            onClick={() => handleSwipe(true)}
-            data-testid="button-like"
-          >
-            <Heart className="w-8 h-8 text-white" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
