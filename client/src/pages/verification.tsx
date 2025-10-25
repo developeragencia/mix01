@@ -328,7 +328,7 @@ export default function Verification() {
                 setCurrentStep('document');
                 queryClient.invalidateQueries({ queryKey: ['/api/verification/status'] });
               }}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+              className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
             >
               Tentar Novamente
             </Button>
@@ -380,15 +380,15 @@ export default function Verification() {
 
             {/* ✅ Progress Indicator */}
             <div className="flex items-center justify-center gap-2 mb-6">
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 'document' || currentStep === 'selfie' || currentStep === 'review' ? 'bg-blue-500' : 'bg-gray-700'}`}>
+              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 'document' || currentStep === 'selfie' || currentStep === 'review' ? 'bg-pink-500' : 'bg-gray-700'}`}>
                 <FileText className="w-5 h-5 text-white" />
               </div>
-              <div className={`h-1 w-12 ${currentStep === 'selfie' || currentStep === 'review' ? 'bg-blue-500' : 'bg-gray-700'}`}></div>
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 'selfie' || currentStep === 'review' ? 'bg-blue-500' : 'bg-gray-700'}`}>
+              <div className={`h-1 w-12 ${currentStep === 'selfie' || currentStep === 'review' ? 'bg-pink-500' : 'bg-gray-700'}`}></div>
+              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 'selfie' || currentStep === 'review' ? 'bg-pink-500' : 'bg-gray-700'}`}>
                 <Camera className="w-5 h-5 text-white" />
               </div>
-              <div className={`h-1 w-12 ${currentStep === 'review' ? 'bg-blue-500' : 'bg-gray-700'}`}></div>
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 'review' ? 'bg-blue-500' : 'bg-gray-700'}`}>
+              <div className={`h-1 w-12 ${currentStep === 'review' ? 'bg-pink-500' : 'bg-gray-700'}`}></div>
+              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 'review' ? 'bg-pink-500' : 'bg-gray-700'}`}>
                 <CheckCircle className="w-5 h-5 text-white" />
               </div>
             </div>
@@ -403,15 +403,15 @@ export default function Verification() {
                 {currentStep === 'document' && (
                   <>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</span>
                       <span>Tire foto do seu documento (RG, CNH ou Passaporte)</span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</span>
                       <span>Certifique-se de que os dados estejam legíveis</span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</span>
                       <span>Evite reflexos e sombras</span>
                     </li>
                   </>
@@ -419,15 +419,15 @@ export default function Verification() {
                 {currentStep === 'selfie' && (
                   <>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</span>
                       <span>Tire uma selfie clara do seu rosto</span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</span>
                       <span>Certifique-se de estar bem iluminado</span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</span>
                       <span>Seu rosto deve estar claramente visível</span>
                     </li>
                   </>
@@ -435,11 +435,11 @@ export default function Verification() {
                 {currentStep === 'review' && (
                   <>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</span>
                       <span>Revise suas fotos antes de enviar</span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</span>
+                      <span className="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</span>
                       <span>A análise pode levar até 24 horas</span>
                     </li>
                   </>
@@ -459,7 +459,7 @@ export default function Verification() {
                 />
                 <Button
                   onClick={() => documentInputRef.current?.click()}
-                  className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+                  className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
                 >
                   <FileText className="w-5 h-5 mr-2" />
                   Enviar Foto do Documento
@@ -485,7 +485,7 @@ export default function Verification() {
                 </div>
                 <Button
                   onClick={handleNextStep}
-                  className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+                  className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
                 >
                   Continuar para Selfie
                 </Button>
@@ -506,7 +506,7 @@ export default function Verification() {
                 <Button
                   onClick={openCamera}
                   disabled={isCameraLoading}
-                  className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+                  className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
                 >
                   <Camera className="w-5 h-5 mr-2" />
                   {isCameraLoading ? 'Abrindo Câmera...' : 'Abrir Câmera'}
@@ -614,7 +614,7 @@ export default function Verification() {
                 </div>
                 <Button
                   onClick={handleNextStep}
-                  className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+                  className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
                 >
                   Revisar e Enviar
                 </Button>

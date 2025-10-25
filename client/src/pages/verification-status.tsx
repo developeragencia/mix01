@@ -89,7 +89,7 @@ export default function VerificationStatus() {
             </p>
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+              className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
             >
               Tentar Novamente
             </Button>
@@ -231,7 +231,7 @@ export default function VerificationStatus() {
             <div className="space-y-3">
               <Button
                 onClick={() => setLocation('/verification')}
-                className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+                className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
               >
                 Tentar Novamente
               </Button>
@@ -267,7 +267,7 @@ export default function VerificationStatus() {
             </div>
             <Button
               onClick={() => setLocation('/verification')}
-              className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full text-lg shadow-lg"
+              className="w-full h-14 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold rounded-full text-lg shadow-lg"
             >
               Iniciar Verificação
             </Button>
