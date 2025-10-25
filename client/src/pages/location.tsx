@@ -33,6 +33,10 @@ export default function Localizacao() {
   const [selectedEstabelecimento, setSelectedEstabelecimento] = useState<any>(null);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [showPessoas, setShowPessoas] = useState(false);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city: string} | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [distanceFilter, setDistanceFilter] = useState<number>(5); // km
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   
   const qrScannerRef = useRef<QrScanner | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -44,8 +48,90 @@ export default function Localizacao() {
     }
   }, [authLoading, isAuthenticated, setLocation]);
 
+  // ✅ Geolocalização automática ao carregar
+  useEffect(() => {
+    getUserLocation();
+  }, []);
+
+  // ✅ Obter localização do usuário
+  const getUserLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocalização não suportada",
+        description: "Seu navegador não suporta geolocalização",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGettingLocation(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // Geocoding reverso para obter cidade
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          const city = data.address?.city || data.address?.town || data.address?.village || "São Paulo";
+          
+          setUserLocation({
+            lat: latitude,
+            lng: longitude,
+            city: city
+          });
+          
+          toast({
+            title: "Localização obtida! 📍",
+            description: `Você está em ${city}`,
+            duration: 3000
+          });
+        } catch (error) {
+          setUserLocation({
+            lat: latitude,
+            lng: longitude,
+            city: "São Paulo"
+          });
+        }
+        
+        setIsGettingLocation(false);
+      },
+      (error) => {
+        console.error("Erro ao obter localização:", error);
+        toast({
+          title: "Erro ao obter localização",
+          description: "Não foi possível acessar sua localização. Usando São Paulo como padrão.",
+          variant: "destructive",
+          duration: 3000
+        });
+        setUserLocation({
+          lat: -23.5505,
+          lng: -46.6333,
+          city: "São Paulo"
+        });
+        setIsGettingLocation(false);
+      }
+    );
+  };
+
+  // ✅ Calcular distância entre dois pontos (fórmula de Haversine)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Raio da Terra em km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   // Buscar estabelecimentos reais
-  const { data: estabelecimentos = [] } = useQuery<Establishment[]>({
+  const { data: estabelecimentos = [], isLoading: isLoadingEstabelecimentos } = useQuery<Establishment[]>({
     queryKey: ['/api/establishments'],
     enabled: true,
     staleTime: 15 * 60 * 1000, // ⚡ 15 minutos - estabelecimentos não mudam frequentemente
@@ -60,6 +146,27 @@ export default function Localizacao() {
       }
       return response.json();
     }
+  });
+
+  // ✅ Filtrar estabelecimentos por busca e distância
+  const filteredEstabelecimentos = estabelecimentos.filter(est => {
+    const matchesSearch = !searchTerm || 
+      est.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      est.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      est.address.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Filtrar por distância se houver coordenadas
+    if (userLocation && est.latitude && est.longitude) {
+      const distance = calculateDistance(
+        userLocation.lat, 
+        userLocation.lng, 
+        est.latitude, 
+        est.longitude
+      );
+      return matchesSearch && distance <= distanceFilter;
+    }
+    
+    return matchesSearch;
   });
 
   // Buscar pessoas próximas reais
@@ -270,9 +377,15 @@ export default function Localizacao() {
             <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-lg">
-                  <MapPin className="h-4 w-4 text-blue-500" />
+                  {isGettingLocation ? (
+                    <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
+                  ) : (
+                    <MapPin className="h-4 w-4 text-blue-500" />
+                  )}
                 </div>
-                <span className="text-white font-semibold text-sm">São Paulo, SP</span>
+                <span className="text-white font-semibold text-sm">
+                  {isGettingLocation ? "Localizando..." : (userLocation?.city || "São Paulo")}, SP
+                </span>
               </div>
               <div className="text-xs text-blue-100 font-medium">Maps</div>
             </div>
@@ -374,7 +487,7 @@ export default function Localizacao() {
                 <div className="text-left flex-1 min-w-0">
                   <div className="font-bold text-base">Ver estabelecimentos próximos</div>
                   <div className="text-xs text-blue-100">
-                    {estabelecimentos.length || 35} locais • Bares e restaurantes
+                    {filteredEstabelecimentos.length || estabelecimentos.length || 35} locais • Bares e restaurantes
                   </div>
                 </div>
               </div>
@@ -536,8 +649,8 @@ export default function Localizacao() {
             className="bg-white rounded-3xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl"
           >
             <div className="bg-gradient-to-r from-pink-600 to-purple-600 text-white p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold">Estabelecimentos em SP</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold">Estabelecimentos em {userLocation?.city || "SP"}</h3>
                 <Button 
                   onClick={() => setShowEstabelecimentos(false)}
                   variant="ghost" 
@@ -548,20 +661,74 @@ export default function Localizacao() {
                   <X className="h-5 w-5" />
                 </Button>
               </div>
-              <p className="text-pink-100 text-sm mt-2">
-                Escolha onde você quer se conectar
-              </p>
+              
+              {/* ✅ Busca e filtros */}
+              <div className="space-y-3">
+                <input 
+                  type="text"
+                  placeholder="Buscar estabelecimentos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-300"
+                />
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-pink-100">Distância máxima:</span>
+                  <select 
+                    value={distanceFilter}
+                    onChange={(e) => setDistanceFilter(Number(e.target.value))}
+                    className="px-3 py-1.5 rounded-lg text-gray-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300"
+                  >
+                    <option value={2}>2 km</option>
+                    <option value={5}>5 km</option>
+                    <option value={10}>10 km</option>
+                    <option value={20}>20 km</option>
+                    <option value={50}>50 km</option>
+                  </select>
+                </div>
+                
+                <p className="text-pink-100 text-xs">
+                  {filteredEstabelecimentos.length} estabelecimentos encontrados
+                </p>
+              </div>
             </div>
             
             <div className="p-4 max-h-96 overflow-y-auto">
-              {estabelecimentos.length === 0 ? (
+              {isLoadingEstabelecimentos ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="w-full p-4 bg-gray-100 rounded-2xl">
+                        <div className="h-6 bg-gray-300 rounded mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-1 w-3/4"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : filteredEstabelecimentos.length === 0 ? (
                 <div className="text-center py-12">
                   <Store className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Nenhum estabelecimento disponível</p>
+                  <p className="text-gray-500">
+                    {searchTerm ? "Nenhum estabelecimento encontrado" : "Nenhum estabelecimento disponível"}
+                  </p>
+                  {searchTerm && (
+                    <button 
+                      onClick={() => setSearchTerm("")}
+                      className="mt-3 text-pink-600 text-sm font-semibold hover:underline"
+                    >
+                      Limpar busca
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {estabelecimentos.map((estabelecimento) => (
+                  {filteredEstabelecimentos.map((estabelecimento) => {
+                    const distance = userLocation && estabelecimento.latitude && estabelecimento.longitude
+                      ? calculateDistance(userLocation.lat, userLocation.lng, estabelecimento.latitude, estabelecimento.longitude)
+                      : null;
+                    
+                    return (
                     <motion.div
                       key={estabelecimento.id}
                       whileHover={{ scale: 1.02 }}
@@ -581,6 +748,11 @@ export default function Localizacao() {
                           </div>
                           <div className="text-sm text-gray-600">{estabelecimento.type}</div>
                           <div className="text-xs text-gray-500">{estabelecimento.address}</div>
+                          {distance && (
+                            <div className="text-xs text-blue-600 font-semibold mt-1">
+                              📍 {distance.toFixed(1)} km de distância
+                            </div>
+                          )}
                         </div>
                         <div className="text-gray-400">
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -589,7 +761,8 @@ export default function Localizacao() {
                         </div>
                       </Button>
                     </motion.div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
