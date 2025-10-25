@@ -93,11 +93,11 @@ export default function NearbyUsers() {
   }, []);
 
   const handleLike = async () => {
-    // Verificar limite de 12 matches gratuitos
-    if (likeCount >= 12 && !user?.isPremium) {
+    // Verificar limite de 15 matches gratuitos
+    if (likeCount >= 15 && !user?.isPremium) {
       toast({
         title: "🚫 Limite de matches atingido",
-        description: "Você atingiu o limite de 12 matches gratuitos!",
+        description: "Você atingiu o limite de 15 matches gratuitos!",
         duration: 4000,
       });
       setLocation("/swipe-limit");
@@ -389,7 +389,7 @@ export default function NearbyUsers() {
             </p>
             {likeCount > 0 && !user?.isPremium && (
               <p className="text-pink-400 text-xs mt-2 font-medium">
-                {likeCount}/12 matches gratuitos hoje
+                {likeCount}/15 matches gratuitos hoje
               </p>
             )}
           </CardContent>

@@ -80,10 +80,10 @@ export default function Discover() {
     console.log('🔴 Swipe data:', { swipeType, profileName, profileId: currentProfile.id });
     
     if (direction === "right") {
-      if (actionCounts.likes >= 12) {
+      if (actionCounts.likes >= 15) {
         toast({
           title: "🚫 Limite de matches atingido",
-          description: "Você atingiu o limite de 12 matches gratuitos!",
+          description: "Você atingiu o limite de 15 matches gratuitos!",
           duration: 4000,
         });
         setLocation("/swipe-limit");

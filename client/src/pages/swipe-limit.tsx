@@ -75,7 +75,7 @@ export default function SwipeLimit() {
         <div className="mb-8 text-white text-center">
           <p className="mb-2">É hora de sair da tela e viver o momento.</p>
           <p>Já tem mais <span className="font-bold text-pink-300">MIX</span> pra você.</p>
-          <p className="text-sm text-pink-200 mt-2">Continuar grátis: limite de 12 curtidas grátis</p>
+          <p className="text-sm text-pink-200 mt-2">Continuar grátis: limite de 15 curtidas grátis</p>
         </div>
 
         {/* Action Buttons */}
