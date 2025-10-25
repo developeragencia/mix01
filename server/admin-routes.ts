@@ -82,8 +82,8 @@ export function registerAdminRoutes(app: Express) {
         return res.status(500).json({ message: "Erro de configuração - usuário sem senha" });
       }
       
-      // Verificar senha com bcrypt
-      const bcrypt = await import('bcrypt');
+      // Verificar senha com bcryptjs (compatível com Windows)
+      const bcrypt = await import('bcryptjs');
       const validPassword = await bcrypt.compare(password, user.password);
       
       console.log("🔐 Resultado da comparação de senha:", validPassword ? "✅ VÁLIDA" : "❌ INVÁLIDA");

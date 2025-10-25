@@ -6,7 +6,7 @@ import { registerAdminRoutes } from "./admin-routes";
 import { createStripeProducts } from "./stripe-setup";
 import { insertUserSchema, registerUserSchema, insertProfileSchema, insertSwipeSchema, insertMessageSchema, type Swipe, type Match } from "@shared/schema";
 import { z } from "zod";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import passport from "passport";
 import { setupAuth, requireAuth } from "./auth";
 import { OAuthStorage } from "./oauth-storage";
