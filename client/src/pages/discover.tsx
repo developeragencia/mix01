@@ -171,12 +171,12 @@ export default function Discover() {
 
   return (
     <div className="h-screen flex flex-col relative overflow-hidden bg-black">
-      {/* FOTO GRANDE - Ocupa toda a tela sem cortes */}
+      {/* FOTO GRANDE - Ocupa toda a tela */}
       <div className="absolute inset-0 z-0">
         <img
           src={currentProfile.photos?.[currentPhotoIndex] || currentProfile.photos?.[0] || `https://ui-avatars.com/api/?name=${currentProfile.name}&background=ec4899&color=fff&size=800`}
           alt={currentProfile.name}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover object-center"
           data-testid="img-profile-photo"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
