@@ -339,6 +339,110 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Get single match details
+  app.get("/api/admin/matches/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Get match data
+      const match = await db.select().from(matches).where(eq(matches.id, parseInt(id))).limit(1);
+      
+      if (!match || match.length === 0) {
+        return res.status(404).json({ error: 'Match not found' });
+      }
+      
+      const matchData = match[0];
+      
+      // Get user 1 details
+      const user1Data = await db.select().from(users).where(eq(users.id, matchData.user1Id)).limit(1);
+      const user1Profile = await db.select().from(profiles).where(eq(profiles.userId, matchData.user1Id)).limit(1);
+      
+      // Get user 2 details
+      const user2Data = await db.select().from(users).where(eq(users.id, matchData.user2Id)).limit(1);
+      const user2Profile = await db.select().from(profiles).where(eq(profiles.userId, matchData.user2Id)).limit(1);
+      
+      // Get messages between users
+      const matchMessages = await db.select().from(messages)
+        .where(sql`(${messages.senderId} = ${matchData.user1Id} AND ${messages.recipientId} = ${matchData.user2Id}) OR (${messages.senderId} = ${matchData.user2Id} AND ${messages.recipientId} = ${matchData.user1Id})`)
+        .orderBy(messages.sentAt)
+        .limit(50);
+      
+      // Get verification status for both users
+      const user1Verification = await db.select().from(verifications).where(eq(verifications.userId, matchData.user1Id)).limit(1);
+      const user2Verification = await db.select().from(verifications).where(eq(verifications.userId, matchData.user2Id)).limit(1);
+      
+      // Format response
+      const response = {
+        id: matchData.id,
+        user1: {
+          id: matchData.user1Id,
+          name: user1Profile[0]?.name || user1Data[0]?.firstName || 'Usuário',
+          age: user1Profile[0]?.age || 25,
+          profession: user1Profile[0]?.profession || user1Profile[0]?.job || 'Não informado',
+          photo: user1Profile[0]?.photos?.[0] || user1Data[0]?.profileImage || '/placeholder-avatar.png',
+          location: user1Profile[0]?.location || user1Data[0]?.city || 'São Paulo, SP',
+          verified: user1Verification[0]?.isVerified || false
+        },
+        user2: {
+          id: matchData.user2Id,
+          name: user2Profile[0]?.name || user2Data[0]?.firstName || 'Usuário',
+          age: user2Profile[0]?.age || 25,
+          profession: user2Profile[0]?.profession || user2Profile[0]?.job || 'Não informado',
+          photo: user2Profile[0]?.photos?.[0] || user2Data[0]?.profileImage || '/placeholder-avatar.png',
+          location: user2Profile[0]?.location || user2Data[0]?.city || 'São Paulo, SP',
+          verified: user2Verification[0]?.isVerified || false
+        },
+        matchedAt: matchData.createdAt,
+        status: 'active',
+        messages: matchMessages.map(msg => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          senderName: msg.senderId === matchData.user1Id ? (user1Profile[0]?.name || 'Usuário 1') : (user2Profile[0]?.name || 'Usuário 2'),
+          content: msg.content,
+          sentAt: msg.sentAt,
+          isRead: msg.isRead || false
+        })),
+        stats: {
+          totalMessages: matchMessages.length,
+          lastActivity: matchMessages[matchMessages.length - 1]?.sentAt || matchData.createdAt,
+          conversationStarted: matchMessages[0]?.sentAt || matchData.createdAt,
+          responseTime: '2m 15s'
+        },
+        reports: [],
+        compatibility: 89
+      };
+      
+      console.log(`📊 Match detail loaded: ${id}`);
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching match details:', error);
+      res.status(500).json({ error: 'Failed to fetch match details' });
+    }
+  });
+
+  // Delete match
+  app.delete("/api/admin/matches/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      console.log('🗑️ Deleting match:', id);
+      
+      const deleted = await db.delete(matches)
+        .where(eq(matches.id, parseInt(id)))
+        .returning();
+      
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: 'Match not found' });
+      }
+      
+      console.log('✅ Match deleted successfully');
+      res.json({ success: true, message: 'Match deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting match:', error);
+      res.status(500).json({ error: 'Failed to delete match' });
+    }
+  });
+
   // Admin Messages - DADOS REAIS DO BANCO
   app.get("/api/admin/messages", async (req, res) => {
     try {
