@@ -1282,7 +1282,7 @@ export class DatabaseStorage implements IStorage {
     const verification = await db.query.verifications.findFirst({
       where: eq(verifications.userId, userId),
     });
-    return verification || { isVerified: false };
+    return verification || { isVerified: false, status: 'none' };
   }
 
   async requestVerification(userId: number, method: string, images: string[]) {
@@ -1290,12 +1290,19 @@ export class DatabaseStorage implements IStorage {
       where: eq(verifications.userId, userId),
     });
 
+    const [documentImage, selfieImage] = images;
+
     if (existing) {
       const [updated] = await db
         .update(verifications)
         .set({
           verificationMethod: method,
           verificationImages: images,
+          status: 'pending',
+          submittedAt: new Date(),
+          documentImage: documentImage || null,
+          selfieImage: selfieImage || null,
+          isVerified: false,
         })
         .where(eq(verifications.userId, userId))
         .returning();
@@ -1308,6 +1315,10 @@ export class DatabaseStorage implements IStorage {
         userId,
         verificationMethod: method,
         verificationImages: images,
+        status: 'pending',
+        submittedAt: new Date(),
+        documentImage: documentImage || null,
+        selfieImage: selfieImage || null,
         isVerified: false,
       })
       .returning();

@@ -37,10 +37,12 @@ export default function Verification() {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isCameraLoading, setIsCameraLoading] = useState(false);
 
-  const { data: verification, isLoading, error } = useQuery<Verification>({
+  const { data: verification, isLoading, error, refetch } = useQuery<Verification>({
     queryKey: ['/api/verification/status'],
     enabled: !!user?.id,
     retry: false,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   const requestVerificationMutation = useMutation({
@@ -240,12 +242,19 @@ export default function Verification() {
       
       console.log("✅ Verificação enviada com sucesso!");
       
-      // ✅ Aguardar um pouco para garantir que o backend processou
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // ✅ Refetch imediato dos dados
+      await refetch();
       
-      // ✅ Redirecionar para página de status
-      console.log("🔄 Redirecionando para /verification-status");
-      window.location.href = '/verification-status';
+      // ✅ Aguardar para garantir que a UI foi atualizada
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // ✅ Resetar estado local
+      setSelectedImage(null);
+      setSelectedDocument(null);
+      setCurrentStep('document');
+      setIsSubmitting(false);
+      
+      console.log("🔄 Status atualizado para pending, mostrando mensagem");
     } catch (error) {
       console.error("❌ Erro ao enviar verificação:", error);
       setIsSubmitting(false);
@@ -349,7 +358,7 @@ export default function Verification() {
               </p>
             )}
           </div>
-        ) : (
+        ) : verification?.status === 'none' || !verification ? (
           <>
             <div className="bg-blue-900/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10" data-testid="card-info">
               <div className="flex items-start gap-4 mb-4">
@@ -666,7 +675,7 @@ export default function Verification() {
               </div>
             </div>
           </>
-        )}
+        ) : null}
 
         <div className="text-center">
           <button

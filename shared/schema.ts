@@ -223,6 +223,11 @@ export const verifications = pgTable("verifications", {
   verificationMethod: text("verification_method"), // "selfie", "document", "manual"
   verifiedAt: timestamp("verified_at"),
   verificationImages: text("verification_images").array().default([]),
+  status: text("status").default("none"), // "none", "pending", "approved", "rejected"
+  rejectionReason: text("rejection_reason"),
+  submittedAt: timestamp("submitted_at"),
+  documentImage: text("document_image"),
+  selfieImage: text("selfie_image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
