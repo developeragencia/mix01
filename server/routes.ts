@@ -1089,14 +1089,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Not authenticated" });
       }
       
+      // ⚡ CACHE: Adicionar headers de cache (5 minutos)
+      res.setHeader('Cache-Control', 'private, max-age=300');
+      res.setHeader('ETag', `discover-${currentUserId}-${Date.now()}`);
+      
+      console.time(`⏱️ Discover total - User ${currentUserId}`);
+      
       // ⚡ OTIMIZAÇÃO: Usar método otimizado que faz tudo em uma query
+      console.time('⏱️ getProfilesForDiscovery');
       const profiles = await storage.getProfilesForDiscovery(currentUserId, 50);
+      console.timeEnd('⏱️ getProfilesForDiscovery');
       
       // ⚡ OTIMIZAÇÃO: Buscar swipes e matches em paralelo
+      console.time('⏱️ getUserSwipes + getUserMatches');
       const [userSwipes, userMatches] = await Promise.all([
         storage.getUserSwipes(currentUserId),
         storage.getUserMatches(currentUserId)
       ]);
+      console.timeEnd('⏱️ getUserSwipes + getUserMatches');
       
       const swipedUserIds = new Set(userSwipes.map((s: Swipe) => s.swipedId));
       const matchedUserIds = new Set(
@@ -1110,8 +1120,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       // ⚡ OTIMIZAÇÃO: Buscar todos os usuários em UMA query ao invés de N queries
+      console.time('⏱️ getUsersByIds');
       const userIds = filteredProfiles.map(p => p.userId);
       const users = await storage.getUsersByIds?.(userIds) || [];
+      console.timeEnd('⏱️ getUsersByIds');
+      
       const usersMap = new Map(users.map(u => [u.id, u]));
       
       // ⚡ OTIMIZAÇÃO: Merge síncrono sem await
@@ -1123,6 +1136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastSeen: user?.lastSeen || new Date()
         };
       });
+      
+      console.timeEnd(`⏱️ Discover total - User ${currentUserId}`);
+      console.log(`✅ Discover retornou ${profilesWithOnlineStatus.length} perfis`);
       
       res.json(profilesWithOnlineStatus);
     } catch (error) {

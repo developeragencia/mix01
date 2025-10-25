@@ -34,20 +34,29 @@ export default function Discover() {
     return saved ? JSON.parse(saved) : { likes: 0, passes: 0 };
   });
 
-  const { data: allProfiles = [], isLoading } = useQuery({
+  const { data: allProfiles = [], isLoading, isFetching } = useQuery({
     queryKey: ["/api/discover"],
-    retry: false,
+    retry: 1, // ⚡ Retry apenas 1 vez
+    retryDelay: 1000, // ⚡ Delay de 1s entre retries
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // ⚡ Não refetch no mount
     staleTime: 10 * 60 * 1000, // ⚡ 10 minutos - perfis não mudam tão rápido
     gcTime: 30 * 60 * 1000, // ⚡ 30 minutos em cache
     queryFn: async () => {
+      console.time('⏱️ Fetch /api/discover');
       const response = await fetch("/api/discover", {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        }
       });
+      console.timeEnd('⏱️ Fetch /api/discover');
       if (!response.ok) throw new Error('Failed to fetch profiles');
-      return response.json();
+      const data = await response.json();
+      console.log(`✅ Discover recebeu ${data.length} perfis`);
+      return data;
     }
-  }) as { data: Profile[], isLoading: boolean };
+  }) as { data: Profile[], isLoading: boolean, isFetching: boolean };
 
   const profiles = allProfiles.filter(profile => profile.userId !== user?.id);
   const currentProfile = profiles[currentIndex];
@@ -146,9 +155,13 @@ export default function Discover() {
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-white">Carregando perfis...</p>
+        <div className="text-center px-6">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full border-4 border-pink-500/30"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-pink-500 border-t-transparent animate-spin"></div>
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">✨ Carregando perfis</h3>
+          <p className="text-blue-200 text-sm">Procurando pessoas incríveis para você...</p>
         </div>
       </div>
     );

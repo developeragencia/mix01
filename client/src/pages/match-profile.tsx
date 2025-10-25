@@ -44,7 +44,10 @@ export default function MatchProfile() {
   // Mutation para desfazer match
   const undoMatchMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/matches/${profile?.userId}`, {
+      if (!profile?.userId) {
+        throw new Error("Profile userId not found");
+      }
+      return await apiRequest(`/api/matches/${profile.userId}`, {
         method: "DELETE",
       });
     },
@@ -54,9 +57,10 @@ export default function MatchProfile() {
         description: "O match foi desfeito com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/matches"] });
-      setLocation("/matches");
+      setTimeout(() => setLocation("/matches"), 500);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Erro ao desfazer match:", error);
       toast({
         title: "Erro",
         description: "Não foi possível desfazer o match.",
@@ -68,7 +72,10 @@ export default function MatchProfile() {
   // Mutation para bloquear
   const blockMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/block/${profile?.userId}`, {
+      if (!profile?.userId) {
+        throw new Error("Profile userId not found");
+      }
+      return await apiRequest(`/api/block/${profile.userId}`, {
         method: "POST",
       });
     },
@@ -78,9 +85,10 @@ export default function MatchProfile() {
         description: `${profile?.name} foi bloqueado com sucesso.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/matches"] });
-      setLocation("/matches");
+      setTimeout(() => setLocation("/matches"), 500);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Erro ao bloquear:", error);
       toast({
         title: "Erro",
         description: "Não foi possível bloquear este usuário.",
@@ -92,7 +100,10 @@ export default function MatchProfile() {
   // Mutation para denunciar
   const reportMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/report/${profile?.userId}`, {
+      if (!profile?.userId) {
+        throw new Error("Profile userId not found");
+      }
+      return await apiRequest(`/api/report/${profile.userId}`, {
         method: "POST",
         body: {
           reason: "Comportamento inapropriado",
@@ -104,9 +115,10 @@ export default function MatchProfile() {
         title: "Denúncia enviada",
         description: "Obrigado pela sua denúncia. Vamos analisá-la.",
       });
-      setLocation("/matches");
+      setTimeout(() => setLocation("/matches"), 500);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Erro ao denunciar:", error);
       toast({
         title: "Erro",
         description: "Não foi possível enviar a denúncia.",
