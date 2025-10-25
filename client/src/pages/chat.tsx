@@ -57,7 +57,8 @@ export default function Chat() {
   const { data: messages = [], isLoading } = useQuery<Message[]>({
     queryKey: [`/api/messages/${matchId}`],
     enabled: !!matchId,
-    refetchInterval: 3000,
+    refetchInterval: 10000, // ⚡ Aumentado para 10s - reduz carga no servidor (WebSocket já faz tempo real)
+    staleTime: 8000, // ⚡ Cache de 8s
   });
 
   // WebSocket para mensagens em tempo real

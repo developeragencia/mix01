@@ -38,6 +38,8 @@ export default function Discover() {
     queryKey: ["/api/discover"],
     retry: false,
     refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // ⚡ 10 minutos - perfis não mudam tão rápido
+    gcTime: 30 * 60 * 1000, // ⚡ 30 minutos em cache
     queryFn: async () => {
       const response = await fetch("/api/discover", {
         credentials: 'include'

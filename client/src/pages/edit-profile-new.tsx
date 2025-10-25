@@ -54,18 +54,16 @@ export default function EditProfileNew() {
     }
 
     if (user?.id) {
-      // Garantir que temos os dados mais recentes do usuário
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] }).then(() => {
-        // Buscar perfil
-        fetch(`/api/profiles/${user.id}`, { credentials: 'include' })
-          .then(res => {
-            if (res.ok) return res.json();
-            if (res.status === 404) {
-              console.log("Profile not found, using user data");
-              return null;
-            }
-            throw new Error('Failed to load profile');
-          })
+      // ⚡ Buscar perfil diretamente sem invalidar cache (melhora performance)
+      fetch(`/api/profiles/${user.id}`, { credentials: 'include' })
+        .then(res => {
+          if (res.ok) return res.json();
+          if (res.status === 404) {
+            console.log("Profile not found, using user data");
+            return null;
+          }
+          throw new Error('Failed to load profile');
+        })
           .then(profile => {
             const userData = user as any;
             if (profile) {
@@ -123,7 +121,6 @@ export default function EditProfileNew() {
           .catch(err => {
             console.error("Error loading profile:", err);
           });
-      });
     }
   }, [user, isLoading, setLocation]);
 

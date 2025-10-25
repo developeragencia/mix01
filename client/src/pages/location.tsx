@@ -48,6 +48,9 @@ export default function Localizacao() {
   const { data: estabelecimentos = [] } = useQuery<Establishment[]>({
     queryKey: ['/api/establishments'],
     enabled: true,
+    staleTime: 15 * 60 * 1000, // ⚡ 15 minutos - estabelecimentos não mudam frequentemente
+    gcTime: 30 * 60 * 1000, // ⚡ 30 minutos em cache
+    refetchOnWindowFocus: false, // ⚡ Não refetch ao focar
     queryFn: async () => {
       const response = await fetch("/api/establishments", {
         credentials: 'include' // ✅ CRÍTICO: Envia cookies de sessão
@@ -63,6 +66,9 @@ export default function Localizacao() {
   const { data: pessoasProximas = [] } = useQuery<Profile[]>({
     queryKey: ['/api/profiles/discovery'],
     enabled: true,
+    staleTime: 5 * 60 * 1000, // ⚡ 5 minutos - pessoas próximas
+    gcTime: 15 * 60 * 1000, // ⚡ 15 minutos em cache
+    refetchOnWindowFocus: false, // ⚡ Não refetch ao focar
     queryFn: async () => {
       const response = await fetch("/api/profiles/discovery", {
         credentials: 'include' // ✅ CRÍTICO: Envia cookies de sessão

@@ -31,10 +31,10 @@ export function useAuth() {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: 0, // ✅ Sem retry - falha rápido se não autenticado
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false, // ⚡ Desabilitar refetch ao focar - melhora performance
+    refetchOnMount: false, // ⚡ Não refetch ao montar se já tem dados em cache
+    staleTime: 15 * 60 * 1000, // ⚡ 15 minutos - dados mais duráveis
+    gcTime: 30 * 60 * 1000, // ⚡ 30 minutos - mantém mais tempo em cache
     queryFn: async () => {
       const response = await fetch("/api/auth/user", {
         credentials: 'include'

@@ -61,6 +61,9 @@ export default function Profile() {
     queryKey: ['/api/profiles', user?.id],
     enabled: !!user?.id,
     retry: false,
+    staleTime: 5 * 60 * 1000, // ⚡ 5 minutos - dados do perfil
+    gcTime: 15 * 60 * 1000, // ⚡ 15 minutos em cache
+    refetchOnWindowFocus: false, // ⚡ Não refetch ao focar
     queryFn: async () => {
       const res = await fetch(`/api/profiles/${user?.id}`, {
         credentials: 'include',
