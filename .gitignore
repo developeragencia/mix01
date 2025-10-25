@@ -5,3 +5,32 @@ server/public
 vite.config.ts.*
 *.tar.gz
 .git.backup.*
+
+# Backup files
+*.backup
+*_backup_*/
+backups/
+src_backup_*/
+
+# Temporary files
+*.log
+*.txt.bak
+build-log.txt
+cookies.txt
+
+# Documentation duplicates (keep only README.md)
+Instructions.md
+replit.md
+
+# Old deployment configs
+render.yaml
+railway.toml
+Procfile
+deploy.sh
+render-environment-variables.json
+
+# Test and debug files
+test*.html
+debug*.html
+*_TEST_*.md
+*_TESTE_*.md

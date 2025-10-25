@@ -18,22 +18,31 @@ export default function Matches() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // ⚡ Buscar matches reais do banco de dados - OTIMIZADO
-  const { data: matchesData = [], isLoading, error } = useQuery<Conversation[]>({
+  // ⚡ OTIMIZADO: Configuração eficiente de cache e polling
+  const { data: matchesData = [], isLoading, error, refetch } = useQuery<Conversation[]>({
     queryKey: ['/api/matches'],
-    refetchInterval: 30000, // ⚡ 30 segundos ao invés de 5
-    staleTime: 20000, // ⚡ 20 segundos
-    gcTime: 5 * 60 * 1000, // ⚡ 5 minutos
-    retry: 1,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchInterval: 30000, // Polling: 30 segundos
+    staleTime: 20000, // Cache válido por 20 segundos
+    gcTime: 5 * 60 * 1000, // Garbage collection: 5 minutos
+    refetchOnWindowFocus: true, // Atualizar ao voltar para a aba
+    refetchOnMount: true, // Atualizar ao montar componente
+    retry: 2, // Tentar 2 vezes em caso de erro
+    retryDelay: 1000, // 1 segundo entre tentativas
   });
 
   // Separar novos matches (sem mensagens) de conversas ativas (com mensagens)
   const newMatches = matchesData.filter(conv => conv.lastMessage === null);
   const conversations = matchesData.filter(conv => conv.lastMessage !== null);
   
-  const unreadMessagesCount = 0;
+  console.log("📊 Matches - Dados carregados:", {
+    total: matchesData.length,
+    newMatches: newMatches.length,
+    conversations: conversations.length
+  });
+  
+  const unreadMessagesCount = conversations.filter((c: any) => 
+    c.lastMessage?.senderId === c.profile?.userId
+  ).length;
 
   const openConversation = (matchId: number) => {
     setLocation(`/chat/${matchId}`);
@@ -118,14 +127,12 @@ export default function Matches() {
         {/* Seção: Novos Matches */}
         {newMatches.length > 0 && (
           <div className="mb-6 px-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                Deu MIX 
-                {newMatches.length > 0 && (
-                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                    {newMatches.length}
-                  </span>
-                )}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-white font-bold text-xl flex items-center gap-2">
+                💕 Deu MIX
+                <span className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
+                  {newMatches.length}
+                </span>
               </h2>
             </div>
 
