@@ -45,28 +45,44 @@ export default function Verification() {
 
   const requestVerificationMutation = useMutation({
     mutationFn: async (data: { method: string; images: string[] }) => {
+      console.log("🔵 Mutation: Enviando dados para backend...", {
+        method: data.method,
+        imagesCount: data.images.length
+      });
+      
       const res = await fetch('/api/verification/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Falha ao enviar verificação');
-      return res.json();
+      
+      console.log("🔵 Mutation: Response status:", res.status);
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("❌ Mutation: Erro na resposta:", errorData);
+        throw new Error(errorData.message || 'Falha ao enviar verificação');
+      }
+      
+      const result = await res.json();
+      console.log("✅ Mutation: Sucesso!", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("✅ onSuccess: Verificação enviada!", data);
       queryClient.invalidateQueries({ queryKey: ['/api/verification/status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/profiles', user?.id] });
       toast({
         title: "Verificação enviada!",
-        description: "Sua selfie foi enviada e será analisada em breve.",
+        description: "Sua documentação foi enviada e será analisada em breve.",
       });
-      setSelectedImage(null);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("❌ onError: Erro ao enviar:", error);
       toast({
-        title: "Erro",
-        description: "Não foi possível enviar a verificação. Tente novamente.",
+        title: "Erro ao enviar",
+        description: error.message || "Não foi possível enviar a verificação. Tente novamente.",
         variant: "destructive",
       });
     },
@@ -115,21 +131,38 @@ export default function Verification() {
   // ✅ Abrir câmera
   const openCamera = async () => {
     try {
+      console.log("🎥 Tentando abrir câmera...");
       setIsCameraLoading(true);
+      
+      // Verificar se getUserMedia está disponível
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("getUserMedia não suportado neste navegador");
+      }
+      
+      console.log("🎥 Solicitando permissão de câmera...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 1280, height: 720 }
       });
       
+      console.log("✅ Permissão concedida! Stream:", stream);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        await videoRef.current.play(); // ✅ Garantir que o vídeo inicie
         streamRef.current = stream;
         setIsCameraOpen(true);
+        console.log("✅ Câmera aberta com sucesso!");
+        
+        toast({
+          title: "Câmera aberta!",
+          description: "Posicione seu rosto no círculo.",
+        });
       }
-    } catch (error) {
-      console.error('Erro ao acessar câmera:', error);
+    } catch (error: any) {
+      console.error('❌ Erro ao acessar câmera:', error);
       toast({
         title: "Erro ao acessar câmera",
-        description: "Permita o acesso à câmera para tirar a selfie.",
+        description: error.message || "Permita o acesso à câmera para tirar a selfie.",
         variant: "destructive",
       });
     } finally {
@@ -199,14 +232,28 @@ export default function Verification() {
 
     setIsSubmitting(true);
     try {
+      console.log("📤 Enviando verificação...");
       await requestVerificationMutation.mutateAsync({
         method: 'document_selfie',
         images: [selectedDocument, selectedImage],
       });
-      // Redirecionar para página de status
-      setLocation('/verification-status');
-    } finally {
+      
+      console.log("✅ Verificação enviada com sucesso!");
+      
+      // ✅ Aguardar um pouco para garantir que o backend processou
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // ✅ Redirecionar para página de status
+      console.log("🔄 Redirecionando para /verification-status");
+      window.location.href = '/verification-status';
+    } catch (error) {
+      console.error("❌ Erro ao enviar verificação:", error);
       setIsSubmitting(false);
+      toast({
+        title: "Erro ao enviar",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
     }
   };
 
