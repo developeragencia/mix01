@@ -36,7 +36,7 @@ export default function AdminLogin() {
         localStorage.setItem("adminToken", data.token || email);
         
         setTimeout(() => {
-          setLocation("/admin/dashboard");
+        setLocation("/admin/dashboard");
         }, 300);
       } else {
         const errorData = await response.json();
@@ -141,7 +141,7 @@ export default function AdminLogin() {
                 <div className="bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-300 rounded-2xl p-4 flex items-start space-x-3 animate-shake shadow-lg">
                   <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0 animate-bounce" />
                   <p className="text-sm text-red-800 font-medium">{error}</p>
-                </div>
+        </div>
               )}
               
               <style>{`
@@ -159,60 +159,60 @@ export default function AdminLogin() {
               <div className="space-y-3">
                 <label className="block text-sm font-bold text-white flex items-center gap-2">
                   <Mail className="w-4 h-4 text-white" />
-                  Email do Administrador
-                </label>
+              Email do Administrador
+            </label>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-200" />
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@mixapp.com"
                     className="w-full pl-12 pr-4 h-14 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-xl transition-all duration-200 hover:border-gray-300 font-medium text-base"
-                    required
+              required
                     autoComplete="email"
-                  />
+            />
                 </div>
-              </div>
+          </div>
 
               {/* Campo de senha */}
               <div className="space-y-3">
                 <label className="block text-sm font-bold text-white flex items-center gap-2">
                   <Lock className="w-4 h-4 text-white" />
-                  Senha
-                </label>
+              Senha
+            </label>
                 <div className="relative group">
                   <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-200" />
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Digite sua senha"
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite sua senha"
                     className="w-full pl-12 pr-14 h-14 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-xl transition-all duration-200 hover:border-gray-300 font-medium text-base"
-                    required
+                required
                     autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-lg p-1"
                     aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                  >
+              >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
+              </button>
+            </div>
+          </div>
 
               {/* Botão de login */}
-              <Button
-                type="submit"
-                disabled={isLoading}
+          <Button
+            type="submit"
+            disabled={isLoading}
                 className="w-full h-14 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group text-base"
-              >
+          >
                 {/* Efeito de brilho ao passar o mouse */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 
-                {isLoading ? (
+            {isLoading ? (
                   <span className="flex items-center justify-center relative z-10 gap-2">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Autenticando...
@@ -222,9 +222,9 @@ export default function AdminLogin() {
                     <Shield className="w-5 h-5" />
                     Entrar no Painel Admin
                   </span>
-                )}
-              </Button>
-            </form>
+            )}
+          </Button>
+        </form>
 
             {/* Informações de desenvolvimento */}
             <div className="mt-8 p-5 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-2 border-blue-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -248,20 +248,20 @@ export default function AdminLogin() {
                   </p>
                 </div>
               </div>
-            </div>
+        </div>
 
             {/* Botão de voltar */}
             <div className="mt-8 text-center">
-              <Button
+          <Button
                 type="button"
-                variant="ghost"
-                onClick={() => setLocation("/")}
+            variant="ghost"
+            onClick={() => setLocation("/")}
                 className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 hover:scale-105 rounded-xl font-medium"
-              >
+          >
                 <span className="flex items-center gap-2">
                   ← Voltar ao App
                 </span>
-              </Button>
+          </Button>
             </div>
           </div>
 
@@ -281,8 +281,8 @@ export default function AdminLogin() {
                 </p>
               </div>
             </div>
-          </div>
-        </Card>
+        </div>
+      </Card>
       </div>
     </div>
   );
