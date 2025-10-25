@@ -46,6 +46,7 @@ export interface IStorage {
   // Swipe methods
   createSwipe(swipe: InsertSwipe): Promise<Swipe>;
   getSwipe(swiperId: number, swipedId: number): Promise<Swipe | undefined>;
+  deleteSwipesBetweenUsers?(user1Id: number, user2Id: number): Promise<void>; // ✅ Novo método
   
   // Match methods
   createMatch(user1Id: number, user2Id: number): Promise<Match>;
@@ -568,6 +569,23 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting swipe:', error);
       return undefined;
+    }
+  }
+
+  // ✅ DELETE SWIPES BETWEEN USERS - Deletar swipes entre dois usuários
+  async deleteSwipesBetweenUsers(user1Id: number, user2Id: number): Promise<void> {
+    try {
+      // Deletar swipes em ambas as direções
+      await db.delete(swipes)
+        .where(
+          sql`(${swipes.swiperId} = ${user1Id} AND ${swipes.swipedId} = ${user2Id}) 
+              OR (${swipes.swiperId} = ${user2Id} AND ${swipes.swipedId} = ${user1Id})`
+        );
+      
+      console.log(`✅ Swipes deletados entre usuários ${user1Id} e ${user2Id}`);
+    } catch (error) {
+      console.error('Error deleting swipes between users:', error);
+      throw error;
     }
   }
 

@@ -1523,9 +1523,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Match not found" });
       }
 
+      // ✅ CORREÇÃO: Deletar os swipes entre os dois usuários para permitir re-match
+      await storage.deleteSwipesBetweenUsers?.(currentUserId, targetUserId);
+      
       // Deletar o match
       await storage.deleteMatch(match.id);
 
+      console.log(`✅ Match e swipes deletados entre ${currentUserId} e ${targetUserId}`);
       res.json({ success: true, message: "Match deleted successfully" });
     } catch (error) {
       console.error("Error deleting match:", error);
