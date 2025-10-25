@@ -54,67 +54,76 @@ export default function EditProfileNew() {
     }
 
     if (user?.id) {
-      fetch(`/api/profiles/${user.id}`, { credentials: 'include' })
-        .then(res => {
-          if (res.ok) return res.json();
-          if (res.status === 404) {
-            console.log("Profile not found, using user data");
-            return null;
-          }
-          throw new Error('Failed to load profile');
-        })
-        .then(profile => {
-          const userData = user as any;
-          if (profile) {
-            setName(profile.name || user.firstName || "");
-            setBio(profile.bio || userData.bio || "");
-            setInterests(profile.interests || userData.interests || []);
-            setHeight(profile.height?.toString() || "");
-            setRelationshipType(profile.relationshipGoals || "");
-            setLanguages(profile.languages || []);
-            setStarSign(profile.starSign || "");
-            setFamilyPlans(profile.familyPlans || "");
-            setPersonalityType(profile.personalityType || "");
-            setCommunicationStyle(profile.communicationStyle || "");
-            setPhotos(profile.photos || userData.photos || []);
-            setGender(profile.gender || userData.gender || "");
-            setSexualOrientation(profile.sexualOrientation || userData.sexualOrientation || []);
-            setPets(profile.pets || "");
-            setDrinking(profile.drinking || "");
-            setSmoking(profile.smoking || "");
-            setExercise(profile.exercise || "");
-            setDiet(profile.diet || "");
-            setSleepSchedule(profile.sleepSchedule || "");
-            setCity(profile.location || userData.city || "");
-            setSocialMedia(profile.instagram || "");
-            setFavoriteMusic(profile.spotify || "");
-            
-            // Carregar birthDate do usuário
-            if (userData.birthDate) {
-              // Converter YYYY-MM-DD para DD/MM/YYYY
-              const [year, month, day] = userData.birthDate.split('-');
-              setBirthDate(`${day}/${month}/${year}`);
+      // Garantir que temos os dados mais recentes do usuário
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] }).then(() => {
+        // Buscar perfil
+        fetch(`/api/profiles/${user.id}`, { credentials: 'include' })
+          .then(res => {
+            if (res.ok) return res.json();
+            if (res.status === 404) {
+              console.log("Profile not found, using user data");
+              return null;
             }
-          } else {
-            // Use user data as fallback
+            throw new Error('Failed to load profile');
+          })
+          .then(profile => {
             const userData = user as any;
-            setName(user.firstName || "");
-            setBio(userData.bio || "");
-            setInterests(userData.interests || []);
-            setPhotos(userData.photos || []);
-            setGender(userData.gender || "");
-            setSexualOrientation(userData.sexualOrientation || []);
-            setCity(userData.city || "");
-            
-            if (userData.birthDate) {
-              const [year, month, day] = userData.birthDate.split('-');
-              setBirthDate(`${day}/${month}/${year}`);
+            if (profile) {
+              // Priorizar profile.name, depois user.firstName
+              setName(profile.name || user.firstName || "");
+              setBio(profile.bio || userData.bio || "");
+              setInterests(profile.interests || userData.interests || []);
+              setHeight(profile.height?.toString() || "");
+              setRelationshipType(profile.relationshipGoals || "");
+              setLanguages(profile.languages || []);
+              setStarSign(profile.starSign || "");
+              setFamilyPlans(profile.familyPlans || "");
+              setPersonalityType(profile.personalityType || "");
+              setCommunicationStyle(profile.communicationStyle || "");
+              setPhotos(profile.photos || userData.photos || []);
+              setGender(profile.gender || userData.gender || "");
+              setSexualOrientation(profile.sexualOrientation || userData.sexualOrientation || []);
+              setPets(profile.pets || "");
+              setDrinking(profile.drinking || "");
+              setSmoking(profile.smoking || "");
+              setExercise(profile.exercise || "");
+              setDiet(profile.diet || "");
+              setSleepSchedule(profile.sleepSchedule || "");
+              setCity(profile.location || userData.city || "");
+              setSocialMedia(profile.instagram || "");
+              setFavoriteMusic(profile.spotify || "");
+              
+              // Carregar birthDate do usuário
+              if (userData.birthDate) {
+                // Converter YYYY-MM-DD para DD/MM/YYYY
+                const [year, month, day] = userData.birthDate.split('-');
+                setBirthDate(`${day}/${month}/${year}`);
+              }
+              
+              console.log("✅ Perfil carregado:", { name: profile.name, firstName: user.firstName });
+            } else {
+              // Use user data as fallback
+              const userData = user as any;
+              setName(user.firstName || "");
+              setBio(userData.bio || "");
+              setInterests(userData.interests || []);
+              setPhotos(userData.photos || []);
+              setGender(userData.gender || "");
+              setSexualOrientation(userData.sexualOrientation || []);
+              setCity(userData.city || "");
+              
+              if (userData.birthDate) {
+                const [year, month, day] = userData.birthDate.split('-');
+                setBirthDate(`${day}/${month}/${year}`);
+              }
+              
+              console.log("✅ Usando dados do usuário (perfil não existe):", { firstName: user.firstName });
             }
-          }
-        })
-        .catch(err => {
-          console.error("Error loading profile:", err);
-        });
+          })
+          .catch(err => {
+            console.error("Error loading profile:", err);
+          });
+      });
     }
   }, [user, isLoading, setLocation]);
 

@@ -55,7 +55,7 @@ export default function OnboardingFlow() {
     setIsSubmitting(true);
 
     try {
-      // Salvar apenas o nome
+      // Salvar o nome no usuário e perfil
       const response = await apiRequest(`/api/profiles/${user.id}`, {
         method: 'PATCH',
         body: JSON.stringify({
@@ -65,11 +65,17 @@ export default function OnboardingFlow() {
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao salvar nome');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao salvar nome');
       }
 
-      // Invalidar cache
+      console.log("✅ Nome salvo com sucesso!");
+
+      // Invalidar cache e aguardar atualização
       await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      
+      // Aguardar um pouco para garantir que o cache foi atualizado
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Ir para próxima etapa
       setStep(2);

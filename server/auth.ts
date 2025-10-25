@@ -26,7 +26,7 @@ export function setupAuth(app: Express) {
     // PRODUÇÃO ou IFRAME: Configuração CHIPS para iframe
     secure: true, // ✅ NECESSÁRIO para sameSite: none (Replit usa HTTPS)
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // ✅ 30 dias - usuário permanece conectado
     sameSite: 'none' as const, // ✅ NECESSÁRIO para iframe
     path: '/',
     partitioned: true, // ✅ CHIPS - necessário para Chrome em iframe
@@ -34,7 +34,7 @@ export function setupAuth(app: Express) {
     // DESENVOLVIMENTO PURO (fora de Replit): Configuração padrão
     secure: false,
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // ✅ 30 dias - usuário permanece conectado
     sameSite: 'lax' as const,
     path: '/',
   };
