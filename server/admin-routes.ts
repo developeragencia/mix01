@@ -60,24 +60,22 @@ export function registerAdminRoutes(app: Express) {
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
       
-      // Verificar se é admin
-      const adminUser = await db.select()
-        .from(users)
-        .where(eq(users.id, user.id))
-        .limit(1);
+      console.log("👤 Usuário encontrado:", user.id, user.email);
       
-      if (!adminUser || adminUser.length === 0) {
-        console.log("❌ Não é admin");
+      // Verificar se é um dos emails admin permitidos
+      const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
+      if (!adminEmails.includes(email)) {
+        console.log("❌ Não é admin - email não autorizado");
         return res.status(403).json({ message: "Acesso negado" });
       }
       
-      // Verificar senha (senha padrão: admin123)
-      // Em produção, usar bcrypt.compare()
+      // Verificar senha com bcrypt
       const bcrypt = require('bcryptjs');
       const validPassword = await bcrypt.compare(password, user.password);
       
-      if (!validPassword && password !== "admin123") {
+      if (!validPassword) {
         console.log("❌ Senha incorreta");
+        console.log("Hash armazenado:", user.password.substring(0, 20) + "...");
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
       
@@ -86,7 +84,7 @@ export function registerAdminRoutes(app: Express) {
       // Fazer login na sessão
       req.login(user, (err) => {
         if (err) {
-          console.error("Erro no login:", err);
+          console.error("❌ Erro ao criar sessão:", err);
           return res.status(500).json({ message: "Erro ao fazer login" });
         }
         
@@ -96,13 +94,13 @@ export function registerAdminRoutes(app: Express) {
           user: {
             id: user.id,
             email: user.email,
-            firstName: user.firstName
+            firstName: user.firstName || 'Admin'
           }
         });
       });
     } catch (error) {
-      console.error("Erro no login admin:", error);
-      res.status(500).json({ message: "Erro interno" });
+      console.error("❌ ERRO CRÍTICO no login admin:", error);
+      res.status(500).json({ message: "Erro interno", details: error instanceof Error ? error.message : String(error) });
     }
   });
   
