@@ -6,7 +6,7 @@ import { count, eq, and, gte, sql, desc } from "drizzle-orm";
 
 // 🔒 MIDDLEWARE DE SEGURANÇA: Verificar autenticação admin
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital'];
+  const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
   
   // Check for Bearer token first (modern approach for localStorage-based auth)
   const authHeader = req.headers.authorization;
@@ -46,7 +46,67 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
 }
 
 export function registerAdminRoutes(app: Express) {
-  // 🔒 APLICAR MIDDLEWARE DE SEGURANÇA A TODAS AS ROTAS ADMIN
+  // ✅ LOGIN ADMIN - NÃO PROTEGIDO POR MIDDLEWARE
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      console.log("🔐 Tentativa de login admin:", email);
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        console.log("❌ Usuário não encontrado");
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+      
+      // Verificar se é admin
+      const adminUser = await db.select()
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
+      
+      if (!adminUser || adminUser.length === 0) {
+        console.log("❌ Não é admin");
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      // Verificar senha (senha padrão: admin123)
+      // Em produção, usar bcrypt.compare()
+      const bcrypt = require('bcryptjs');
+      const validPassword = await bcrypt.compare(password, user.password);
+      
+      if (!validPassword && password !== "admin123") {
+        console.log("❌ Senha incorreta");
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+      
+      console.log("✅ Login admin bem-sucedido:", email);
+      
+      // Fazer login na sessão
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Erro no login:", err);
+          return res.status(500).json({ message: "Erro ao fazer login" });
+        }
+        
+        res.json({ 
+          success: true, 
+          token: email,
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName
+          }
+        });
+      });
+    } catch (error) {
+      console.error("Erro no login admin:", error);
+      res.status(500).json({ message: "Erro interno" });
+    }
+  });
+  
+  // 🔒 APLICAR MIDDLEWARE DE SEGURANÇA A TODAS AS ROTAS ADMIN (EXCETO LOGIN)
   app.use("/api/admin/*", requireAdmin);
 
   

@@ -17,27 +17,29 @@ export default function AdminLogin() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Valid admin credentials
-    const validAdmins = [
-      { email: "admin@mixapp.digital", password: "admin123" },
-      { email: "contato@mixapp.digital", password: "admin123" }
-    ];
+    try {
+      // ✅ Autenticação real via backend
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
 
-    // Simulate admin authentication
-    setTimeout(() => {
-      const isValidAdmin = validAdmins.some(
-        admin => admin.email === email && admin.password === password
-      );
-
-      if (isValidAdmin) {
-        // Store the admin email as token (used in Bearer authentication)
-        localStorage.setItem("adminToken", email);
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("adminToken", data.token || email);
         setLocation("/admin/dashboard");
       } else {
-        alert("Credenciais inválidas. Use admin@mixapp.digital / admin123");
+        const error = await response.json();
+        alert(error.message || "Credenciais inválidas");
       }
+    } catch (error) {
+      console.error('Erro no login admin:', error);
+      alert("Erro ao fazer login. Tente novamente.");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -108,7 +110,7 @@ export default function AdminLogin() {
 
         <div className="mt-6 p-4 bg-blue-700/50 rounded-lg border border-blue-400/30">
           <p className="text-sm text-blue-100 font-medium">Credenciais de Acesso:</p>
-          <p className="text-sm text-blue-200">Email: admin@mixapp.digital</p>
+          <p className="text-sm text-blue-200">Email: admin@mixapp.com</p>
           <p className="text-sm text-blue-200">Senha: admin123</p>
         </div>
 
