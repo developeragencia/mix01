@@ -1130,7 +1130,8 @@ export function registerAdminRoutes(app: Express) {
       const updated = await db.update(verifications)
         .set({
           isVerified: true,
-          verifiedAt: new Date()
+          verifiedAt: new Date(),
+          status: 'approved'
         })
         .where(eq(verifications.id, parseInt(id)))
         .returning();
@@ -1160,17 +1161,22 @@ export function registerAdminRoutes(app: Express) {
       
       console.log('❌ Rejecting verification:', id, 'Reason:', reason);
       
-      // Delete the verification request
-      const deleted = await db.delete(verifications)
+      // Update verification to rejected status instead of deleting
+      const updated = await db.update(verifications)
+        .set({
+          status: 'rejected',
+          rejectionReason: reason || 'Documento inválido ou ilegível',
+          isVerified: false
+        })
         .where(eq(verifications.id, parseInt(id)))
         .returning();
       
-      if (deleted.length === 0) {
+      if (updated.length === 0) {
         return res.status(404).json({ error: 'Verification not found' });
       }
       
-      console.log('❌ Verification rejected and removed');
-      res.json({ success: true, message: 'Verification rejected' });
+      console.log('✅ Verification rejected');
+      res.json({ success: true, verification: updated[0] });
     } catch (error) {
       console.error('Error rejecting verification:', error);
       res.status(500).json({ error: 'Failed to reject verification' });

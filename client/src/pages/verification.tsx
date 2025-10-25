@@ -45,6 +45,18 @@ export default function Verification() {
     refetchOnMount: true,
   });
 
+  // Log detalhado para debug
+  useEffect(() => {
+    if (verification) {
+      console.log("🔍 DEBUG VERIFICAÇÃO - Dados recebidos:", {
+        isVerified: verification.isVerified,
+        status: verification.status,
+        verifiedAt: verification.verifiedAt,
+        submittedAt: verification.submittedAt
+      });
+    }
+  }, [verification]);
+
   const requestVerificationMutation = useMutation({
     mutationFn: async (data: { method: string; images: string[] }) => {
       console.log("🔵 Mutation: Enviando dados para backend...", {
