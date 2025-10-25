@@ -170,13 +170,13 @@ export default function Discover() {
   }
 
   return (
-    <div className="h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
-      {/* FOTO GRANDE - Mostra foto completa sem cortes */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center p-4">
+    <div className="h-screen flex flex-col relative overflow-hidden bg-black">
+      {/* FOTO GRANDE - Ocupa toda a tela sem cortes */}
+      <div className="absolute inset-0 z-0">
         <img
           src={currentProfile.photos?.[currentPhotoIndex] || currentProfile.photos?.[0] || `https://ui-avatars.com/api/?name=${currentProfile.name}&background=ec4899&color=fff&size=800`}
           alt={currentProfile.name}
-          className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+          className="w-full h-full object-contain"
           data-testid="img-profile-photo"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -185,7 +185,7 @@ export default function Discover() {
           }}
         />
         {/* Gradiente escuro na parte inferior para legibilidade */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30"></div>
       </div>
 
       {/* Áreas clicáveis para navegação de fotos */}
