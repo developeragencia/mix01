@@ -191,6 +191,7 @@ function Router() {
       <Route path="/discover" component={Discover} />
       <Route path="/swipe" component={Swipe} />
       <Route path="/matches" component={Matches} />
+      <Route path="/matches-grid" component={MatchesGrid} />
       <Route path="/match-profile/:id" component={MatchProfile} />
       <Route path="/match-celebration/:matchId" component={MatchCelebration} />
       <Route path="/messages" component={Messages} />
