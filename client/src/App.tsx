@@ -55,6 +55,7 @@ import EditProfile from "@/pages/edit-profile";
 import EditProfileNew from "@/pages/edit-profile-new";
 import Settings from "@/pages/settings";
 import Verification from "@/pages/verification";
+import VerificationStatus from "@/pages/verification-status";
 import SessionDebug from "@/pages/session-debug";
 import SeuMix from "@/pages/seu-mix";
 import NotFound from "@/pages/not-found";
@@ -201,6 +202,7 @@ function Router() {
       <Route path="/settings" component={Settings} />
       <Route path="/subscription" component={Subscription} />
       <Route path="/verification" component={Verification} />
+      <Route path="/verification-status" component={VerificationStatus} />
       <Route path="/session-debug" component={SessionDebug} />
       <Route path="/notifications" component={Notifications} />
       <Route path="/security" component={Security} />

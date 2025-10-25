@@ -1110,8 +1110,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.timeEnd('⏱️ getUserSwipes + getUserMatches + getBlockedUsers');
       
       // ✅ CORREÇÃO: Apenas filtrar swipes (não matches - para permitir re-match após desfazer)
-      const swipedUserIds = new Set(userSwipes.map((s: Swipe) => s.swipedId));
-      
+        const swipedUserIds = new Set(userSwipes.map((s: Swipe) => s.swipedId));
+        
       // ✅ CORREÇÃO: Criar set de usuários bloqueados
       const blockedUserIds = new Set(blockedUsers.map((b: any) => b.blockedUserId));
       
@@ -1131,11 +1131,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ⚡ OTIMIZAÇÃO: Merge síncrono sem await
       const profilesWithOnlineStatus = filteredProfiles.map(profile => {
         const user = usersMap.get(profile.userId);
-        return {
-          ...profile,
-          isOnline: user?.isOnline || false,
-          lastSeen: user?.lastSeen || new Date()
-        };
+          return {
+            ...profile,
+            isOnline: user?.isOnline || false,
+            lastSeen: user?.lastSeen || new Date()
+          };
       });
       
       console.timeEnd(`⏱️ Discover total - User ${currentUserId}`);
