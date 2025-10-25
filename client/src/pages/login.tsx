@@ -27,6 +27,8 @@ function LoginContent() {
       setIsLoading(true);
       setError("");
 
+      console.log("🔵 Enviando credencial do Google para o backend...");
+
       const response = await fetch("/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -36,13 +38,27 @@ function LoginContent() {
 
       const data = await response.json();
 
+      console.log("🔵 Resposta do backend:", {
+        status: response.status,
+        ok: response.ok,
+        success: data.success,
+        isProfileComplete: data.isProfileComplete,
+        isNewUser: data.isNewUser
+      });
+
       if (response.ok && data.success) {
+        const welcomeMessage = data.isNewUser 
+          ? "Conta criada! Complete seu perfil"
+          : "Bem-vindo de volta!";
+        
         toast({ 
           title: "Login realizado!", 
-          description: "Bem-vindo ao MIX!" 
+          description: welcomeMessage
         });
         
         await new Promise(resolve => setTimeout(resolve, 500));
+        
+        console.log("🔵 Redirecionando para:", data.isProfileComplete ? '/discover' : '/onboarding-flow');
         
         if (data.isProfileComplete) {
           window.location.href = '/discover';
@@ -50,10 +66,24 @@ function LoginContent() {
           window.location.href = '/onboarding-flow';
         }
       } else {
-        setError(data.message || "Erro ao fazer login. Tente novamente.");
+        console.error("❌ Erro na resposta:", data);
+        const errorMessage = data.message || data.error || "Erro ao fazer login. Tente novamente.";
+        setError(errorMessage);
+        toast({
+          title: "Erro ao fazer login",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
     } catch (err: any) {
-      setError("Erro de conexão. Verifique sua internet e tente novamente.");
+      console.error("❌ Erro ao fazer login com Google:", err);
+      const errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+      setError(errorMessage);
+      toast({
+        title: "Erro de conexão",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

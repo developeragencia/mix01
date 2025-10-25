@@ -65,14 +65,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ✅ Google OAuth Login/Register Endpoint
   app.post("/api/auth/google", async (req, res) => {
     try {
+      console.log("🔵 ========================================");
+      console.log("🔵 GOOGLE OAUTH REQUEST");
+      console.log("🔵 ========================================");
+      
       const { credential } = req.body;
 
       if (!credential) {
+        console.error("❌ Credencial não fornecida");
         return res.status(400).json({ 
           success: false, 
           message: "Credencial do Google não fornecida" 
         });
       }
+
+      console.log("🔵 Verificando token do Google...");
 
       // Verify the JWT token from Google
       const ticket = await googleClient.verifyIdToken({
@@ -83,18 +90,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const payload = ticket.getPayload();
       
       if (!payload || !payload.email) {
+        console.error("❌ Payload inválido ou email não encontrado");
         return res.status(401).json({ 
           success: false, 
           message: "Erro ao validar credencial do Google" 
         });
       }
 
-      const { email, given_name, family_name, picture } = payload;
+      const { email, given_name, family_name, picture, email_verified } = payload;
+      
+      console.log("🔵 ========================================");
+      console.log("🔵 DADOS DO GOOGLE:");
+      console.log("🔵 Email:", email);
+      console.log("🔵 Nome:", given_name, family_name);
+      console.log("🔵 Email verificado:", email_verified);
+      console.log("🔵 ========================================");
 
       // Check if user exists
       let user = await storage.getUserByEmail(email);
+      const isNewUser = !user;
 
       if (!user) {
+        console.log("🔵 Usuário não existe, criando novo usuário...");
+        
         // Create new user
         user = await storage.createUser({
           email: email,
@@ -120,21 +138,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
           subscriptionType: "free",
           dailyLikes: 0,
         });
+        
+        console.log("✅ Novo usuário criado com ID:", user.id);
+      } else {
+        console.log("🔵 Usuário já existe, ID:", user.id);
+        
+        // Atualizar foto de perfil se mudou
+        if (picture && picture !== user.profileImage) {
+          console.log("🔵 Atualizando foto de perfil...");
+          await storage.updateUser(user.id, { profileImage: picture });
+        }
       }
+
+      console.log("🔵 Fazendo login do usuário...");
 
       // Login user
       req.login(user, async (err) => {
         if (err) {
+          console.error("❌ Erro ao criar sessão:", err);
           return res.status(500).json({ 
             success: false, 
             message: "Erro ao criar sessão" 
           });
         }
 
+        console.log("✅ Login realizado com sucesso");
+
         // Get fresh user data
         const freshUser = await storage.getUserByEmail(email);
         
         if (!freshUser) {
+          console.error("❌ Erro ao buscar dados do usuário");
           return res.status(500).json({ 
             success: false, 
             message: "Erro ao buscar dados do usuário" 
@@ -151,11 +185,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           freshUser.interestedIn.length > 0
         );
 
+        console.log("🔵 ========================================");
+        console.log("🔵 VERIFICAÇÃO DE PERFIL:");
+        console.log("🔵 birthDate:", !!freshUser.birthDate, freshUser.birthDate);
+        console.log("🔵 gender:", !!freshUser.gender, freshUser.gender);
+        console.log("🔵 photos:", freshUser.photos?.length || 0);
+        console.log("🔵 interestedIn:", freshUser.interestedIn?.length || 0);
+        console.log("🔵 Perfil completo:", isProfileComplete);
+        console.log("🔵 ========================================");
+
         // Save session
         req.session.save((saveErr) => {
           if (saveErr) {
-            console.error("Erro ao salvar sessão:", saveErr);
+            console.error("❌ Erro ao salvar sessão:", saveErr);
+          } else {
+            console.log("✅ Sessão salva com sucesso");
           }
+          
+          console.log("🔵 ========================================");
+          console.log("🔵 RESPOSTA ENVIADA:");
+          console.log("🔵 success: true");
+          console.log("🔵 isNewUser:", isNewUser);
+          console.log("🔵 isProfileComplete:", isProfileComplete);
+          console.log("🔵 ========================================");
           
           return res.json({
             success: true,
@@ -166,15 +218,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
               firstName: freshUser.firstName,
               username: freshUser.username,
             },
+            isNewUser: isNewUser,
             isProfileComplete: isProfileComplete,
           });
         });
       });
     } catch (error: any) {
-      console.error("Erro Google OAuth:", error);
+      console.error("🔵 ========================================");
+      console.error("❌ ERRO GOOGLE OAUTH:");
+      console.error("❌ Tipo:", error.name);
+      console.error("❌ Mensagem:", error.message);
+      console.error("❌ Stack:", error.stack);
+      console.error("🔵 ========================================");
+      
       return res.status(500).json({ 
         success: false, 
-        message: "Erro ao processar login com Google" 
+        message: `Erro ao processar login com Google: ${error.message}`,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   });

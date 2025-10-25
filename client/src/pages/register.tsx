@@ -30,6 +30,8 @@ function RegisterContent() {
       setIsLoading(true);
       setError("");
 
+      console.log("🔵 Enviando credencial do Google para o backend (cadastro)...");
+
       const response = await fetch("/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,20 +41,47 @@ function RegisterContent() {
 
       const data = await response.json();
 
+      console.log("🔵 Resposta do backend:", {
+        status: response.status,
+        ok: response.ok,
+        success: data.success,
+        isProfileComplete: data.isProfileComplete,
+        isNewUser: data.isNewUser
+      });
+
       if (response.ok && data.success) {
+        const welcomeMessage = data.isNewUser 
+          ? "Conta criada com sucesso!" 
+          : "Você já tem uma conta! Complete seu perfil";
+        
         toast({ 
-          title: "Conta criada!", 
-          description: "Bem-vindo ao MIX!" 
+          title: data.isNewUser ? "Conta criada!" : "Bem-vindo de volta!", 
+          description: welcomeMessage
         });
         
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        console.log("🔵 Redirecionando para onboarding...");
         window.location.href = '/onboarding-flow';
       } else {
-        setError(data.message || "Erro ao criar conta. Tente novamente.");
+        console.error("❌ Erro na resposta:", data);
+        const errorMessage = data.message || data.error || "Erro ao criar conta. Tente novamente.";
+        setError(errorMessage);
+        toast({
+          title: "Erro ao criar conta",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
     } catch (err: any) {
-      setError("Erro de conexão. Verifique sua internet e tente novamente.");
+      console.error("❌ Erro ao cadastrar com Google:", err);
+      const errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+      setError(errorMessage);
+      toast({
+        title: "Erro de conexão",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
