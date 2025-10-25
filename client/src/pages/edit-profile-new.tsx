@@ -119,6 +119,16 @@ export default function EditProfileNew() {
   }, [user, isLoading, setLocation]);
 
   const handlePhotoUpload = (index: number, file: File) => {
+    // Validar tamanho do arquivo original (máx 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "Por favor, selecione uma imagem menor que 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const img = new Image();
     const reader = new FileReader();
     
@@ -128,9 +138,11 @@ export default function EditProfileNew() {
         let width = img.width;
         let height = img.height;
         
-        const MAX_WIDTH = 500;
-        const MAX_HEIGHT = 800;
+        // Reduzir dimensões mais agressivamente
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 1200;
         
+        // Calcular proporção
         if (width > height) {
           if (width > MAX_WIDTH) {
             height = height * (MAX_WIDTH / width);
@@ -146,32 +158,76 @@ export default function EditProfileNew() {
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
+        if (!ctx) {
+          toast({
+            title: "Erro ao processar imagem",
+            description: "Não foi possível processar a imagem. Tente novamente.",
+            variant: "destructive",
+          });
+          return;
+        }
         
-        let quality = 0.4;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Começar com qualidade mais baixa
+        let quality = 0.7;
         let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
         let sizeKB = Math.round((compressedDataUrl.length * 0.75) / 1024);
         
-        // Recomprimir se ainda estiver muito grande
-        while (sizeKB > 280 && quality > 0.1) {
+        console.log(`📸 Foto ${index + 1} inicial: ${width}x${height}, ${sizeKB} KB, qualidade ${quality.toFixed(2)}`);
+        
+        // Recomprimir agressivamente até ficar abaixo de 250 KB (margem de segurança)
+        const MAX_SIZE_KB = 250;
+        let attempts = 0;
+        const MAX_ATTEMPTS = 20;
+        
+        while (sizeKB > MAX_SIZE_KB && quality > 0.05 && attempts < MAX_ATTEMPTS) {
           quality -= 0.05;
           compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
           sizeKB = Math.round((compressedDataUrl.length * 0.75) / 1024);
-          console.log(`🔄 Recomprimindo foto ${index + 1} com qualidade ${quality.toFixed(2)}: ${sizeKB} KB`);
+          attempts++;
+          console.log(`🔄 Tentativa ${attempts}: qualidade ${quality.toFixed(2)}, ${sizeKB} KB`);
         }
         
-        console.log(`📸 Foto ${index + 1} final: ${width}x${height}, ${sizeKB} KB, qualidade ${quality.toFixed(2)}`);
+        console.log(`✅ Foto ${index + 1} final: ${width}x${height}, ${sizeKB} KB, qualidade ${quality.toFixed(2)}`);
         
+        // Verificação final
         if (sizeKB > 300) {
-          console.warn(`⚠️ Foto ${index + 1} ainda grande: ${sizeKB} KB`);
+          toast({
+            title: "Imagem ainda muito grande",
+            description: `A foto ${index + 1} tem ${sizeKB} KB. Tente uma imagem menor ou com menos detalhes.`,
+            variant: "destructive",
+          });
+          return;
         }
         
         const newPhotos = [...photos];
         newPhotos[index] = compressedDataUrl;
         setPhotos(newPhotos);
+        
+        toast({
+          title: "Foto adicionada!",
+          description: `Foto ${index + 1} (${sizeKB} KB) pronta para salvar`,
+        });
+      };
+      
+      img.onerror = () => {
+        toast({
+          title: "Erro ao carregar imagem",
+          description: "Não foi possível carregar a imagem. Tente outro arquivo.",
+          variant: "destructive",
+        });
       };
       
       img.src = event.target?.result as string;
+    };
+    
+    reader.onerror = () => {
+      toast({
+        title: "Erro ao ler arquivo",
+        description: "Não foi possível ler o arquivo. Tente novamente.",
+        variant: "destructive",
+      });
     };
     
     reader.readAsDataURL(file);
@@ -223,9 +279,33 @@ export default function EditProfileNew() {
       });
       
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Erro ao atualizar perfil:", errorText);
-        throw new Error(`Erro ao atualizar: ${errorText}`);
+        let errorMessage = "Erro ao atualizar perfil";
+        try {
+          const errorData = await res.json();
+          console.error("Erro ao atualizar perfil:", errorData);
+          
+          // Tratamento específico para erro de foto muito grande
+          if (errorData.error === "PHOTO_TOO_LARGE") {
+            const photoNumbers = errorData.oversizedPhotos?.join(", ") || "";
+            errorMessage = `Fotos muito grandes: #${photoNumbers}. Máximo permitido: ${errorData.maxSizeKB} KB por foto.`;
+            
+            toast({
+              title: "Erro ao salvar",
+              description: errorMessage,
+              variant: "destructive",
+            });
+            return;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch {
+          // Se não conseguir fazer parse do JSON, usar texto
+          const errorText = await res.text();
+          console.error("Erro ao atualizar perfil (texto):", errorText);
+          errorMessage = errorText || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       console.log("✅ Perfil atualizado com sucesso!");
@@ -242,11 +322,15 @@ export default function EditProfileNew() {
       setTimeout(() => setLocation('/profile'), 500);
     } catch (error: any) {
       console.error("❌ Erro ao salvar perfil:", error);
-      toast({
-        title: "Erro ao salvar",
-        description: error.message || "Não foi possível salvar as alterações. Tente novamente.",
-        variant: "destructive",
-      });
+      
+      // Não mostrar toast se já mostramos um específico acima
+      if (error.message && !error.message.includes("Fotos muito grandes")) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message || "Não foi possível salvar as alterações. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
