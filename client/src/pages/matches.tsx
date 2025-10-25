@@ -129,7 +129,7 @@ export default function Matches() {
           <div className="mb-6 px-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-white font-bold text-xl flex items-center gap-2">
-                💕 Deu MIX
+                Deu MIX
                 <span className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
                   {newMatches.length}
                 </span>
