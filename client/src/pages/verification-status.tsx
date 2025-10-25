@@ -17,14 +17,15 @@ interface Verification {
 
 export default function VerificationStatus() {
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
 
   // ✅ Polling a cada 5 segundos para verificar mudanças de status
   const { data: verification, isLoading, error } = useQuery<Verification>({
     queryKey: ['/api/verification/status'],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !authLoading, // ✅ Só habilitar se auth estiver pronto
     refetchInterval: 5000,
     retry: 1,
+    retryDelay: 1000,
   });
 
   // ✅ Log para debug
@@ -39,20 +40,23 @@ export default function VerificationStatus() {
     }
   }, [verification]);
 
-  // ✅ Redirect se não autenticado
+  // ✅ Redirect se não autenticado (CORRIGIDO: usar authLoading)
   useEffect(() => {
-    if (!user && !isLoading) {
+    if (!authLoading && !user) {
       console.log("❌ Usuário não autenticado, redirecionando...");
       setLocation('/login');
     }
-  }, [user, isLoading, setLocation]);
+  }, [authLoading, user, setLocation]);
 
-  if (isLoading) {
+  // ✅ Mostrar loading se auth ou verificação estão carregando
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <p className="text-white text-sm">Carregando status...</p>
+          <p className="text-white text-sm">
+            {authLoading ? 'Verificando autenticação...' : 'Carregando status...'}
+          </p>
         </div>
       </div>
     );
