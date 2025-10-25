@@ -64,8 +64,12 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "returnNull" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      refetchOnMount: false, // ⚡ Não refetch ao montar
+      refetchOnReconnect: false, // ⚡ Não refetch ao reconectar
+      staleTime: 5 * 60 * 1000, // ⚡ 5 minutos (ao invés de Infinity)
+      gcTime: 10 * 60 * 1000, // ⚡ 10 minutos para garbage collection
+      retry: 1, // ⚡ Tentar 1 vez ao invés de false
+      retryDelay: 1000, // ⚡ Delay de 1 segundo
       // Remove deprecated onError - this causes unhandled rejections
     },
     mutations: {

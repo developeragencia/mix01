@@ -1,8 +1,10 @@
 import { Flame, Heart, MessageCircle, User } from "lucide-react";
 import { useLocation } from "wouter";
 import { NeonHeart } from "@/components/NeonHeart";
+import { memo } from "react";
 
-export default function BottomNavigation() {
+// ⚡ MEMOIZADO: Evita re-renders desnecessários
+const BottomNavigation = memo(function BottomNavigation() {
   const [location, setLocation] = useLocation();
 
   const navItems = [
@@ -60,4 +62,6 @@ export default function BottomNavigation() {
       </div>
     </div>
   );
-}
+});
+
+export default BottomNavigation;

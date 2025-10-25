@@ -996,7 +996,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log("🔵 ✅ Dados do usuário atualizados com sucesso!");
         
-        // ✅ VERIFICAR SE PERFIL ESTÁ COMPLETO APÓS ATUALIZAÇÃO
+        // ✅ VERIFICAR SE PERFIL ESTÁ COMPLETO APÓS ATUALIZAÇÃO E SALVAR NO BD
         const updatedUser = await storage.getUser(userId);
         const isComplete = isProfileComplete(updatedUser);
         
@@ -1008,6 +1008,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("🔵 interestedIn:", updatedUser?.interestedIn?.length || 0);
         console.log("🔵 RESULTADO:", isComplete ? "✅ COMPLETO" : "❌ INCOMPLETO");
         console.log("🔵 ========================================");
+        
+        // ✅ CRÍTICO: Atualizar isProfileComplete no banco de dados
+        if (updatedUser && updatedUser.isProfileComplete !== isComplete) {
+          console.log("🔵 Atualizando isProfileComplete no BD:", isComplete);
+          await storage.updateUser(userId, { isProfileComplete: isComplete });
+        }
       }
       
       // Verificar se perfil já existe

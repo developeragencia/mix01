@@ -33,10 +33,16 @@ export default function OnboardingFlow() {
     }
   }, [user]);
 
-  // Redirecionar se não autenticado
+  // ✅ CORREÇÃO: Redirecionar se não autenticado OU se perfil já completo
   useEffect(() => {
-    if (!authLoading && !user) {
-      window.location.href = '/';
+    if (!authLoading) {
+      if (!user) {
+        console.log("❌ Usuário não autenticado - redirecionando para /");
+        window.location.href = '/';
+      } else if (user.isProfileComplete === true) {
+        console.log("✅ Perfil já completo - redirecionando para /discover");
+        window.location.href = '/discover';
+      }
     }
   }, [authLoading, user]);
 

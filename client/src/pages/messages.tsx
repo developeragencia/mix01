@@ -21,9 +21,14 @@ export default function Messages() {
     }
   }, [authLoading, isAuthenticated, setLocation]);
 
+  // ⚡ OTIMIZADO: Reduzir polling e adicionar cache
   const { data, isLoading, error } = useQuery<any[]>({
     queryKey: ['/api/matches'],
-    refetchInterval: 5000,
+    refetchInterval: 30000, // ⚡ 30 segundos
+    staleTime: 20000, // ⚡ 20 segundos
+    gcTime: 5 * 60 * 1000, // ⚡ 5 minutos
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   if (isLoading) {

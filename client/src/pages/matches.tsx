@@ -18,11 +18,15 @@ export default function Matches() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Buscar matches reais do banco de dados
+  // ⚡ Buscar matches reais do banco de dados - OTIMIZADO
   const { data: matchesData = [], isLoading, error } = useQuery<Conversation[]>({
     queryKey: ['/api/matches'],
-    refetchInterval: 5000,
+    refetchInterval: 30000, // ⚡ 30 segundos ao invés de 5
+    staleTime: 20000, // ⚡ 20 segundos
+    gcTime: 5 * 60 * 1000, // ⚡ 5 minutos
     retry: 1,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   // Separar novos matches (sem mensagens) de conversas ativas (com mensagens)
