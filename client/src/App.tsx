@@ -139,6 +139,7 @@ function Router() {
           <Route path="/super-likes" component={SuperLikes} />
           <Route path="/boost-profile" component={BoostProfile} />
           <Route path="/nearby" component={NearbyUsers} />
+          <Route path="/nearby-users" component={NearbyUsers} />
           <Route path="/swipe-limit" component={SwipeLimit} />
           <Route path="/payment" component={Payment} />
           <Route path="/subscribe" component={Subscribe} />
