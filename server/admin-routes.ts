@@ -53,30 +53,44 @@ export function registerAdminRoutes(app: Express) {
       
       console.log("🔐 Tentativa de login admin:", email);
       
+      // Validar campos obrigatórios
+      if (!email || !password) {
+        console.log("❌ Email ou senha não fornecidos");
+        return res.status(400).json({ message: "Email e senha são obrigatórios" });
+      }
+      
+      // Verificar se é um dos emails admin permitidos PRIMEIRO
+      const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
+      if (!adminEmails.includes(email)) {
+        console.log("❌ Não é admin - email não autorizado:", email);
+        return res.status(403).json({ message: "Acesso negado - apenas administradores" });
+      }
+      
       // Verificar se o usuário existe
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        console.log("❌ Usuário não encontrado");
-        return res.status(401).json({ message: "Credenciais inválidas" });
+        console.log("❌ Usuário admin não encontrado no banco:", email);
+        return res.status(401).json({ message: "Credenciais inválidas - usuário não encontrado" });
       }
       
-      console.log("👤 Usuário encontrado:", user.id, user.email);
+      console.log("👤 Usuário admin encontrado:", user.id, user.email);
+      console.log("🔑 Hash da senha no banco:", user.password ? user.password.substring(0, 30) + "..." : "SENHA VAZIA!");
       
-      // Verificar se é um dos emails admin permitidos
-      const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
-      if (!adminEmails.includes(email)) {
-        console.log("❌ Não é admin - email não autorizado");
-        return res.status(403).json({ message: "Acesso negado" });
+      // Verificar se a senha existe no banco
+      if (!user.password) {
+        console.log("❌ ERRO: Usuário sem senha no banco de dados!");
+        return res.status(500).json({ message: "Erro de configuração - usuário sem senha" });
       }
       
       // Verificar senha com bcrypt
-      const bcrypt = require('bcryptjs');
+      const bcrypt = await import('bcrypt');
       const validPassword = await bcrypt.compare(password, user.password);
       
+      console.log("🔐 Resultado da comparação de senha:", validPassword ? "✅ VÁLIDA" : "❌ INVÁLIDA");
+      
       if (!validPassword) {
-        console.log("❌ Senha incorreta");
-        console.log("Hash armazenado:", user.password.substring(0, 20) + "...");
-        return res.status(401).json({ message: "Credenciais inválidas" });
+        console.log("❌ Senha incorreta para:", email);
+        return res.status(401).json({ message: "Credenciais inválidas - senha incorreta" });
       }
       
       console.log("✅ Login admin bem-sucedido:", email);
@@ -85,8 +99,10 @@ export function registerAdminRoutes(app: Express) {
       req.login(user, (err) => {
         if (err) {
           console.error("❌ Erro ao criar sessão:", err);
-          return res.status(500).json({ message: "Erro ao fazer login" });
+          return res.status(500).json({ message: "Erro ao criar sessão", details: err.message });
         }
+        
+        console.log("✅ Sessão criada com sucesso para admin:", email);
         
         res.json({ 
           success: true, 
@@ -100,7 +116,12 @@ export function registerAdminRoutes(app: Express) {
       });
     } catch (error) {
       console.error("❌ ERRO CRÍTICO no login admin:", error);
-      res.status(500).json({ message: "Erro interno", details: error instanceof Error ? error.message : String(error) });
+      console.error("Stack trace:", error instanceof Error ? error.stack : "N/A");
+      res.status(500).json({ 
+        message: "Erro interno do servidor", 
+        details: error instanceof Error ? error.message : String(error),
+        type: error instanceof Error ? error.name : typeof error
+      });
     }
   });
   
