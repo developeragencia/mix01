@@ -248,6 +248,14 @@ export const reports = pgTable("reports", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ✅ Tabela de bloqueios entre usuários
+export const blocks = pgTable("blocks", {
+  id: serial("id").primaryKey(),
+  blockerId: integer("blocker_id").references(() => users.id).notNull(), // Quem bloqueou
+  blockedUserId: integer("blocked_user_id").references(() => users.id).notNull(), // Quem foi bloqueado
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Tabela de configurações do app
 export const appSettings = pgTable("app_settings", {
   id: serial("id").primaryKey(),
@@ -467,6 +475,7 @@ export type Verification = typeof verifications.$inferSelect;
 export type InsertVerification = z.infer<typeof insertVerificationSchema>;
 export type Report = typeof reports.$inferSelect;
 export type InsertReport = z.infer<typeof insertReportSchema>;
+export type Block = typeof blocks.$inferSelect; // ✅ Novo tipo
 export type AppSetting = typeof appSettings.$inferSelect;
 export type InsertAppSetting = z.infer<typeof insertAppSettingSchema>;
 export type AdminUser = typeof adminUsers.$inferSelect;

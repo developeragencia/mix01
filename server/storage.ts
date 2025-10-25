@@ -1,8 +1,8 @@
 import { eq, and, gt, sql, inArray } from "drizzle-orm";
 import { db } from "./db";
-import { users, profiles, swipes, matches, messages, subscriptionPlans, subscriptions, payments, checkIns, establishments, boosts, rewinds, verifications, profileViews } from "@shared/schema";
+import { users, profiles, swipes, matches, messages, subscriptionPlans, subscriptions, payments, checkIns, establishments, boosts, rewinds, verifications, profileViews, blocks } from "@shared/schema";
 import type { 
-  User, Profile, Swipe, Match, Message, SubscriptionPlan, Subscription, Payment, CheckIn, Establishment, Boost, Rewind, Verification,
+  User, Profile, Swipe, Match, Message, SubscriptionPlan, Subscription, Payment, CheckIn, Establishment, Boost, Rewind, Verification, Block,
   InsertUser, InsertProfile, InsertSwipe, InsertMessage, InsertSubscriptionPlan, 
   InsertSubscription, InsertPayment, InsertCheckIn, InsertEstablishment, InsertBoost, InsertRewind, InsertVerification
 } from "@shared/schema";
@@ -54,6 +54,12 @@ export interface IStorage {
   
   // Report methods
   createReport?(report: {reporterId: number, reportedUserId: number, reason: string, status: string}): Promise<any>; // ✅ Novo método
+  
+  // Block methods
+  createBlock?(blockerId: number, blockedUserId: number): Promise<Block>; // ✅ Novo método
+  getBlockedUsers?(userId: number): Promise<Block[]>; // ✅ Novo método
+  isBlocked?(blockerId: number, blockedUserId: number): Promise<boolean>; // ✅ Novo método
+  unblockUser?(blockerId: number, blockedUserId: number): Promise<void>; // ✅ Novo método
   
   // Message methods
   createMessage(message: InsertMessage): Promise<Message>;
@@ -659,6 +665,63 @@ export class DatabaseStorage implements IStorage {
       return { id: Date.now(), ...report, createdAt: new Date() };
     } catch (error) {
       console.error('Error creating report:', error);
+      throw error;
+    }
+  }
+
+  // ✅ CREATE BLOCK - Bloquear usuário
+  async createBlock(blockerId: number, blockedUserId: number): Promise<Block> {
+    try {
+      const [block] = await db.insert(blocks).values({
+        blockerId,
+        blockedUserId
+      }).returning();
+      console.log(`✅ Usuário ${blockedUserId} bloqueado por ${blockerId}`);
+      return block;
+    } catch (error) {
+      console.error('Error creating block:', error);
+      throw error;
+    }
+  }
+
+  // ✅ GET BLOCKED USERS - Buscar usuários bloqueados
+  async getBlockedUsers(userId: number): Promise<Block[]> {
+    try {
+      return await db.select().from(blocks)
+        .where(eq(blocks.blockerId, userId));
+    } catch (error) {
+      console.error('Error getting blocked users:', error);
+      return [];
+    }
+  }
+
+  // ✅ IS BLOCKED - Verificar se usuário está bloqueado
+  async isBlocked(blockerId: number, blockedUserId: number): Promise<boolean> {
+    try {
+      const [block] = await db.select().from(blocks)
+        .where(and(
+          eq(blocks.blockerId, blockerId),
+          eq(blocks.blockedUserId, blockedUserId)
+        ))
+        .limit(1);
+      return !!block;
+    } catch (error) {
+      console.error('Error checking if blocked:', error);
+      return false;
+    }
+  }
+
+  // ✅ UNBLOCK USER - Desbloquear usuário
+  async unblockUser(blockerId: number, blockedUserId: number): Promise<void> {
+    try {
+      await db.delete(blocks)
+        .where(and(
+          eq(blocks.blockerId, blockerId),
+          eq(blocks.blockedUserId, blockedUserId)
+        ));
+      console.log(`✅ Usuário ${blockedUserId} desbloqueado por ${blockerId}`);
+    } catch (error) {
+      console.error('Error unblocking user:', error);
       throw error;
     }
   }

@@ -1100,23 +1100,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const profiles = await storage.getProfilesForDiscovery(currentUserId, 50);
       console.timeEnd('⏱️ getProfilesForDiscovery');
       
-      // ⚡ OTIMIZAÇÃO: Buscar swipes e matches em paralelo
-      console.time('⏱️ getUserSwipes + getUserMatches');
-      const [userSwipes, userMatches] = await Promise.all([
+      // ⚡ OTIMIZAÇÃO: Buscar swipes, matches e blocks em paralelo
+      console.time('⏱️ getUserSwipes + getUserMatches + getBlockedUsers');
+      const [userSwipes, userMatches, blockedUsers] = await Promise.all([
         storage.getUserSwipes(currentUserId),
-        storage.getUserMatches(currentUserId)
+        storage.getUserMatches(currentUserId),
+        storage.getBlockedUsers?.(currentUserId) || Promise.resolve([])
       ]);
-      console.timeEnd('⏱️ getUserSwipes + getUserMatches');
+      console.timeEnd('⏱️ getUserSwipes + getUserMatches + getBlockedUsers');
       
+      // ✅ CORREÇÃO: Apenas filtrar swipes (não matches - para permitir re-match após desfazer)
       const swipedUserIds = new Set(userSwipes.map((s: Swipe) => s.swipedId));
-      const matchedUserIds = new Set(
-        userMatches.flatMap((m: Match) => [m.user1Id, m.user2Id])
-          .filter((id: number) => id !== currentUserId)
-      );
       
-      // ⚡ OTIMIZAÇÃO: Filtrar perfis já swipados/matched
+      // ✅ CORREÇÃO: Criar set de usuários bloqueados
+      const blockedUserIds = new Set(blockedUsers.map((b: any) => b.blockedUserId));
+      
+      // ⚡ OTIMIZAÇÃO: Filtrar apenas perfis já swipados e bloqueados (NÃO matches)
       const filteredProfiles = profiles.filter(profile => 
-        !swipedUserIds.has(profile.userId) && !matchedUserIds.has(profile.userId)
+        !swipedUserIds.has(profile.userId) && !blockedUserIds.has(profile.userId)
       );
       
       // ⚡ OTIMIZAÇÃO: Buscar todos os usuários em UMA query ao invés de N queries
@@ -1544,8 +1545,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("🚫 BLOCK user:", { currentUserId, blockedUserId });
 
-      // Criar registro de bloqueio (você pode criar uma tabela 'blocks' se necessário)
-      // Por enquanto, vamos apenas deletar o match
+      // ✅ Criar registro de bloqueio
+      await storage.createBlock?.(currentUserId, blockedUserId);
+
+      // Deletar match se existir
       const matches = await storage.getUserMatches(currentUserId);
       const match = matches.find(m => 
         (m.user1Id === currentUserId && m.user2Id === blockedUserId) ||
