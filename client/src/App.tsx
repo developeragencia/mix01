@@ -5,16 +5,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from "@/lib/error-boundary";
 import { setupGlobalErrorHandling } from "@/lib/global-error-handler";
 import { setupPromiseInterceptor } from "@/lib/promise-interceptor";
-import { lazy, Suspense } from "react";
+import { useMobile } from "@/hooks/use-mobile";
 
 // Setup global error handling and promise interception on app initialization
 setupGlobalErrorHandling();
 setupPromiseInterceptor();
 
-// Remove unhandled rejection handler to prevent console errors in production
-import { useMobile } from "@/hooks/use-mobile";
-
-// ⚡ PÁGINAS CRÍTICAS (carregamento imediato) - Sem lazy loading
+// ✅ TODAS AS PÁGINAS - Carregamento imediato (SEM LAZY LOADING)
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -26,126 +23,111 @@ import Messages from "@/pages/messages";
 import Chat from "@/pages/chat";
 import Location from "@/pages/location";
 import OnboardingFlow from "@/pages/onboarding-flow";
+import Welcome1 from "@/pages/welcome-1";
+import Welcome2 from "@/pages/welcome-2";
+import Welcome3 from "@/pages/welcome-3";
+import Welcome4 from "@/pages/welcome-4";
+import Welcome5 from "@/pages/welcome-5";
+import Welcome6 from "@/pages/welcome-6";
+import Terms from "@/pages/terms";
+import CreateProfile from "@/pages/create-profile";
+import UploadPhotos from "@/pages/upload-photos";
+import Premium from "@/pages/premium";
+import LikesReceived from "@/pages/likes-received";
+import SuperLikes from "@/pages/super-likes";
+import BoostProfile from "@/pages/boost-profile";
+import NearbyUsers from "@/pages/nearby-users";
+import Notifications from "@/pages/notifications";
+import PaymentSuccess from "@/pages/payment-success";
+import Subscribe from "@/pages/subscribe";
+import SubscriptionManagement from "@/pages/subscription-management";
+import SubscriptionPlans from "@/pages/subscription-plans";
+import MatchesGrid from "@/pages/matches-grid";
+import ProfileDetail from "@/pages/profile-detail";
+import ForgotPassword from "@/pages/forgot-password";
+import PhoneAuth from "@/pages/phone-auth";
+import ResetPassword from "@/pages/reset-password";
+import Help from "@/pages/help";
+import Likes from "@/pages/likes";
+import Views from "@/pages/views";
+import Subscription from "@/pages/subscription";
+import Plans from "@/pages/plans";
+import EditProfile from "@/pages/edit-profile";
+import EditProfileNew from "@/pages/edit-profile-new";
+import Settings from "@/pages/settings";
+import Verification from "@/pages/verification";
+import VerificationStatus from "@/pages/verification-status";
+import SessionDebug from "@/pages/session-debug";
+import SeuMix from "@/pages/seu-mix";
+import NotFound from "@/pages/not-found";
+import Games from "@/pages/games";
+import Favorites from "@/pages/favorites";
+import SafetyTools from "@/pages/safety-tools";
+import Security from "@/pages/security";
+import Support from "@/pages/support";
+import Download from "@/pages/download";
+import Product from "@/pages/product";
+import Checkout from "@/pages/checkout";
+import PremiumSettings from "@/pages/premium-settings";
+import Swipe from "@/pages/Swipe";
+import Payment from "@/pages/payment";
+import SwipeLimit from "@/pages/swipe-limit";
+import MatchProfile from "@/pages/match-profile";
+import MatchCelebration from "@/pages/match-celebration";
 
-// ⚡ LAZY LOADING - Páginas carregadas sob demanda
-const Welcome1 = lazy(() => import("@/pages/welcome-1"));
-const Welcome2 = lazy(() => import("@/pages/welcome-2"));
-const Welcome3 = lazy(() => import("@/pages/welcome-3"));
-const Welcome4 = lazy(() => import("@/pages/welcome-4"));
-const Welcome5 = lazy(() => import("@/pages/welcome-5"));
-const Welcome6 = lazy(() => import("@/pages/welcome-6"));
-const Terms = lazy(() => import("@/pages/terms"));
-const CreateProfile = lazy(() => import("@/pages/create-profile"));
-const UploadPhotos = lazy(() => import("@/pages/upload-photos"));
-const Premium = lazy(() => import("@/pages/premium"));
-const LikesReceived = lazy(() => import("@/pages/likes-received"));
-const SuperLikes = lazy(() => import("@/pages/super-likes"));
-const BoostProfile = lazy(() => import("@/pages/boost-profile"));
-const NearbyUsers = lazy(() => import("@/pages/nearby-users"));
-const Notifications = lazy(() => import("@/pages/notifications"));
-const PaymentSuccess = lazy(() => import("@/pages/payment-success"));
-const Subscribe = lazy(() => import("@/pages/subscribe"));
-const SubscriptionManagement = lazy(() => import("@/pages/subscription-management"));
-const SubscriptionPlans = lazy(() => import("@/pages/subscription-plans"));
-const MatchesGrid = lazy(() => import("@/pages/matches-grid"));
-const ProfileDetail = lazy(() => import("@/pages/profile-detail"));
-const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
-const PhoneAuth = lazy(() => import("@/pages/phone-auth"));
-const ResetPassword = lazy(() => import("@/pages/reset-password"));
-const Help = lazy(() => import("@/pages/help"));
-const Likes = lazy(() => import("@/pages/likes"));
-const Views = lazy(() => import("@/pages/views"));
-const Subscription = lazy(() => import("@/pages/subscription"));
-const Plans = lazy(() => import("@/pages/plans"));
-const EditProfile = lazy(() => import("@/pages/edit-profile"));
-const EditProfileNew = lazy(() => import("@/pages/edit-profile-new"));
-const Settings = lazy(() => import("@/pages/settings"));
-const Verification = lazy(() => import("@/pages/verification"));
-const VerificationStatus = lazy(() => import("@/pages/verification-status"));
-const SessionDebug = lazy(() => import("@/pages/session-debug"));
-const SeuMix = lazy(() => import("@/pages/seu-mix"));
-const NotFound = lazy(() => import("@/pages/not-found"));
-const Games = lazy(() => import("@/pages/games"));
-const Favorites = lazy(() => import("@/pages/favorites"));
-const SafetyTools = lazy(() => import("@/pages/safety-tools"));
-const Security = lazy(() => import("@/pages/security"));
-const Support = lazy(() => import("@/pages/support"));
-const Download = lazy(() => import("@/pages/download"));
-const Product = lazy(() => import("@/pages/product"));
-const Checkout = lazy(() => import("@/pages/checkout"));
-const PremiumSettings = lazy(() => import("@/pages/premium-settings"));
-const Swipe = lazy(() => import("@/pages/Swipe"));
-const Payment = lazy(() => import("@/pages/payment"));
-const SwipeLimit = lazy(() => import("@/pages/swipe-limit"));
-const MatchProfile = lazy(() => import("@/pages/match-profile"));
-const MatchCelebration = lazy(() => import("@/pages/match-celebration"));
+// Admin pages
+import AdminLogin from "@/pages/admin/admin-login";
+import AdminDashboard from "@/pages/admin/admin-dashboard";
+import AdminUsersNew from "@/pages/admin/admin-users-new";
+import AdminUserEdit from "@/pages/admin/admin-user-edit";
+import AdminMatchesNew from "@/pages/admin/admin-matches-new";
+import AdminMatchEdit from "@/pages/admin/admin-match-edit";
+import AdminMessagesNew from "@/pages/admin/admin-messages-new";
+import AdminMessageEdit from "@/pages/admin/admin-message-edit";
+import AdminSubscriptionsNew from "@/pages/admin/admin-subscriptions-new";
+import AdminSubscriptionPlans from "@/pages/admin/admin-subscription-plans";
+import AdminPayments from "@/pages/admin/admin-payments";
+import AdminReportsNew from "@/pages/admin/admin-reports-new";
+import AdminVerifications from "@/pages/admin/admin-verifications";
+import AdminNotifications from "@/pages/admin/admin-notifications";
+import AdminAnalytics from "@/pages/admin/admin-analytics";
+import AdminSettingsNew from "@/pages/admin/admin-settings-new";
+import AdminAppConfig from "@/pages/admin/admin-app-config";
+import OAuthConfig from "@/pages/admin/oauth-config";
 
-// ⚡ LAZY LOADING - Admin pages
-const AdminLogin = lazy(() => import("@/pages/admin/admin-login"));
-const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard"));
-const AdminUsersNew = lazy(() => import("@/pages/admin/admin-users-new"));
-const AdminUserEdit = lazy(() => import("@/pages/admin/admin-user-edit"));
-const AdminMatchesNew = lazy(() => import("@/pages/admin/admin-matches-new"));
-const AdminMatchEdit = lazy(() => import("@/pages/admin/admin-match-edit"));
-const AdminMessagesNew = lazy(() => import("@/pages/admin/admin-messages-new"));
-const AdminMessageEdit = lazy(() => import("@/pages/admin/admin-message-edit"));
-const AdminSubscriptionsNew = lazy(() => import("@/pages/admin/admin-subscriptions-new"));
-const AdminSubscriptionPlans = lazy(() => import("@/pages/admin/admin-subscription-plans"));
-const AdminPayments = lazy(() => import("@/pages/admin/admin-payments"));
-const AdminReportsNew = lazy(() => import("@/pages/admin/admin-reports-new"));
-const AdminVerifications = lazy(() => import("@/pages/admin/admin-verifications"));
-const AdminNotifications = lazy(() => import("@/pages/admin/admin-notifications"));
-const AdminAnalytics = lazy(() => import("@/pages/admin/admin-analytics"));
-const AdminSettingsNew = lazy(() => import("@/pages/admin/admin-settings-new"));
-const AdminAppConfig = lazy(() => import("@/pages/admin/admin-app-config"));
-const OAuthConfig = lazy(() => import("@/pages/admin/oauth-config"));
+// Admin Detail Pages
+import AdminUserDetail from "@/pages/admin/admin-user-detail";
+import AdminMatchDetail from "@/pages/admin/admin-match-detail";
+import AdminMessageDetail from "@/pages/admin/admin-message-detail";
+import AdminSubscriptionDetail from "@/pages/admin/admin-subscription-detail";
+import AdminPaymentDetail from "@/pages/admin/admin-payment-detail";
+import AdminVerificationDetail from "@/pages/admin/admin-verification-detail";
+import AdminNotificationDetail from "@/pages/admin/admin-notification-detail";
+import AdminReportDetail from "@/pages/admin/admin-report-detail";
 
-// ⚡ LAZY LOADING - Admin Detail Pages
-const AdminUserDetail = lazy(() => import("@/pages/admin/admin-user-detail"));
-const AdminMatchDetail = lazy(() => import("@/pages/admin/admin-match-detail"));
-const AdminMessageDetail = lazy(() => import("@/pages/admin/admin-message-detail"));
-const AdminSubscriptionDetail = lazy(() => import("@/pages/admin/admin-subscription-detail"));
-const AdminPaymentDetail = lazy(() => import("@/pages/admin/admin-payment-detail"));
-const AdminVerificationDetail = lazy(() => import("@/pages/admin/admin-verification-detail"));
-const AdminNotificationDetail = lazy(() => import("@/pages/admin/admin-notification-detail"));
-const AdminReportDetail = lazy(() => import("@/pages/admin/admin-report-detail"));
+import AuthStatus from "@/pages/auth-status";
+import OAuthDebug from "@/pages/oauth-debug";
 
-const AuthStatus = lazy(() => import("@/pages/auth-status"));
-const OAuthDebug = lazy(() => import("@/pages/oauth-debug"));
-
-// Onboarding Flow já importado acima (sem lazy)
-
-// Onboarding pages (OLD - will be removed) - LAZY LOADED
-const WelcomeRules = lazy(() => import("@/pages/onboarding/welcome-rules"));
-const OnboardingName = lazy(() => import("@/pages/onboarding/name"));
-const OnboardingBirthday = lazy(() => import("@/pages/onboarding/birthday"));
-const OnboardingGender = lazy(() => import("@/pages/onboarding/gender"));
-const OnboardingOrientation = lazy(() => import("@/pages/onboarding/orientation"));
-const OnboardingShowMe = lazy(() => import("@/pages/onboarding/show-me"));
-const OnboardingLookingFor = lazy(() => import("@/pages/onboarding/looking-for"));
-const OnboardingDistance = lazy(() => import("@/pages/onboarding/distance"));
-const OnboardingPersonality = lazy(() => import("@/pages/onboarding/personality"));
-const OnboardingInterests = lazy(() => import("@/pages/onboarding/interests"));
-const OnboardingPhotos = lazy(() => import("@/pages/onboarding/photos"));
-const OnboardingSuccess = lazy(() => import("@/pages/onboarding/success"));
-const Tutorial = lazy(() => import("@/pages/tutorial"));
-
-// ⚡ Loading component - Minimalista e rápido
-const PageLoader = () => (
-  <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center z-50">
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-      <span className="text-white/80 text-sm">Carregando...</span>
-    </div>
-  </div>
-);
+// Onboarding pages (OLD - will be removed)
+import WelcomeRules from "@/pages/onboarding/welcome-rules";
+import OnboardingName from "@/pages/onboarding/name";
+import OnboardingBirthday from "@/pages/onboarding/birthday";
+import OnboardingGender from "@/pages/onboarding/gender";
+import OnboardingOrientation from "@/pages/onboarding/orientation";
+import OnboardingShowMe from "@/pages/onboarding/show-me";
+import OnboardingLookingFor from "@/pages/onboarding/looking-for";
+import OnboardingDistance from "@/pages/onboarding/distance";
+import OnboardingPersonality from "@/pages/onboarding/personality";
+import OnboardingInterests from "@/pages/onboarding/interests";
+import OnboardingPhotos from "@/pages/onboarding/photos";
+import OnboardingSuccess from "@/pages/onboarding/success";
+import Tutorial from "@/pages/tutorial";
 
 function Router() {
   const isMobile = useMobile();
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Switch>
+    <Switch>
       <Route path="/" component={Splash} />
       
       {/* Mobile-only routes - apenas rotas específicas para mobile */}
@@ -288,8 +270,7 @@ function Router() {
       )}
       
       <Route component={NotFound} />
-      </Switch>
-    </Suspense>
+    </Switch>
   );
 }
 
