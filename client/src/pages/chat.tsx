@@ -3,11 +3,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Send, Heart, Phone, Video, MoreHorizontal, Image as ImageIcon, Smile, X } from "lucide-react";
+import { ArrowLeft, Send, Heart, Phone, Video, MoreHorizontal, Image as ImageIcon, Smile, X, Trash2, Check, CheckCheck } from "lucide-react";
 import { formatTimeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import type { Message } from "@shared/schema";
 import BottomNavigation from "@/components/BottomNavigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Emojis mais usados
 const POPULAR_EMOJIS = [
@@ -28,6 +34,9 @@ export default function Chat() {
   const [messageText, setMessageText] = useState("");
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Buscar dados REAIS do usuário atual
   const { data: currentUser, isError: userError, isLoading: isLoadingUser } = useQuery({
@@ -95,6 +104,17 @@ export default function Chat() {
               });
             }
           }
+        }
+        
+        // ✅ Typing indicator
+        if (data.type === 'user_typing' && data.matchId === matchId && data.userId !== currentUserId) {
+          setOtherUserTyping(true);
+          setTimeout(() => setOtherUserTyping(false), 3000);
+        }
+        
+        // ✅ Read receipts
+        if (data.type === 'message_read' && data.matchId === matchId) {
+          queryClient.invalidateQueries({ queryKey: [`/api/messages/${matchId}`] });
         }
       } catch (error) {
         console.error('Erro ao processar mensagem WebSocket:', error);
@@ -169,8 +189,16 @@ export default function Chat() {
     },
   });
 
+  // ✅ Scroll otimizado - só rola se o usuário estava perto do final
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const messagesContainer = messagesEndRef.current?.parentElement;
+    if (!messagesContainer) return;
+
+    const isNearBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight < 200;
+    
+    if (isNearBottom || messages.length === 1) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -185,7 +213,67 @@ export default function Chat() {
     setShowEmojiPicker(false);
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ✅ Typing indicator handler
+  const handleTyping = (text: string) => {
+    setMessageText(text);
+    
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: 'typing',
+        matchId,
+        userId: currentUserId
+      }));
+      
+      // Clear existing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      // Set new timeout to stop typing indicator
+      typingTimeoutRef.current = setTimeout(() => {
+        ws.send(JSON.stringify({
+          type: 'stop_typing',
+          matchId,
+          userId: currentUserId
+        }));
+      }, 1000);
+    }
+  };
+
+  // ✅ Delete message mutation
+  const deleteMessageMutation = useMutation({
+    mutationFn: async (messageId: number) => {
+      const response = await fetch(`/api/messages/${messageId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao deletar mensagem');
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/${matchId}`] });
+      toast({
+        title: "Mensagem deletada",
+        description: "A mensagem foi removida com sucesso.",
+        duration: 2000,
+      });
+    },
+    onError: (error: Error) => {
+      console.error('❌ Erro ao deletar mensagem:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível deletar a mensagem.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    },
+  });
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -200,21 +288,59 @@ export default function Chat() {
       return;
     }
 
-    // Verificar tamanho (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Verificar tamanho inicial (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "Arquivo muito grande",
-        description: "A imagem deve ter no máximo 5MB.",
+        description: "A imagem deve ter no máximo 10MB.",
         variant: "destructive",
         duration: 3000,
       });
       return;
     }
 
-    // Converter para base64 e enviar
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
+    // ✅ COMPRESSÃO DE IMAGEM
+    const compressedImage = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Redimensionar se necessário (máximo 1200px)
+          const maxSize = 1200;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = (height / width) * maxSize;
+              width = maxSize;
+            } else {
+              width = (width / height) * maxSize;
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Comprimir (qualidade 0.7)
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressed);
+        };
+        img.onerror = reject;
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    // Enviar imagem comprimida
+    try {
+      const base64String = compressedImage;
       
       try {
         const response = await fetch("/api/messages/image", {
@@ -262,9 +388,15 @@ export default function Chat() {
           duration: 3000,
         });
       }
-    };
-    
-    reader.readAsDataURL(file);
+    } catch (compressionError) {
+      console.error('Erro ao comprimir imagem:', compressionError);
+      toast({
+        title: "Erro ao processar",
+        description: "Não foi possível processar a imagem.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
 
     // Limpar o input
     if (fileInputRef.current) {
@@ -346,6 +478,7 @@ export default function Chat() {
               size="icon" 
               className="text-white hover:bg-white/20 rounded-full transition-all"
               data-testid="button-phone"
+              onClick={() => toast({ title: "Em breve", description: "Chamadas de voz em desenvolvimento" })}
             >
               <Phone className="w-5 h-5" />
             </Button>
@@ -354,17 +487,42 @@ export default function Chat() {
               size="icon" 
               className="text-white hover:bg-white/20 rounded-full transition-all"
               data-testid="button-video"
+              onClick={() => toast({ title: "Em breve", description: "Chamadas de vídeo em desenvolvimento" })}
             >
               <Video className="w-5 h-5" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-white/20 rounded-full transition-all"
-              data-testid="button-more"
-            >
-              <MoreHorizontal className="w-5 h-5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/20 rounded-full transition-all"
+                  data-testid="button-more"
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-gray-900 border-gray-800">
+                <DropdownMenuItem 
+                  onClick={() => setLocation(`/match-profile/${currentProfile.userId}`)}
+                  className="text-white hover:bg-white/10 cursor-pointer"
+                >
+                  Ver Perfil
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLocation(`/match-profile/${currentProfile.userId}`)}
+                  className="text-white hover:bg-white/10 cursor-pointer"
+                >
+                  Desfazer Match
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLocation(`/match-profile/${currentProfile.userId}`)}
+                  className="text-red-400 hover:bg-white/10 cursor-pointer"
+                >
+                  Denunciar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -396,7 +554,7 @@ export default function Chat() {
                 return (
                   <div
                     key={message.id}
-                    className={`flex items-end gap-2 ${isOwnMessage ? "justify-end" : "justify-start"}`}
+                    className={`flex items-end gap-2 ${isOwnMessage ? "justify-end" : "justify-start"} group`}
                     data-testid={`message-${message.id}`}
                   >
                     {!isOwnMessage && (
@@ -411,38 +569,80 @@ export default function Chat() {
                       </div>
                     )}
                     
-                    <div
-                      className={`max-w-[70%] px-4 py-3 rounded-2xl shadow-lg ${
-                        isOwnMessage
-                          ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-br-sm"
-                          : "bg-white/15 backdrop-blur-sm text-white rounded-bl-sm border border-white/10"
-                      }`}
-                    >
-                      {(message as any).imageUrl ? (
-                        <div className="space-y-2">
-                          <img 
-                            src={(message as any).imageUrl} 
-                            alt="Imagem enviada" 
-                            className="rounded-lg max-w-full h-auto max-h-64 object-cover"
-                          />
-                          {message.content !== "📷 Imagem" && (
-                            <p className="text-sm leading-relaxed break-words">{message.content}</p>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-sm leading-relaxed break-words">{message.content}</p>
-                      )}
-                      <p
-                        className={`text-xs mt-1.5 ${
-                          isOwnMessage ? "text-white/80" : "text-white/60"
+                    <div className="relative">
+                      <div
+                        className={`max-w-[70%] px-4 py-3 rounded-2xl shadow-lg ${
+                          isOwnMessage
+                            ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-br-sm"
+                            : "bg-white/15 backdrop-blur-sm text-white rounded-bl-sm border border-white/10"
                         }`}
                       >
-                        {formatTimeAgo(new Date(message.createdAt))}
-                      </p>
+                        {(message as any).imageUrl ? (
+                          <div className="space-y-2">
+                            <img 
+                              src={(message as any).imageUrl} 
+                              alt="Imagem enviada" 
+                              className="rounded-lg max-w-full h-auto max-h-64 object-cover"
+                            />
+                            {message.content !== "📷 Imagem" && (
+                              <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                        )}
+                        <div className="flex items-center justify-between mt-1.5">
+                          <p
+                            className={`text-xs ${
+                              isOwnMessage ? "text-white/80" : "text-white/60"
+                            }`}
+                          >
+                            {formatTimeAgo(new Date(message.createdAt))}
+                          </p>
+                          {isOwnMessage && (
+                            <CheckCheck className={`w-3.5 h-3.5 ml-2 ${
+                              (message as any).read ? 'text-blue-400' : 'text-white/60'
+                            }`} />
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* ✅ Delete button (only for own messages) */}
+                      {isOwnMessage && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteMessageMutation.mutate(message.id)}
+                          className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400"
+                          disabled={deleteMessageMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
               })}
+              
+              {/* ✅ Typing indicator */}
+              {otherUserTyping && (
+                <div className="flex items-end gap-2 justify-start">
+                  <div className="w-8 h-8 flex-shrink-0">
+                    <img
+                      src={profilePhoto}
+                      alt={currentProfile.name}
+                      className="w-8 h-8 rounded-full object-cover border border-white/20"
+                    />
+                  </div>
+                  <div className="bg-white/15 backdrop-blur-sm rounded-2xl px-5 py-3 rounded-bl-sm border border-white/10">
+                    <div className="flex space-x-1.5">
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </>
           )}
@@ -499,7 +699,7 @@ export default function Chat() {
             
             <Input
               value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
+              onChange={(e) => handleTyping(e.target.value)}
               placeholder="Digite sua mensagem..."
               className="flex-1 bg-white/10 border-white/30 text-white placeholder-white/60 rounded-full px-5 py-3 focus:bg-white/15 focus:border-pink-500 transition-all"
               disabled={sendMessageMutation.isPending}

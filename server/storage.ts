@@ -59,6 +59,8 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   getMatchMessages(matchId: number): Promise<Message[]>;
   getConversations(userId: number): Promise<{ match: Match; lastMessage: Message | null; profile: Profile }[]>;
+  getMessageById?(messageId: number): Promise<Message | undefined>; // ✅ Novo método
+  deleteMessage?(messageId: number): Promise<void>; // ✅ Novo método
   
   // Additional methods for 100% completion
   getUserLikes(userId: number): Promise<(Swipe & { profile: Profile })[]>;
@@ -733,6 +735,30 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting conversations:', error);
       return [];
+    }
+  }
+
+  // ✅ GET MESSAGE BY ID - Novo método
+  async getMessageById(messageId: number): Promise<Message | undefined> {
+    try {
+      const [message] = await db.select().from(messages)
+        .where(eq(messages.id, messageId))
+        .limit(1);
+      return message;
+    } catch (error) {
+      console.error('Error getting message by id:', error);
+      return undefined;
+    }
+  }
+
+  // ✅ DELETE MESSAGE - Novo método
+  async deleteMessage(messageId: number): Promise<void> {
+    try {
+      await db.delete(messages).where(eq(messages.id, messageId));
+      console.log(`✅ Message ${messageId} deletada com sucesso`);
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      throw error;
     }
   }
 
