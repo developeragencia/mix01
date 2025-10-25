@@ -1,4 +1,4 @@
-import { eq, and, gt, sql } from "drizzle-orm";
+import { eq, and, gt, sql, inArray } from "drizzle-orm";
 import { db } from "./db";
 import { users, profiles, swipes, matches, messages, subscriptionPlans, subscriptions, payments, checkIns, establishments, boosts, rewinds, verifications, profileViews } from "@shared/schema";
 import type { 
@@ -10,6 +10,7 @@ import type {
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
+  getUsersByIds?(ids: number[]): Promise<User[]>; // ⚡ Novo método para busca em batch
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByPhone(phone: string): Promise<User | undefined>;
@@ -199,6 +200,18 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting user:', error);
       return undefined;
+    }
+  }
+
+  // ⚡ Buscar múltiplos usuários de uma vez (otimização N+1)
+  async getUsersByIds(ids: number[]): Promise<User[]> {
+    try {
+      if (ids.length === 0) return [];
+      const result = await db.select().from(users).where(inArray(users.id, ids));
+      return result;
+    } catch (error) {
+      console.error('Error getting users by IDs:', error);
+      return [];
     }
   }
 

@@ -1085,44 +1085,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUserId = (req.user as any)?.id;
       
-      // Buscar todos os perfis
-      const allProfiles = await storage.getProfiles();
-      
-      // Filtrar para excluir o próprio perfil do usuário logado
-      let profiles = currentUserId 
-        ? allProfiles.filter(profile => profile.userId !== currentUserId)
-        : allProfiles;
-      
-      // Se tiver usuário logado, filtrar perfis já swipados e com match
-      if (currentUserId) {
-        // Buscar todos os swipes do usuário atual
-        const userSwipes = await storage.getUserSwipes(currentUserId);
-        const swipedUserIds = new Set(userSwipes.map((s: Swipe) => s.swipedId));
-        
-        // Buscar todos os matches do usuário atual
-        const userMatches = await storage.getUserMatches(currentUserId);
-        const matchedUserIds = new Set(
-          userMatches.flatMap((m: Match) => [m.user1Id, m.user2Id])
-            .filter((id: number) => id !== currentUserId)
-        );
-        
-        // Filtrar perfis que já foram swipados ou que já deram match
-        profiles = profiles.filter(profile => 
-          !swipedUserIds.has(profile.userId) && !matchedUserIds.has(profile.userId)
-        );
+      if (!currentUserId) {
+        return res.status(401).json({ error: "Not authenticated" });
       }
       
-      // Add user online status to profiles
-      const profilesWithOnlineStatus = await Promise.all(
-        profiles.map(async (profile) => {
-          const user = await storage.getUser(profile.userId);
-          return {
-            ...profile,
-            isOnline: user?.isOnline || false,
-            lastSeen: user?.lastSeen || new Date()
-          };
-        })
+      // ⚡ OTIMIZAÇÃO: Usar método otimizado que faz tudo em uma query
+      const profiles = await storage.getProfilesForDiscovery(currentUserId, 50);
+      
+      // ⚡ OTIMIZAÇÃO: Buscar swipes e matches em paralelo
+      const [userSwipes, userMatches] = await Promise.all([
+        storage.getUserSwipes(currentUserId),
+        storage.getUserMatches(currentUserId)
+      ]);
+      
+      const swipedUserIds = new Set(userSwipes.map((s: Swipe) => s.swipedId));
+      const matchedUserIds = new Set(
+        userMatches.flatMap((m: Match) => [m.user1Id, m.user2Id])
+          .filter((id: number) => id !== currentUserId)
       );
+      
+      // ⚡ OTIMIZAÇÃO: Filtrar perfis já swipados/matched
+      const filteredProfiles = profiles.filter(profile => 
+        !swipedUserIds.has(profile.userId) && !matchedUserIds.has(profile.userId)
+      );
+      
+      // ⚡ OTIMIZAÇÃO: Buscar todos os usuários em UMA query ao invés de N queries
+      const userIds = filteredProfiles.map(p => p.userId);
+      const users = await storage.getUsersByIds?.(userIds) || [];
+      const usersMap = new Map(users.map(u => [u.id, u]));
+      
+      // ⚡ OTIMIZAÇÃO: Merge síncrono sem await
+      const profilesWithOnlineStatus = filteredProfiles.map(profile => {
+        const user = usersMap.get(profile.userId);
+        return {
+          ...profile,
+          isOnline: user?.isOnline || false,
+          lastSeen: user?.lastSeen || new Date()
+        };
+      });
       
       res.json(profilesWithOnlineStatus);
     } catch (error) {
