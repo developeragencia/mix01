@@ -14,11 +14,18 @@ setupPromiseInterceptor();
 // Remove unhandled rejection handler to prevent console errors in production
 import { useMobile } from "@/hooks/use-mobile";
 
-// ⚡ PÁGINAS CRÍTICAS (carregamento imediato)
+// ⚡ PÁGINAS CRÍTICAS (carregamento imediato) - Sem lazy loading
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Splash from "@/pages/splash";
+import Discover from "@/pages/discover";
+import Profile from "@/pages/profile";
+import Matches from "@/pages/matches";
+import Messages from "@/pages/messages";
+import Chat from "@/pages/chat";
+import Location from "@/pages/location";
+import OnboardingFlow from "@/pages/onboarding-flow";
 
 // ⚡ LAZY LOADING - Páginas carregadas sob demanda
 const Welcome1 = lazy(() => import("@/pages/welcome-1"));
@@ -40,13 +47,7 @@ const PaymentSuccess = lazy(() => import("@/pages/payment-success"));
 const Subscribe = lazy(() => import("@/pages/subscribe"));
 const SubscriptionManagement = lazy(() => import("@/pages/subscription-management"));
 const SubscriptionPlans = lazy(() => import("@/pages/subscription-plans"));
-const Location = lazy(() => import("@/pages/location"));
-const Discover = lazy(() => import("@/pages/discover"));
-const Matches = lazy(() => import("@/pages/matches"));
 const MatchesGrid = lazy(() => import("@/pages/matches-grid"));
-const Messages = lazy(() => import("@/pages/messages"));
-const Chat = lazy(() => import("@/pages/chat"));
-const Profile = lazy(() => import("@/pages/profile"));
 const ProfileDetail = lazy(() => import("@/pages/profile-detail"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const PhoneAuth = lazy(() => import("@/pages/phone-auth"));
@@ -112,8 +113,7 @@ const AdminReportDetail = lazy(() => import("@/pages/admin/admin-report-detail")
 const AuthStatus = lazy(() => import("@/pages/auth-status"));
 const OAuthDebug = lazy(() => import("@/pages/oauth-debug"));
 
-// NEW: Unified Onboarding Flow (replaces old onboarding pages)
-const OnboardingFlow = lazy(() => import("@/pages/onboarding-flow"));
+// Onboarding Flow já importado acima (sem lazy)
 
 // Onboarding pages (OLD - will be removed) - LAZY LOADED
 const WelcomeRules = lazy(() => import("@/pages/onboarding/welcome-rules"));
@@ -130,10 +130,13 @@ const OnboardingPhotos = lazy(() => import("@/pages/onboarding/photos"));
 const OnboardingSuccess = lazy(() => import("@/pages/onboarding/success"));
 const Tutorial = lazy(() => import("@/pages/tutorial"));
 
-// ⚡ Loading component
+// ⚡ Loading component - Minimalista e rápido
 const PageLoader = () => (
-  <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center">
-    <div className="text-white text-xl">Carregando...</div>
+  <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center z-50">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+      <span className="text-white/80 text-sm">Carregando...</span>
+    </div>
   </div>
 );
 
