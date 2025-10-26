@@ -1600,7 +1600,7 @@ export function registerAdminRoutes(app: Express) {
   // Get app settings by category
   app.get("/api/admin/app-settings/category/:category", async (req, res) => {
     try {
-      const { category } = req.params;
+      const { category} = req.params;
       const settings = await db.select()
         .from(appSettings)
         .where(eq(appSettings.category, category))
@@ -1611,6 +1611,197 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error('Error fetching category settings:', error);
       res.status(500).json({ error: 'Failed to fetch category settings' });
+    }
+  });
+
+  // Dashboard Statistics
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      // Users stats
+      const [totalUsers] = await db.select({ count: count() }).from(users);
+      const [activeUsers] = await db.select({ count: count() })
+        .from(users)
+        .where(gte(users.lastLoginAt, weekAgo));
+      const [newUsers] = await db.select({ count: count() })
+        .from(users)
+        .where(gte(users.createdAt, today));
+      const [usersLastMonth] = await db.select({ count: count() })
+        .from(users)
+        .where(gte(users.createdAt, monthAgo));
+
+      // Matches stats  
+      const [totalMatches] = await db.select({ count: count() }).from(matches);
+      const [matchesToday] = await db.select({ count: count() })
+        .from(matches)
+        .where(gte(matches.matchedAt, today));
+      const [matchesThisWeek] = await db.select({ count: count() })
+        .from(matches)
+        .where(gte(matches.matchedAt, weekAgo));
+      const [matchesLastMonth] = await db.select({ count: count() })
+        .from(matches)
+        .where(gte(matches.matchedAt, monthAgo));
+
+      // Messages stats
+      const [totalMessages] = await db.select({ count: count() }).from(messages);
+      const [messagesToday] = await db.select({ count: count() })
+        .from(messages)
+        .where(gte(messages.sentAt, today));
+      const [messagesLastMonth] = await db.select({ count: count() })
+        .from(messages)
+        .where(gte(messages.sentAt, monthAgo));
+
+      // Revenue stats
+      const paymentsResult = await db.select({
+        total: sql<number>`COALESCE(SUM(${payments.amount}), 0)::int`
+      }).from(payments)
+      .where(eq(payments.status, 'completed'));
+      
+      const paymentsTodayResult = await db.select({
+        total: sql<number>`COALESCE(SUM(${payments.amount}), 0)::int`
+      }).from(payments)
+      .where(and(
+        eq(payments.status, 'completed'),
+        gte(payments.createdAt, today)
+      ));
+
+      const paymentsMonthResult = await db.select({
+        total: sql<number>`COALESCE(SUM(${payments.amount}), 0)::int`
+      }).from(payments)
+      .where(and(
+        eq(payments.status, 'completed'),
+        gte(payments.createdAt, monthAgo)
+      ));
+
+      // Verifications stats
+      const [pendingVerifications] = await db.select({ count: count() })
+        .from(verifications)
+        .where(eq(verifications.status, 'pending'));
+      const [approvedVerifications] = await db.select({ count: count() })
+        .from(verifications)
+        .where(eq(verifications.status, 'approved'));
+      const [rejectedVerifications] = await db.select({ count: count() })
+        .from(verifications)
+        .where(eq(verifications.status, 'rejected'));
+
+      // Reports stats
+      const [pendingReports] = await db.select({ count: count() })
+        .from(reports)
+        .where(eq(reports.status, 'pending'));
+      const [resolvedReports] = await db.select({ count: count() })
+        .from(reports)
+        .where(eq(reports.status, 'resolved'));
+      const [urgentReports] = await db.select({ count: count() })
+        .from(reports)
+        .where(eq(reports.priority, 'high'));
+
+      const stats = {
+        users: {
+          total: totalUsers?.count || 0,
+          active: activeUsers?.count || 0,
+          new: newUsers?.count || 0,
+          growth: usersLastMonth?.count ? 
+            Math.round(((totalUsers?.count || 0) - (usersLastMonth?.count || 0)) / (usersLastMonth?.count || 1) * 100) : 0
+        },
+        matches: {
+          total: totalMatches?.count || 0,
+          today: matchesToday?.count || 0,
+          thisWeek: matchesThisWeek?.count || 0,
+          growth: matchesLastMonth?.count ? 
+            Math.round(((totalMatches?.count || 0) - (matchesLastMonth?.count || 0)) / (matchesLastMonth?.count || 1) * 100) : 0
+        },
+        messages: {
+          total: totalMessages?.count || 0,
+          today: messagesToday?.count || 0,
+          avgPerUser: totalUsers?.count ? Math.round((totalMessages?.count || 0) / totalUsers.count) : 0,
+          growth: messagesLastMonth?.count ? 
+            Math.round(((totalMessages?.count || 0) - (messagesLastMonth?.count || 0)) / (messagesLastMonth?.count || 1) * 100) : 0
+        },
+        revenue: {
+          total: paymentsResult[0]?.total || 0,
+          today: paymentsTodayResult[0]?.total || 0,
+          thisMonth: paymentsMonthResult[0]?.total || 0,
+          growth: paymentsMonthResult[0]?.total ? 
+            Math.round(((paymentsResult[0]?.total || 0) - (paymentsMonthResult[0]?.total || 0)) / (paymentsMonthResult[0]?.total || 1) * 100) : 0
+        },
+        verifications: {
+          pending: pendingVerifications?.count || 0,
+          approved: approvedVerifications?.count || 0,
+          rejected: rejectedVerifications?.count || 0
+        },
+        reports: {
+          pending: pendingReports?.count || 0,
+          resolved: resolvedReports?.count || 0,
+          urgent: urgentReports?.count || 0
+        }
+      };
+
+      console.log('📊 Dashboard stats fetched successfully');
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      res.status(500).json({ error: 'Failed to fetch stats' });
+    }
+  });
+
+  // Recent Activity
+  app.get("/api/admin/activity", async (req, res) => {
+    try {
+      const activities: any[] = [];
+      
+      // Recent users (last 5)
+      const recentUsers = await db.select({
+        id: users.id,
+        email: users.email,
+        createdAt: users.createdAt
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt))
+      .limit(5);
+
+      recentUsers.forEach(user => {
+        activities.push({
+          id: `user-${user.id}`,
+          type: 'user',
+          title: 'Novo usuário',
+          description: user.email,
+          timestamp: new Date(user.createdAt).toLocaleString('pt-BR'),
+          status: 'success'
+        });
+      });
+
+      // Recent matches (last 5)
+      const recentMatches = await db.select({
+        id: matches.id,
+        matchedAt: matches.matchedAt
+      })
+      .from(matches)
+      .orderBy(desc(matches.matchedAt))
+      .limit(5);
+
+      recentMatches.forEach(match => {
+        activities.push({
+          id: `match-${match.id}`,
+          type: 'match',
+          title: 'Novo match',
+          description: `Match #${match.id} criado`,
+          timestamp: new Date(match.matchedAt).toLocaleString('pt-BR'),
+          status: 'success'
+        });
+      });
+
+      // Sort by timestamp (most recent first)
+      activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      console.log(`📋 Fetched ${activities.length} recent activities`);
+      res.json(activities.slice(0, 10)); // Return top 10
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
+      res.status(500).json({ error: 'Failed to fetch activity' });
     }
   });
 
