@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
   Users, 
-  Search,
-  Filter,
+  Search, 
+  Filter, 
   Download,
-  Eye,
+  Eye, 
   Mail,
   MapPin,
   Calendar,
@@ -146,7 +146,7 @@ export default function AdminUsers() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-24 bg-blue-800/50 rounded-xl"></div>
-            ))}
+          ))}
           </div>
           <div className="h-96 bg-blue-800/50 rounded-xl"></div>
         </div>
@@ -205,13 +205,13 @@ export default function AdminUsers() {
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-3">
               {/* Search Bar */}
-              <div className="flex-1 relative">
+            <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-400" />
-                <Input
+              <Input
                   type="text"
                   placeholder="Buscar por email, nome ou username..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-blue-800/50 border-blue-700/50 text-white placeholder:text-blue-400 h-12"
                 />
                 {searchTerm && (
@@ -222,7 +222,7 @@ export default function AdminUsers() {
                     <X className="w-5 h-5" />
                   </button>
                 )}
-              </div>
+            </div>
 
               {/* Filter Toggle Button */}
               <Button
@@ -337,12 +337,12 @@ export default function AdminUsers() {
         </Card>
 
         {/* Results Count */}
-        <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
           <p className="text-blue-300 text-sm">
             Mostrando <span className="font-bold text-white">{filteredUsers?.length || 0}</span> de <span className="font-bold text-white">{users?.length || 0}</span> usuários
           </p>
-        </div>
-
+                  </div>
+                  
         {/* Users Table */}
         <Card className="bg-blue-900/30 backdrop-blur-sm border-blue-700/50 overflow-hidden">
           <div className="overflow-x-auto">
@@ -381,7 +381,7 @@ export default function AdminUsers() {
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white font-bold">
                             {user.firstName?.[0] || user.email[0].toUpperCase()}
-                          </div>
+                    </div>
                           <div>
                             <p className="text-white font-medium flex items-center gap-2">
                               {user.firstName || user.username || user.email.split('@')[0]}
@@ -393,8 +393,8 @@ export default function AdminUsers() {
                               <Mail className="w-3 h-3" />
                               {user.email}
                             </p>
-                          </div>
-                        </div>
+                    </div>
+                  </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {user.isVerified ? (
@@ -422,20 +422,20 @@ export default function AdminUsers() {
                         <div className="text-white text-sm flex items-center gap-1">
                           <Clock className="w-4 h-4 text-blue-400" />
                           {formatDate(user.lastLoginAt)}
-                        </div>
+                </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <Button
-                          size="sm"
+                  <Button
+                    size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             setLocation(`/admin/users/${user.id}`);
                           }}
                           className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          Ver
-                        </Button>
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Ver
+                  </Button>
                       </td>
                     </tr>
                   ))
@@ -454,8 +454,8 @@ export default function AdminUsers() {
                 )}
               </tbody>
             </table>
-          </div>
-        </Card>
+              </div>
+            </Card>
       </div>
     </AdminLayout>
   );

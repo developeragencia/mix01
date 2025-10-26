@@ -235,7 +235,7 @@ export default function AdminVerifications() {
               <Clock className="w-10 h-10 text-yellow-400" />
             </div>
           </Card>
-
+          
           <Card className="p-4 bg-gradient-to-br from-green-900/50 to-green-800/30 backdrop-blur-sm border-green-700/50">
             <div className="flex items-center justify-between">
               <div>
@@ -245,7 +245,7 @@ export default function AdminVerifications() {
               <CheckCircle className="w-10 h-10 text-green-400" />
             </div>
           </Card>
-
+          
           <Card className="p-4 bg-gradient-to-br from-red-900/50 to-red-800/30 backdrop-blur-sm border-red-700/50">
             <div className="flex items-center justify-between">
               <div>
@@ -415,23 +415,23 @@ export default function AdminVerifications() {
                 {/* Actions */}
                 {verification.status === 'pending' && (
                   <div className="flex gap-2">
-                    <Button
+                        <Button
                       onClick={() => approveMutation.mutate(verification.id)}
                       disabled={approveMutation.isPending}
                       className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Aprovar
-                    </Button>
-                    <Button
+                          Aprovar
+                        </Button>
+                        <Button
                       onClick={() => setSelectedVerification(verification)}
                       disabled={rejectMutation.isPending}
                       variant="outline"
                       className="flex-1 border-red-600/50 text-red-300 hover:bg-red-700/50"
                     >
                       <XCircle className="w-4 h-4 mr-2" />
-                      Rejeitar
-                    </Button>
+                          Rejeitar
+                        </Button>
                   </div>
                 )}
 
@@ -461,10 +461,10 @@ export default function AdminVerifications() {
               </Card>
             </div>
           )}
-        </div>
+      </div>
 
         {/* Reject Modal */}
-        {selectedVerification && (
+          {selectedVerification && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <Card className="max-w-md w-full p-6 bg-blue-900 border-blue-700">
               <div className="flex items-center justify-between mb-4">
@@ -479,7 +479,7 @@ export default function AdminVerifications() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-
+              
               <div className="mb-4">
                 <p className="text-blue-300 mb-2">
                   Você está prestes a rejeitar a verificação de <strong className="text-white">{selectedVerification.userName}</strong>
@@ -497,7 +497,7 @@ export default function AdminVerifications() {
                   className="w-full bg-blue-800/50 border border-blue-700/50 text-white rounded-lg px-3 py-2 min-h-[100px] placeholder:text-blue-400"
                   required
                 />
-              </div>
+                </div>
 
               <div className="flex gap-3">
                 <Button
@@ -509,23 +509,23 @@ export default function AdminVerifications() {
                   className="flex-1 border-blue-600/50 text-blue-300"
                 >
                   Cancelar
-                </Button>
-                <Button
-                  onClick={() => {
+              </Button>
+              <Button
+                onClick={() => {
                     if (rejectReason.trim()) {
                       rejectMutation.mutate({
                         id: selectedVerification.id,
-                        reason: rejectReason
-                      });
-                    }
-                  }}
+                      reason: rejectReason
+                    });
+                  }
+                }}
                   disabled={!rejectReason.trim() || rejectMutation.isPending}
                   className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                >
+              >
                   <XCircle className="w-4 h-4 mr-2" />
-                  Confirmar Rejeição
-                </Button>
-              </div>
+                Confirmar Rejeição
+              </Button>
+            </div>
             </Card>
           </div>
         )}

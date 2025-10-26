@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { 
   AlertCircle,
-  Search,
+  Search, 
   Filter,
   Calendar,
   CheckCircle,
@@ -184,7 +184,7 @@ export default function AdminReports() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-24 bg-blue-800/50 rounded-xl"></div>
-            ))}
+          ))}
           </div>
           <div className="h-96 bg-blue-800/50 rounded-xl"></div>
         </div>
@@ -242,13 +242,13 @@ export default function AdminReports() {
         <Card className="p-4 bg-blue-900/30 backdrop-blur-sm border-blue-700/50">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-3">
-              <div className="flex-1 relative">
+            <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-400" />
-                <Input
+              <Input
                   type="text"
                   placeholder="Buscar por usuário ou motivo..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-blue-800/50 border-blue-700/50 text-white placeholder:text-blue-400 h-12"
                 />
                 {searchTerm && (
@@ -276,14 +276,14 @@ export default function AdminReports() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-blue-700/50">
                 <div>
                   <label className="text-blue-300 text-sm font-medium mb-2 block">Status</label>
-                  <select
+            <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as any)}
                     className="w-full bg-blue-800/50 border border-blue-700/50 text-white rounded-lg px-3 py-2"
                   >
                     <option value="all">Todos</option>
-                    <option value="pending">Pendentes</option>
-                    <option value="resolved">Resolvidas</option>
+              <option value="pending">Pendentes</option>
+              <option value="resolved">Resolvidas</option>
                     <option value="dismissed">Descartadas</option>
                   </select>
                 </div>
@@ -312,7 +312,7 @@ export default function AdminReports() {
                     <option value="newest">Mais Recentes</option>
                     <option value="oldest">Mais Antigas</option>
                     <option value="priority">Por Prioridade</option>
-                  </select>
+            </select>
                 </div>
               </div>
             )}
@@ -338,14 +338,14 @@ export default function AdminReports() {
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* Left Section - Report Info */}
                   <div className="flex-1 space-y-4">
-                    <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <Flag className={`w-6 h-6 ${
                           report.priority === 'high' ? 'text-red-400' :
                           report.priority === 'medium' ? 'text-orange-400' :
                           'text-blue-400'
                         }`} />
-                        <div>
+                    <div>
                           <h3 className="text-white font-semibold text-lg">Denúncia #{report.id}</h3>
                           <p className="text-blue-400 text-sm">{formatDate(report.createdAt)}</p>
                         </div>
@@ -364,8 +364,8 @@ export default function AdminReports() {
                         </p>
                         <p className="text-white font-medium">{report.reporterName}</p>
                         <p className="text-blue-400 text-xs">ID: {report.reporterId}</p>
-                      </div>
-
+                  </div>
+                  
                       <div className="bg-red-900/20 rounded-lg p-3 border border-red-700/30">
                         <p className="text-red-300 text-xs mb-1 flex items-center gap-1">
                           <Ban className="w-3 h-3" />
@@ -373,8 +373,8 @@ export default function AdminReports() {
                         </p>
                         <p className="text-white font-medium">{report.reportedName}</p>
                         <p className="text-red-400 text-xs">ID: {report.reportedId}</p>
-                      </div>
-                    </div>
+                  </div>
+                </div>
 
                     <div className="bg-blue-800/30 rounded-lg p-4">
                       <p className="text-blue-300 text-sm font-semibold mb-2">Motivo:</p>
@@ -392,25 +392,25 @@ export default function AdminReports() {
                   <div className="lg:w-64 space-y-3">
                     {report.status === 'pending' && (
                       <>
-                        <Button
+                  <Button
                           onClick={() => resolveMutation.mutate({ id: report.id, action: 'resolve' })}
                           disabled={resolveMutation.isPending}
                           className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
                         >
                           <CheckCircle className="w-4 h-4 mr-2" />
                           Resolver
-                        </Button>
-                        <Button
+                  </Button>
+                          <Button
                           onClick={() => resolveMutation.mutate({ id: report.id, action: 'dismiss' })}
                           disabled={resolveMutation.isPending}
-                          variant="outline"
+                            variant="outline"
                           className="w-full border-gray-600/50 text-gray-300 hover:bg-gray-700/50"
-                        >
+                          >
                           <XCircle className="w-4 h-4 mr-2" />
                           Descartar
-                        </Button>
+                          </Button>
                       </>
-                    )}
+                  )}
 
                     <Button
                       onClick={() => setLocation(`/admin/users/${report.reportedId}`)}
@@ -432,7 +432,7 @@ export default function AdminReports() {
                       Ver Denunciante
                     </Button>
                   </div>
-                </div>
+              </div>
               </Card>
             ))
           ) : (

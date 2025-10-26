@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Settings, ChevronRight, Star, Zap, Crown, Check, Lock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -61,9 +61,10 @@ export default function Profile() {
     queryKey: ['/api/profiles', user?.id],
     enabled: !!user?.id,
     retry: false,
-    staleTime: 5 * 60 * 1000, // ⚡ 5 minutos - dados do perfil
-    gcTime: 15 * 60 * 1000, // ⚡ 15 minutos em cache
+    staleTime: 10 * 60 * 1000, // ⚡ 10 minutos - dados do perfil
+    gcTime: 30 * 60 * 1000, // ⚡ 30 minutos em cache
     refetchOnWindowFocus: false, // ⚡ Não refetch ao focar
+    refetchOnMount: false, // ⚡ Não refetch ao montar se já tem cache
     queryFn: async () => {
       const res = await fetch(`/api/profiles/${user?.id}`, {
         credentials: 'include',
@@ -80,26 +81,34 @@ export default function Profile() {
 
   const { data: superLikes } = useQuery<{ count: number; dailyLimit: number; remaining: number }>({
     queryKey: ['/api/super-likes'],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!profile, // ⚡ Só carrega após o perfil
     retry: false,
+    staleTime: 5 * 60 * 1000, // ⚡ 5 minutos em cache
+    refetchOnWindowFocus: false,
   });
 
   const { data: boostStats } = useQuery<{ views: number; likes: number; matches: number; available?: number }>({
     queryKey: ['/api/boost'],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!profile, // ⚡ Só carrega após o perfil
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: subscription } = useQuery<{ planName: string; status: string; expiresAt: string } | null>({
     queryKey: ['/api/subscription/current'],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!profile, // ⚡ Só carrega após o perfil
     retry: false,
+    staleTime: 15 * 60 * 1000, // ⚡ 15 minutos - assinaturas mudam pouco
+    refetchOnWindowFocus: false,
   });
 
   const { data: profileViews } = useQuery<{ views: number }>({
     queryKey: ['/api/profile/views'],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!profile, // ⚡ Só carrega após o perfil
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const handleLogout = async () => {
@@ -126,7 +135,10 @@ export default function Profile() {
   if (isLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center">
-        <div className="text-white text-xl">Carregando...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+          <div className="text-white text-xl font-medium">Carregando perfil...</div>
+        </div>
       </div>
     );
   }
@@ -141,27 +153,21 @@ export default function Profile() {
 
   const userData = user as any;
   
-  console.log("🔵 DEBUG PROFILE - Dados do usuário:");
-  console.log("🔵 profile.photos:", profile.photos?.length || 0, "fotos");
-  console.log("🔵 user.photos:", userData?.photos?.length || 0, "fotos");
-  console.log("🔵 user.profileImage:", userData?.profileImage ? "Definida" : "Não definida");
-  console.log("🔵 profile.age:", profile.age);
-  console.log("🔵 user.birthDate:", userData?.birthDate);
-  console.log("🔵 profile.name:", profile.name);
-  console.log("🔵 profile.userId:", profile.userId);
+  // ⚡ Memoização de dados para evitar cálculos repetidos
+  const photos = useMemo(() => 
+    profile.photos && profile.photos.length > 0 
+      ? profile.photos 
+      : (userData?.photos || [])
+  , [profile.photos, userData?.photos]);
   
-  const photos = profile.photos && profile.photos.length > 0 
-    ? profile.photos 
-    : (userData?.photos || []);
-  
-  const profilePhoto = photos[0] 
+  const profilePhoto = useMemo(() => 
+    photos[0] 
     || userData?.profileImage 
-    || `https://ui-avatars.com/api/?name=${profile.name}&background=ec4899&color=fff&size=200`;
-  
-  console.log("🔵 Foto de perfil escolhida:", profilePhoto ? profilePhoto.substring(0, 50) + "..." : "placeholder");
-  console.log("🔵 Total de fotos disponíveis:", photos.length);
+    || `https://ui-avatars.com/api/?name=${profile.name}&background=ec4899&color=fff&size=200`
+  , [photos, userData?.profileImage, profile.name]);
 
-  const calculateProfileCompletion = () => {
+  // ⚡ Memoizar cálculo de conclusão do perfil
+  const profileCompletion = useMemo(() => {
     let completed = 0;
     let total = 10;
 
@@ -177,15 +183,13 @@ export default function Profile() {
     if (profile.isVerified) completed++;
 
     return Math.round((completed / total) * 100);
-  };
-
-  const profileCompletion = calculateProfileCompletion();
+  }, [photos, profile]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
       <div className="sticky top-0 z-10 bg-blue-900/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <img src={mixLogo} alt="MIX" className="h-8 w-auto" />
+          <img src={mixLogo} alt="MIX" className="h-8 w-auto" loading="eager" decoding="async" />
           <div className="flex gap-2">
             <Button
               variant="ghost"
@@ -218,14 +222,12 @@ export default function Profile() {
                 alt={profile.name}
                 className="w-full h-full object-cover"
                 data-testid="img-profile-photo"
+                loading="eager"
+                decoding="async"
                 onError={(e) => {
-                  console.error("🔴 Erro ao carregar foto de perfil");
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src = `https://ui-avatars.com/api/?name=${profile.name}&background=ec4899&color=fff&size=200`;
-                }}
-                onLoad={() => {
-                  console.log("✅ Foto de perfil carregada com sucesso");
                 }}
               />
             </div>
@@ -333,7 +335,7 @@ export default function Profile() {
               <div className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-6 shadow-2xl border border-gray-600" data-testid="card-platinum-plan">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <img src={mixLogo} alt="mix" className="h-8 w-auto" />
+                    <img src={mixLogo} alt="mix" className="h-8 w-auto" loading="lazy" decoding="async" />
                     <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-full font-bold" data-testid="badge-platinum">PLATINUM</span>
                   </div>
                   <Button
@@ -389,7 +391,7 @@ export default function Profile() {
               <div className="bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-3xl p-6 shadow-2xl" data-testid="card-gold-plan">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <img src={mixLogo} alt="mix" className="h-8 w-auto" />
+                    <img src={mixLogo} alt="mix" className="h-8 w-auto" loading="lazy" decoding="async" />
                     <span className="bg-yellow-800 text-white text-xs px-2 py-0.5 rounded-full font-bold" data-testid="badge-gold">GOLD</span>
                   </div>
                   <Button

@@ -10,7 +10,7 @@ import {
   Heart, 
   MessageSquare, 
   DollarSign, 
-  TrendingUp,
+  TrendingUp, 
   TrendingDown,
   ArrowRight,
   Activity,
@@ -192,21 +192,21 @@ export default function AdminDashboard() {
           </div>
           <Badge className={`${
             growth >= 0 
-              ? 'bg-green-500/20 text-green-300 border-green-500/30' 
-              : 'bg-red-500/20 text-red-300 border-red-500/30'
+                            ? 'bg-green-500/20 text-green-300 border-green-500/30' 
+                            : 'bg-red-500/20 text-red-300 border-red-500/30'
           }`}>
             {growth >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
             {Math.abs(growth)}%
-          </Badge>
-        </div>
+                      </Badge>
+                    </div>
         <h3 className="text-white/70 text-sm font-medium mb-1">{title}</h3>
         <p className="text-white text-3xl font-bold mb-1">{value}</p>
         <p className="text-white/60 text-xs">{subtitle}</p>
-      </div>
-    </Card>
-  );
+                </div>
+              </Card>
+            );
 
-  return (
+              return (
     <AdminLayout title="Painel Principal">
       <div className="space-y-6">
         {/* Welcome Section with Live Clock */}
@@ -298,14 +298,14 @@ export default function AdminDashboard() {
                   Aprovadas
                 </span>
                 <span className="text-white font-bold">{stats?.verifications.approved || 0}</span>
-              </div>
+                  </div>
               <div className="flex justify-between items-center">
                 <span className="text-blue-300 text-sm flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-red-400" />
                   Rejeitadas
                 </span>
                 <span className="text-white font-bold">{stats?.verifications.rejected || 0}</span>
-              </div>
+                </div>
             </div>
           </Card>
 

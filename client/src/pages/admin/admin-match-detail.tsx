@@ -276,20 +276,20 @@ export default function AdminMatchDetail() {
               <Activity className="w-4 h-4 mr-2" />
               Atividade
             </Button>
-            <Button
+          <Button
               onClick={() => {
                 if (confirm('Tem certeza que deseja remover este match?')) {
                   deleteMatchMutation.mutate();
                 }
               }}
-              disabled={deleteMatchMutation.isPending}
-              variant="outline"
+            disabled={deleteMatchMutation.isPending}
+            variant="outline"
               size="sm"
-              className="border-red-600/50 text-red-300 hover:bg-red-700/50"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
+            className="border-red-600/50 text-red-300 hover:bg-red-700/50"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
               Remover
-            </Button>
+          </Button>
           </div>
         </div>
 
@@ -376,23 +376,23 @@ export default function AdminMatchDetail() {
           <div className="lg:col-span-2 space-y-6">
             {selectedTab === 'overview' && (
               <>
-                {/* Users Info */}
+            {/* Users Info */}
                 <Card className="p-6 bg-blue-900/30 backdrop-blur-sm border-blue-700/50">
-                  <h3 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Users className="w-5 h-5" />
+              <h3 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
+                <Users className="w-5 h-5" />
                     Participantes do Match
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* User 1 */}
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* User 1 */}
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all"></div>
                       <div className="relative bg-blue-800/50 rounded-xl p-4 border border-blue-700/50 hover:border-pink-500/50 transition-all">
                         <div className="flex items-start gap-4">
                           <div className="relative">
-                            <img
-                              src={match.user1.photo}
-                              alt={match.user1.name}
+                  <img
+                    src={match.user1.photo}
+                    alt={match.user1.name}
                               className="w-16 h-16 rounded-full bg-blue-700/50 object-cover border-2 border-pink-500/50"
                             />
                             {match.user1.verified && (
@@ -401,48 +401,48 @@ export default function AdminMatchDetail() {
                               </div>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="text-white font-semibold">{match.user1.name}</h4>
-                              {match.user1.verified && (
-                                <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                                  Verificado
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-blue-200 text-sm">{match.user1.age} anos</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-white font-semibold">{match.user1.name}</h4>
+                      {match.user1.verified && (
+                        <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                          Verificado
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-blue-200 text-sm">{match.user1.age} anos</p>
                             {match.user1.profession && (
-                              <p className="text-blue-200 text-sm">{match.user1.profession}</p>
+                    <p className="text-blue-200 text-sm">{match.user1.profession}</p>
                             )}
                             {match.user1.location && (
-                              <p className="text-blue-300 text-xs flex items-center gap-1 mt-1">
-                                <MapPin className="w-3 h-3" />
-                                {match.user1.location}
-                              </p>
+                    <p className="text-blue-300 text-xs flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      {match.user1.location}
+                    </p>
                             )}
-                            <Button
-                              size="sm"
-                              variant="outline"
+                    <Button
+                      size="sm"
+                      variant="outline"
                               className="mt-3 w-full bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-pink-400/50 text-pink-300 hover:from-pink-500/20 hover:to-purple-500/20"
-                              onClick={() => setLocation(`/admin/users/${match.user1.id}`)}
-                            >
-                              <Eye className="w-3 h-3 mr-1" />
-                              Ver Perfil
-                            </Button>
+                      onClick={() => setLocation(`/admin/users/${match.user1.id}`)}
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      Ver Perfil
+                    </Button>
                           </div>
                         </div>
-                      </div>
-                    </div>
+                  </div>
+                </div>
 
-                    {/* User 2 */}
+                {/* User 2 */}
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all"></div>
                       <div className="relative bg-blue-800/50 rounded-xl p-4 border border-blue-700/50 hover:border-purple-500/50 transition-all">
                         <div className="flex items-start gap-4">
                           <div className="relative">
-                            <img
-                              src={match.user2.photo}
-                              alt={match.user2.name}
+                  <img
+                    src={match.user2.photo}
+                    alt={match.user2.name}
                               className="w-16 h-16 rounded-full bg-blue-700/50 object-cover border-2 border-purple-500/50"
                             />
                             {match.user2.verified && (
@@ -451,40 +451,40 @@ export default function AdminMatchDetail() {
                               </div>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="text-white font-semibold">{match.user2.name}</h4>
-                              {match.user2.verified && (
-                                <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                                  Verificado
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-blue-200 text-sm">{match.user2.age} anos</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-white font-semibold">{match.user2.name}</h4>
+                      {match.user2.verified && (
+                        <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                          Verificado
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-blue-200 text-sm">{match.user2.age} anos</p>
                             {match.user2.profession && (
-                              <p className="text-blue-200 text-sm">{match.user2.profession}</p>
+                    <p className="text-blue-200 text-sm">{match.user2.profession}</p>
                             )}
                             {match.user2.location && (
-                              <p className="text-blue-300 text-xs flex items-center gap-1 mt-1">
-                                <MapPin className="w-3 h-3" />
-                                {match.user2.location}
-                              </p>
+                    <p className="text-blue-300 text-xs flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      {match.user2.location}
+                    </p>
                             )}
-                            <Button
-                              size="sm"
-                              variant="outline"
+                    <Button
+                      size="sm"
+                      variant="outline"
                               className="mt-3 w-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-400/50 text-purple-300 hover:from-purple-500/20 hover:to-blue-500/20"
-                              onClick={() => setLocation(`/admin/users/${match.user2.id}`)}
-                            >
-                              <Eye className="w-3 h-3 mr-1" />
-                              Ver Perfil
-                            </Button>
+                      onClick={() => setLocation(`/admin/users/${match.user2.id}`)}
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      Ver Perfil
+                    </Button>
                           </div>
                         </div>
-                      </div>
-                    </div>
                   </div>
-                </Card>
+                </div>
+              </div>
+            </Card>
 
                 {/* Match Info */}
                 <Card className="p-6 bg-blue-900/30 backdrop-blur-sm border-blue-700/50">
@@ -517,38 +517,38 @@ export default function AdminMatchDetail() {
 
             {selectedTab === 'messages' && (
               <Card className="p-6 bg-blue-900/30 backdrop-blur-sm border-blue-700/50">
-                <h3 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  Histórico de Mensagens ({match.messages.length})
-                </h3>
-                
+              <h3 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Histórico de Mensagens ({match.messages.length})
+              </h3>
+              
                 <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                  {match.messages.map((message) => (
+                {match.messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.senderId === match.user1.id ? 'justify-start' : 'justify-end'}`}
+                  >
                     <div
-                      key={message.id}
-                      className={`flex ${message.senderId === match.user1.id ? 'justify-start' : 'justify-end'}`}
-                    >
-                      <div
                         className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                          message.senderId === match.user1.id
+                        message.senderId === match.user1.id
                             ? 'bg-blue-700/50 text-white rounded-tl-none'
                             : 'bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-white rounded-tr-none'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-semibold opacity-90">{message.senderName}</span>
                           <span className="text-xs opacity-60">{formatTimeAgo(message.sentAt)}</span>
-                        </div>
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                        {!message.isRead && (
-                          <div className="flex justify-end mt-1">
-                            <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
-                          </div>
-                        )}
                       </div>
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                      {!message.isRead && (
+                        <div className="flex justify-end mt-1">
+                            <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
 
                 {match.messages.length === 0 && (
                   <div className="text-center py-12">
@@ -608,7 +608,7 @@ export default function AdminMatchDetail() {
                     </div>
                   </div>
                 </div>
-              </Card>
+            </Card>
             )}
           </div>
 
