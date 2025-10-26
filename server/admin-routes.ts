@@ -653,6 +653,181 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Admin Subscription Activate
+  app.post("/api/admin/subscriptions/:id/activate", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await db.update(subscriptions)
+        .set({ 
+          status: 'active',
+          canceledAt: null,
+          cancelAtPeriodEnd: false
+        })
+        .where(eq(subscriptions.id, parseInt(id)));
+      
+      console.log(`📊 Admin subscription ${id} activated`);
+      res.json({ success: true, message: 'Subscription activated successfully' });
+    } catch (error) {
+      console.error('Error activating subscription:', error);
+      res.status(500).json({ error: 'Failed to activate subscription' });
+    }
+  });
+
+  // Admin Subscription Create
+  app.post("/api/admin/subscriptions/create", async (req, res) => {
+    try {
+      const { 
+        userId, 
+        planType, 
+        status, 
+        startDate, 
+        endDate, 
+        amount,
+        stripeSubscriptionId,
+        stripeCustomerId 
+      } = req.body;
+
+      console.log(`📊 Admin creating subscription for user ${userId}:`, {
+        planType,
+        status,
+        startDate,
+        endDate,
+        amount
+      });
+
+      // Validar campos obrigatórios
+      if (!userId || !planType || !status || !startDate || !endDate || !amount) {
+        return res.status(400).json({ 
+          error: 'Campos obrigatórios faltando',
+          message: 'userId, planType, status, startDate, endDate e amount são obrigatórios'
+        });
+      }
+
+      // Determinar planId baseado no planType
+      let planId = 1; // free
+      if (planType === 'premium') planId = 5;
+      else if (planType === 'vip') planId = 6;
+
+      // Criar a assinatura
+      const [newSubscription] = await db.insert(subscriptions)
+        .values({
+          userId: parseInt(userId),
+          planId: planId,
+          status: status,
+          currentPeriodStart: new Date(startDate),
+          currentPeriodEnd: new Date(endDate),
+          stripeSubscriptionId: stripeSubscriptionId || null,
+          stripeCustomerId: stripeCustomerId || null,
+          cancelAtPeriodEnd: false,
+        })
+        .returning();
+
+      // Atualizar o subscriptionType do usuário
+      await db.update(users)
+        .set({ subscriptionType: planType })
+        .where(eq(users.id, parseInt(userId)));
+
+      console.log(`✅ Admin subscription created successfully: ${newSubscription.id}`);
+      
+      res.json({ 
+        success: true, 
+        subscription: newSubscription,
+        message: 'Subscription created successfully' 
+      });
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      res.status(500).json({ 
+        error: 'Failed to create subscription',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Admin Subscription Update
+  app.put("/api/admin/subscriptions/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { 
+        planType, 
+        status, 
+        startDate, 
+        endDate, 
+        amount,
+        stripeSubscriptionId,
+        stripeCustomerId 
+      } = req.body;
+
+      console.log(`📊 Admin updating subscription ${id}:`, {
+        planType,
+        status,
+        startDate,
+        endDate,
+        amount
+      });
+
+      // Validar campos obrigatórios
+      if (!planType || !status || !startDate || !endDate || !amount) {
+        return res.status(400).json({ 
+          error: 'Campos obrigatórios faltando',
+          message: 'planType, status, startDate, endDate e amount são obrigatórios'
+        });
+      }
+
+      // Buscar a assinatura existente
+      const existingSubscription = await db.select()
+        .from(subscriptions)
+        .where(eq(subscriptions.id, parseInt(id)))
+        .limit(1);
+
+      if (!existingSubscription || existingSubscription.length === 0) {
+        return res.status(404).json({ 
+          error: 'Subscription not found',
+          message: 'Assinatura não encontrada'
+        });
+      }
+
+      // Determinar planId baseado no planType
+      let planId = 1; // free
+      if (planType === 'premium') planId = 5;
+      else if (planType === 'vip') planId = 6;
+
+      // Atualizar a assinatura
+      const [updatedSubscription] = await db.update(subscriptions)
+        .set({
+          planId: planId,
+          status: status,
+          currentPeriodStart: new Date(startDate),
+          currentPeriodEnd: new Date(endDate),
+          stripeSubscriptionId: stripeSubscriptionId || null,
+          stripeCustomerId: stripeCustomerId || null,
+          cancelAtPeriodEnd: status === 'cancelled',
+          canceledAt: status === 'cancelled' ? new Date() : null,
+        })
+        .where(eq(subscriptions.id, parseInt(id)))
+        .returning();
+
+      // Atualizar o subscriptionType do usuário
+      await db.update(users)
+        .set({ subscriptionType: planType })
+        .where(eq(users.id, existingSubscription[0].userId));
+
+      console.log(`✅ Admin subscription ${id} updated successfully`);
+      
+      res.json({ 
+        success: true, 
+        subscription: updatedSubscription,
+        message: 'Subscription updated successfully' 
+      });
+    } catch (error) {
+      console.error('Error updating subscription:', error);
+      res.status(500).json({ 
+        error: 'Failed to update subscription',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // 🔧 ADMIN: Corrigir dados incompletos de todos os usuários (DEV + PRODUCTION)
   app.post("/api/admin/fix-incomplete-data", async (req, res) => {
     try {

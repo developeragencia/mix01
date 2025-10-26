@@ -85,6 +85,8 @@ import AdminMatchEdit from "@/pages/admin/admin-match-edit";
 import AdminMessagesNew from "@/pages/admin/admin-messages-new";
 import AdminMessageEdit from "@/pages/admin/admin-message-edit";
 import AdminSubscriptionsNew from "@/pages/admin/admin-subscriptions-new";
+import AdminSubscriptionCreate from "@/pages/admin/admin-subscription-create";
+import AdminSubscriptionEdit from "@/pages/admin/admin-subscription-edit";
 import AdminSubscriptionPlans from "@/pages/admin/admin-subscription-plans";
 import AdminPayments from "@/pages/admin/admin-payments";
 import AdminReportsNew from "@/pages/admin/admin-reports-new";
@@ -245,6 +247,8 @@ function Router() {
       <Route path="/admin/matches/:id/edit" component={AdminMatchEdit} />
       <Route path="/admin/messages/:id" component={AdminMessageDetail} />
       <Route path="/admin/messages/:id/edit" component={AdminMessageEdit} />
+      <Route path="/admin/subscriptions/create" component={AdminSubscriptionCreate} />
+      <Route path="/admin/subscriptions/:id/edit" component={AdminSubscriptionEdit} />
       <Route path="/admin/subscription-details/:id" component={AdminSubscriptionDetail} />
       <Route path="/admin/subscriptions/:id" component={AdminSubscriptionDetail} />
       <Route path="/admin/payments/:id" component={AdminPaymentDetail} />

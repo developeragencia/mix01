@@ -19,7 +19,9 @@ import {
   DollarSign,
   Eye,
   Ban,
-  CheckCircle
+  CheckCircle,
+  Plus,
+  Edit
 } from "lucide-react";
 
 interface Subscription {
@@ -120,6 +122,24 @@ export default function AdminSubscriptionsNew() {
   return (
     <AdminLayout title="Gerenciar Assinaturas">
       <div className="space-y-3 w-full max-w-full overflow-x-hidden">
+        {/* Header com Botão Criar */}
+        <Card className="p-3 bg-blue-800/50 backdrop-blur-sm border-blue-700/50 w-full">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-pink-400" />
+              Assinaturas
+            </h2>
+            <Button
+              onClick={() => setLocation('/admin/subscriptions/create')}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
+              size="sm"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Assinatura
+            </Button>
+          </div>
+        </Card>
+
         {/* Search and Filters */}
         <Card className="p-3 bg-blue-800/50 backdrop-blur-sm border-blue-700/50 w-full">
           <div className="flex flex-col sm:flex-row gap-3 w-full">
@@ -216,6 +236,14 @@ export default function AdminSubscriptionsNew() {
                 >
                   <Eye className="w-3 h-3 mr-1" />
                   Ver
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setLocation(`/admin/subscriptions/${subscription.id}/edit`)}
+                  className="border-blue-500/50 text-blue-400 hover:bg-blue-500/20 text-xs"
+                >
+                  <Edit className="w-3 h-3" />
                 </Button>
                 {subscription.isActive && (
                   <Button
