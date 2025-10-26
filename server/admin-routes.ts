@@ -2035,7 +2035,7 @@ export function registerAdminRoutes(app: Express) {
       const { id } = req.params;
       const updateData = req.body;
 
-      console.log(`✏️ Updating user ${id}:`, updateData);
+      console.log(`✏️ Updating user ${id}:`, JSON.stringify(updateData, null, 2));
 
       // Validar dados básicos
       if (!updateData.firstName || !updateData.lastName || !updateData.email) {
@@ -2045,25 +2045,41 @@ export function registerAdminRoutes(app: Express) {
         });
       }
 
+      // Preparar sexual_orientation como array
+      const sexualOrientationArray = updateData.sexualOrientation 
+        ? [updateData.sexualOrientation] 
+        : [];
+
+      // Preparar interested_in como array
+      const interestedInArray = updateData.interestedIn 
+        ? [updateData.interestedIn] 
+        : [];
+
       // Atualizar usuário
       const [updatedUser] = await db.update(users)
         .set({
           firstName: updateData.firstName,
           lastName: updateData.lastName,
           email: updateData.email,
-          username: updateData.username,
-          phone: updateData.phone,
-          city: updateData.city,
-          gender: updateData.gender,
-          sexualOrientation: updateData.sexualOrientation,
-          interestedIn: updateData.interestedIn,
-          updatedAt: new Date()
+          username: updateData.username || updateData.email.split('@')[0],
+          phone: updateData.phone || null,
+          city: updateData.city || null,
+          gender: updateData.gender || null,
+          sexualOrientation: sexualOrientationArray,
+          interestedIn: interestedInArray,
+          bio: updateData.bio || null,
+          interests: updateData.interests || [],
+          subscriptionType: updateData.subscriptionType || 'free',
+          isOnline: updateData.isOnline !== undefined ? updateData.isOnline : false
         })
         .where(eq(users.id, parseInt(id)))
         .returning();
 
       if (!updatedUser) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ 
+          error: 'User not found',
+          message: 'Usuário não encontrado'
+        });
       }
 
       // Atualizar perfil se existir
@@ -2074,14 +2090,15 @@ export function registerAdminRoutes(app: Express) {
       if (existingProfile) {
         await db.update(profiles)
           .set({
-            bio: updateData.bio,
+            bio: updateData.bio || null,
             interests: updateData.interests || [],
-            gender: updateData.gender,
-            sexualOrientation: updateData.sexualOrientation,
-            interestedIn: updateData.interestedIn,
-            city: updateData.city
+            gender: updateData.gender || null,
+            city: updateData.city || null,
+            location: updateData.city || null
           })
           .where(eq(profiles.userId, parseInt(id)));
+        
+        console.log(`✅ Profile for user ${id} also updated`);
       }
 
       console.log(`✅ User ${id} updated successfully`);
@@ -2091,7 +2108,8 @@ export function registerAdminRoutes(app: Express) {
         message: 'Usuário atualizado com sucesso'
       });
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error('❌ Error updating user:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
       res.status(500).json({ 
         error: 'Failed to update user',
         message: error instanceof Error ? error.message : 'Erro desconhecido'
