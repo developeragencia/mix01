@@ -26,6 +26,7 @@ import { queryClient } from "@/lib/queryClient";
 
 const subscriptionEditSchema = z.object({
   planType: z.enum(["free", "premium", "vip"]),
+  interval: z.enum(["month", "year"]),
   status: z.enum(["active", "cancelled", "pending", "expired"]),
   startDate: z.string().min(1, "Data de início obrigatória"),
   endDate: z.string().min(1, "Data de término obrigatória"),
@@ -69,10 +70,11 @@ export default function AdminSubscriptionEdit() {
     resolver: zodResolver(subscriptionEditSchema),
     defaultValues: {
       planType: "premium",
+      interval: "month",
       status: "active",
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      amount: "29.90",
+      amount: "19.90",
       stripeSubscriptionId: "",
       stripeCustomerId: "",
     }
@@ -85,8 +87,12 @@ export default function AdminSubscriptionEdit() {
       // Converter amount de centavos para reais
       const amountInReais = (subscription.amount / 100).toFixed(2);
       
+      // Determinar interval baseado no valor ou plano
+      const interval = subscription.interval || (subscription.amount >= 10000 ? 'year' : 'month');
+      
       form.reset({
         planType: subscription.planType.toLowerCase(),
+        interval: interval,
         status: subscription.status,
         startDate: subscription.startDate ? new Date(subscription.startDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         endDate: subscription.endDate ? new Date(subscription.endDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
@@ -319,6 +325,28 @@ export default function AdminSubscriptionEdit() {
                           <SelectItem value="free" className="text-white focus:bg-blue-700">Grátis</SelectItem>
                           <SelectItem value="premium" className="text-white focus:bg-blue-700">Premium</SelectItem>
                           <SelectItem value="vip" className="text-white focus:bg-blue-700">VIP</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-red-400 text-xs" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="interval"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-blue-200">Periodicidade</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-blue-700/50 border-blue-600/50 text-white">
+                            <SelectValue placeholder="Selecione a periodicidade" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-blue-800 border-blue-600">
+                          <SelectItem value="month" className="text-white focus:bg-blue-700">Mensal</SelectItem>
+                          <SelectItem value="year" className="text-white focus:bg-blue-700">Anual</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage className="text-red-400 text-xs" />

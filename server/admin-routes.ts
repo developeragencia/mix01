@@ -680,6 +680,7 @@ export function registerAdminRoutes(app: Express) {
       const { 
         userId, 
         planType, 
+        interval = 'month', // Default to monthly
         status, 
         startDate, 
         endDate, 
@@ -690,6 +691,7 @@ export function registerAdminRoutes(app: Express) {
 
       console.log(`📊 Admin creating subscription for user ${userId}:`, {
         planType,
+        interval,
         status,
         startDate,
         endDate,
@@ -704,10 +706,13 @@ export function registerAdminRoutes(app: Express) {
         });
       }
 
-      // Determinar planId baseado no planType
-      let planId = 1; // free
-      if (planType === 'premium') planId = 5;
-      else if (planType === 'vip') planId = 6;
+      // Determinar planId baseado no planType + interval
+      // Premium Mensal=1, Premium Anual=2, VIP Mensal=3, VIP Anual=4
+      let planId = 1;
+      if (planType === 'premium' && interval === 'month') planId = 1;
+      else if (planType === 'premium' && interval === 'year') planId = 2;
+      else if (planType === 'vip' && interval === 'month') planId = 3;
+      else if (planType === 'vip' && interval === 'year') planId = 4;
 
       // Criar a assinatura
       const [newSubscription] = await db.insert(subscriptions)
@@ -750,6 +755,7 @@ export function registerAdminRoutes(app: Express) {
       const { id } = req.params;
       const { 
         planType, 
+        interval = 'month', // Default to monthly
         status, 
         startDate, 
         endDate, 
@@ -760,6 +766,7 @@ export function registerAdminRoutes(app: Express) {
 
       console.log(`📊 Admin updating subscription ${id}:`, {
         planType,
+        interval,
         status,
         startDate,
         endDate,
@@ -787,10 +794,13 @@ export function registerAdminRoutes(app: Express) {
         });
       }
 
-      // Determinar planId baseado no planType
-      let planId = 1; // free
-      if (planType === 'premium') planId = 5;
-      else if (planType === 'vip') planId = 6;
+      // Determinar planId baseado no planType + interval
+      // Premium Mensal=1, Premium Anual=2, VIP Mensal=3, VIP Anual=4
+      let planId = 1;
+      if (planType === 'premium' && interval === 'month') planId = 1;
+      else if (planType === 'premium' && interval === 'year') planId = 2;
+      else if (planType === 'vip' && interval === 'month') planId = 3;
+      else if (planType === 'vip' && interval === 'year') planId = 4;
 
       // Atualizar a assinatura
       const [updatedSubscription] = await db.update(subscriptions)
