@@ -8,10 +8,14 @@ import { count, eq, and, gte, sql, desc } from "drizzle-orm";
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
   
+  console.log(`🔐 requireAdmin middleware - Path: ${req.path}, Method: ${req.method}`);
+  
   // Check for Bearer token first (modern approach for localStorage-based auth)
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
+    
+    console.log(`🔍 Checking Bearer token: ${token}`);
     
     // Simple token validation: check if it's a valid admin email
     // In production, you'd verify JWT or use a proper token system
@@ -22,13 +26,13 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
       return next();
     }
     
-    console.log(`🔴 ACESSO NEGADO: Token inválido`);
+    console.log(`🔴 ACESSO NEGADO: Token inválido - ${token}`);
     return res.status(401).json({ error: "Token inválido" });
   }
   
   // Fallback to session-based auth
   if (!req.isAuthenticated() || !req.user) {
-    console.log(`🔴 ACESSO NEGADO: Tentativa de acesso admin sem autenticação`);
+    console.log(`🔴 ACESSO NEGADO: Tentativa de acesso admin sem autenticação - Path: ${req.path}`);
     return res.status(401).json({ error: "Não autenticado" });
   }
   
@@ -124,8 +128,105 @@ export function registerAdminRoutes(app: Express) {
       });
     }
   });
+
+  // Update user (ANTES do middleware global para evitar dupla aplicação)
+  app.put("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      console.log(`✏️ Updating user ${id}:`, JSON.stringify(updateData, null, 2));
+
+      // Validar dados básicos
+      if (!updateData.firstName || !updateData.lastName || !updateData.email) {
+        return res.status(400).json({ 
+          error: 'Campos obrigatórios faltando',
+          message: 'Nome, sobrenome e email são obrigatórios'
+        });
+      }
+
+      // Preparar sexual_orientation como array
+      const sexualOrientationArray = updateData.sexualOrientation 
+        ? [updateData.sexualOrientation] 
+        : [];
+
+      // Preparar interested_in como array
+      const interestedInArray = updateData.interestedIn 
+        ? [updateData.interestedIn] 
+        : [];
+
+      // Preparar dados para update (usando exatamente os nomes do schema Drizzle)
+      const updateFields: any = {
+        firstName: updateData.firstName,
+        lastName: updateData.lastName,
+        email: updateData.email
+      };
+
+      // Adicionar campos opcionais apenas se fornecidos
+      if (updateData.username) updateFields.username = updateData.username;
+      if (updateData.phone !== undefined) updateFields.phone = updateData.phone || null;
+      if (updateData.city !== undefined) updateFields.city = updateData.city || null;
+      if (updateData.gender !== undefined) updateFields.gender = updateData.gender || null;
+      if (updateData.bio !== undefined) updateFields.bio = updateData.bio || null;
+      if (updateData.interests !== undefined) updateFields.interests = updateData.interests || [];
+      if (updateData.subscriptionType !== undefined) updateFields.subscriptionType = updateData.subscriptionType;
+      if (updateData.isOnline !== undefined) updateFields.isOnline = updateData.isOnline;
+      
+      // Arrays sempre como array
+      if (sexualOrientationArray.length > 0) updateFields.sexualOrientation = sexualOrientationArray;
+      if (interestedInArray.length > 0) updateFields.interestedIn = interestedInArray;
+
+      console.log(`🔍 Update fields prepared:`, JSON.stringify(updateFields, null, 2));
+
+      // Atualizar usuário
+      const [updatedUser] = await db.update(users)
+        .set(updateFields)
+        .where(eq(users.id, parseInt(id)))
+        .returning();
+
+      if (!updatedUser) {
+        return res.status(404).json({ 
+          error: 'User not found',
+          message: 'Usuário não encontrado'
+        });
+      }
+
+      // Atualizar perfil se existir
+      const existingProfile = await db.query.profiles.findFirst({
+        where: eq(profiles.userId, parseInt(id))
+      });
+
+      if (existingProfile) {
+        await db.update(profiles)
+          .set({
+            bio: updateData.bio || null,
+            interests: updateData.interests || [],
+            gender: updateData.gender || null,
+            city: updateData.city || null,
+            location: updateData.city || null
+          })
+          .where(eq(profiles.userId, parseInt(id)));
+        
+        console.log(`✅ Profile for user ${id} also updated`);
+      }
+
+      console.log(`✅ User ${id} updated successfully`);
+      res.json({ 
+        success: true, 
+        user: updatedUser,
+        message: 'Usuário atualizado com sucesso'
+      });
+    } catch (error) {
+      console.error('❌ Error updating user:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+      res.status(500).json({ 
+        error: 'Failed to update user',
+        message: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
   
-  // 🔒 APLICAR MIDDLEWARE DE SEGURANÇA A TODAS AS ROTAS ADMIN (EXCETO LOGIN)
+  // 🔒 APLICAR MIDDLEWARE DE SEGURANÇA A TODAS AS ROTAS ADMIN (EXCETO LOGIN E PUT USER)
   app.use("/api/admin/*", requireAdmin);
 
   
@@ -2026,103 +2127,6 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       res.status(500).json({ error: 'Failed to mark all notifications as read' });
-    }
-  });
-
-  // Update user
-  app.put("/api/admin/users/:id", requireAdmin, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateData = req.body;
-
-      console.log(`✏️ Updating user ${id}:`, JSON.stringify(updateData, null, 2));
-
-      // Validar dados básicos
-      if (!updateData.firstName || !updateData.lastName || !updateData.email) {
-        return res.status(400).json({ 
-          error: 'Campos obrigatórios faltando',
-          message: 'Nome, sobrenome e email são obrigatórios'
-        });
-      }
-
-      // Preparar sexual_orientation como array
-      const sexualOrientationArray = updateData.sexualOrientation 
-        ? [updateData.sexualOrientation] 
-        : [];
-
-      // Preparar interested_in como array
-      const interestedInArray = updateData.interestedIn 
-        ? [updateData.interestedIn] 
-        : [];
-
-      // Preparar dados para update (usando exatamente os nomes do schema Drizzle)
-      const updateFields: any = {
-        firstName: updateData.firstName,
-        lastName: updateData.lastName,
-        email: updateData.email
-      };
-
-      // Adicionar campos opcionais apenas se fornecidos
-      if (updateData.username) updateFields.username = updateData.username;
-      if (updateData.phone !== undefined) updateFields.phone = updateData.phone || null;
-      if (updateData.city !== undefined) updateFields.city = updateData.city || null;
-      if (updateData.gender !== undefined) updateFields.gender = updateData.gender || null;
-      if (updateData.bio !== undefined) updateFields.bio = updateData.bio || null;
-      if (updateData.interests !== undefined) updateFields.interests = updateData.interests || [];
-      if (updateData.subscriptionType !== undefined) updateFields.subscriptionType = updateData.subscriptionType;
-      if (updateData.isOnline !== undefined) updateFields.isOnline = updateData.isOnline;
-      
-      // Arrays sempre como array
-      if (sexualOrientationArray.length > 0) updateFields.sexualOrientation = sexualOrientationArray;
-      if (interestedInArray.length > 0) updateFields.interestedIn = interestedInArray;
-
-      console.log(`🔍 Update fields prepared:`, JSON.stringify(updateFields, null, 2));
-
-      // Atualizar usuário
-      const [updatedUser] = await db.update(users)
-        .set(updateFields)
-        .where(eq(users.id, parseInt(id)))
-        .returning();
-
-      if (!updatedUser) {
-        return res.status(404).json({ 
-          error: 'User not found',
-          message: 'Usuário não encontrado'
-        });
-      }
-
-      // Atualizar perfil se existir
-      const existingProfile = await db.query.profiles.findFirst({
-        where: eq(profiles.userId, parseInt(id))
-      });
-
-      if (existingProfile) {
-        await db.update(profiles)
-          .set({
-            bio: updateData.bio || null,
-            interests: updateData.interests || [],
-            gender: updateData.gender || null,
-            city: updateData.city || null,
-            location: updateData.city || null
-          })
-          .where(eq(profiles.userId, parseInt(id)));
-        
-        console.log(`✅ Profile for user ${id} also updated`);
-      }
-
-      console.log(`✅ User ${id} updated successfully`);
-      res.json({ 
-        success: true, 
-        user: updatedUser,
-        message: 'Usuário atualizado com sucesso'
-      });
-    } catch (error) {
-      console.error('❌ Error updating user:', error);
-      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
-      res.status(500).json({ 
-        error: 'Failed to update user',
-        message: error instanceof Error ? error.message : 'Erro desconhecido'
-      });
     }
   });
 
