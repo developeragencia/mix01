@@ -60,7 +60,14 @@ export default function AdminUserEdit() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['/api/admin/user-details', id],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/user-details/${id}`);
+      const adminToken = localStorage.getItem("adminToken");
+      const response = await fetch(`/api/admin/user-details/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Failed to fetch user details');
       return response.json();
     }
@@ -104,12 +111,20 @@ export default function AdminUserEdit() {
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: UserEditForm & { interests: string[] }) => {
+      const adminToken = localStorage.getItem("adminToken");
       const response = await fetch(`/api/admin/users/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        credentials: 'include',
         body: JSON.stringify(data)
       });
-      if (!response.ok) throw new Error('Failed to update user');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update user');
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -119,11 +134,13 @@ export default function AdminUserEdit() {
         title: "✅ Usuário Atualizado",
         description: "As informações do usuário foram atualizadas com sucesso",
       });
+      // Redirecionar de volta para a página de detalhes
+      setLocation(`/admin/user-details/${id}`);
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "❌ Erro",
-        description: "Falha ao atualizar usuário",
+        description: error.message || "Falha ao atualizar usuário",
         variant: "destructive"
       });
     }

@@ -2029,4 +2029,74 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Update user
+  app.put("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      console.log(`✏️ Updating user ${id}:`, updateData);
+
+      // Validar dados básicos
+      if (!updateData.firstName || !updateData.lastName || !updateData.email) {
+        return res.status(400).json({ 
+          error: 'Campos obrigatórios faltando',
+          message: 'Nome, sobrenome e email são obrigatórios'
+        });
+      }
+
+      // Atualizar usuário
+      const [updatedUser] = await db.update(users)
+        .set({
+          firstName: updateData.firstName,
+          lastName: updateData.lastName,
+          email: updateData.email,
+          username: updateData.username,
+          phone: updateData.phone,
+          city: updateData.city,
+          gender: updateData.gender,
+          sexualOrientation: updateData.sexualOrientation,
+          interestedIn: updateData.interestedIn,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, parseInt(id)))
+        .returning();
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Atualizar perfil se existir
+      const existingProfile = await db.query.profiles.findFirst({
+        where: eq(profiles.userId, parseInt(id))
+      });
+
+      if (existingProfile) {
+        await db.update(profiles)
+          .set({
+            bio: updateData.bio,
+            interests: updateData.interests || [],
+            gender: updateData.gender,
+            sexualOrientation: updateData.sexualOrientation,
+            interestedIn: updateData.interestedIn,
+            city: updateData.city
+          })
+          .where(eq(profiles.userId, parseInt(id)));
+      }
+
+      console.log(`✅ User ${id} updated successfully`);
+      res.json({ 
+        success: true, 
+        user: updatedUser,
+        message: 'Usuário atualizado com sucesso'
+      });
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ 
+        error: 'Failed to update user',
+        message: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
+
 }
