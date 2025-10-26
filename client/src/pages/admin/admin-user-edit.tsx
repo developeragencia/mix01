@@ -92,6 +92,15 @@ export default function AdminUserEdit() {
 
   useEffect(() => {
     if (user) {
+      console.log("📥 Carregando dados do usuário:", {
+        id: user.id,
+        email: user.email,
+        subscriptionType: user.subscriptionType,
+        gender: user.gender,
+        sexualOrientation: user.sexualOrientation,
+        interestedIn: user.interestedIn
+      });
+      
       form.reset({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
@@ -112,6 +121,9 @@ export default function AdminUserEdit() {
   const updateUserMutation = useMutation({
     mutationFn: async (data: UserEditForm & { interests: string[] }) => {
       const adminToken = localStorage.getItem("adminToken");
+      console.log("🚀 Iniciando requisição de atualização para o servidor...");
+      console.log("📋 Dados que serão enviados:", JSON.stringify(data, null, 2));
+      
       const response = await fetch(`/api/admin/users/${id}`, {
         method: 'PUT',
         headers: { 
@@ -121,25 +133,40 @@ export default function AdminUserEdit() {
         credentials: 'include',
         body: JSON.stringify(data)
       });
+      
+      console.log("📨 Resposta do servidor - Status:", response.status);
+      
       if (!response.ok) {
         const error = await response.json();
+        console.error("❌ Erro na resposta:", error);
         throw new Error(error.message || 'Failed to update user');
       }
-      return response.json();
+      
+      const result = await response.json();
+      console.log("✅ Resposta de sucesso:", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("🎉 Atualização concluída com sucesso!");
+      console.log("📊 Dados atualizados:", data);
+      
       queryClient.invalidateQueries({ queryKey: ['/api/admin/user-details', id] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      
       toast({
         title: "✅ Usuário Atualizado",
-        description: "As informações do usuário foram atualizadas com sucesso",
+        description: "Todas as alterações foram salvas com sucesso",
       });
-      // Redirecionar de volta para a página de detalhes
-      setLocation(`/admin/user-details/${id}`);
+      
+      // Redirecionar de volta para a página de detalhes após 1 segundo
+      setTimeout(() => {
+        setLocation(`/admin/user-details/${id}`);
+      }, 1000);
     },
     onError: (error: Error) => {
+      console.error("💥 Erro ao atualizar usuário:", error);
       toast({
-        title: "❌ Erro",
+        title: "❌ Erro ao Salvar",
         description: error.message || "Falha ao atualizar usuário",
         variant: "destructive"
       });
@@ -147,6 +174,10 @@ export default function AdminUserEdit() {
   });
 
   const onSubmit = (data: UserEditForm) => {
+    console.log("📤 Enviando dados de atualização:", {
+      ...data,
+      interests: selectedInterests
+    });
     updateUserMutation.mutate({
       ...data,
       interests: selectedInterests
@@ -336,7 +367,7 @@ export default function AdminUserEdit() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-200">Tipo de Assinatura</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-blue-700/50 border-blue-600/50 text-white">
                             <SelectValue placeholder="Selecione o tipo" />
@@ -368,7 +399,7 @@ export default function AdminUserEdit() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-200">Gênero</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-blue-700/50 border-blue-600/50 text-white">
                             <SelectValue placeholder="Selecione o gênero" />
@@ -392,7 +423,7 @@ export default function AdminUserEdit() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-200">Orientação Sexual</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-blue-700/50 border-blue-600/50 text-white">
                             <SelectValue placeholder="Selecione a orientação" />
@@ -417,7 +448,7 @@ export default function AdminUserEdit() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-200">Interessado em</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-blue-700/50 border-blue-600/50 text-white">
                             <SelectValue placeholder="Interessado em" />
