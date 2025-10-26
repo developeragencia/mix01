@@ -41,9 +41,10 @@ export default function Localizacao() {
   const qrScannerRef = useRef<QrScanner | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Verificar autenticação
+  // ⚡ CORREÇÃO: Verificar autenticação - evita redirects durante loading
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
+      console.log("⚠️ Location: Usuário não autenticado - redirecionando para /login");
       setLocation("/login");
     }
   }, [authLoading, isAuthenticated, setLocation]);

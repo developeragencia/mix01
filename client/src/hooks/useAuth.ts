@@ -28,7 +28,7 @@ export function useAuth() {
   const queryClient = useQueryClient();
 
   // Verificar se usuário está autenticado
-  const { data: user, isLoading, error } = useQuery({
+  const { data: user, isLoading, error, isFetching } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: 0, // ✅ Sem retry - falha rápido se não autenticado
     refetchOnWindowFocus: false, // ⚡ Desabilitar refetch ao focar - melhora performance
@@ -36,18 +36,31 @@ export function useAuth() {
     staleTime: 15 * 60 * 1000, // ⚡ 15 minutos - dados mais duráveis
     gcTime: 30 * 60 * 1000, // ⚡ 30 minutos - mantém mais tempo em cache
     queryFn: async () => {
+      console.log("🔐 useAuth: Verificando autenticação...");
       const response = await fetch("/api/auth/user", {
         credentials: 'include'
       });
       if (response.status === 401) {
+        console.log("❌ useAuth: Não autenticado (401)");
         return null; // ✅ Retorna null ao invés de lançar erro
       }
       if (!response.ok) {
+        console.log("❌ useAuth: Erro na requisição:", response.status);
         throw new Error('Request failed');
       }
-      return await response.json();
+      const userData = await response.json();
+      console.log("✅ useAuth: Usuário autenticado:", {
+        id: userData.id,
+        email: userData.email,
+        isProfileComplete: userData.isProfileComplete
+      });
+      return userData;
     }
   });
+
+  // ⚡ IMPORTANTE: Considerar "loading" se está fetching OU se não tem dados E não tem erro
+  // Isso evita que páginas redirecionem durante o carregamento inicial
+  const isActuallyLoading = isLoading || isFetching || (!user && !error);
 
   // Logout mutation
   const logoutMutation = useMutation({
@@ -88,7 +101,7 @@ export function useAuth() {
   return {
     user: user as User | null,
     isAuthenticated: !!user && !error,
-    isLoading,
+    isLoading: isActuallyLoading, // ⚡ Usar loading aprimorado
     logout,
     isLoggingOut: logoutMutation.isPending,
   };

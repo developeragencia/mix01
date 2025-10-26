@@ -62,9 +62,14 @@ export default function Discover() {
   const profiles = allProfiles.filter(profile => profile.userId !== user?.id);
   const currentProfile = profiles[currentIndex];
 
+  // ⚡ CORREÇÃO: Só redirecionar se NÃO está loading E NÃO está autenticado
+  // Isso evita redirecionamentos durante o carregamento inicial ao atualizar a página
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
+      console.log("⚠️ Discover: Usuário não autenticado - redirecionando para /login");
       setLocation("/login");
+    } else if (!authLoading && isAuthenticated) {
+      console.log("✅ Discover: Usuário autenticado - permanecendo na página");
     }
   }, [authLoading, isAuthenticated, setLocation]);
 

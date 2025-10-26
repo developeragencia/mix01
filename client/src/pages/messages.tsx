@@ -14,9 +14,10 @@ export default function Messages() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Verificar autenticação
+  // ⚡ CORREÇÃO: Verificar autenticação - evita redirects durante loading
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
+      console.log("⚠️ Messages: Usuário não autenticado - redirecionando para /login");
       setLocation("/login");
     }
   }, [authLoading, isAuthenticated, setLocation]);

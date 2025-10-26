@@ -3,10 +3,17 @@ import { useLocation } from "wouter";
 import mixLogo from "@assets/FAVICON_1752848384518_1760915867705.png";
 
 export default function Splash() {
-  const [, setLocation] = useLocation();
+  const [currentPath, setLocation] = useLocation();
 
   useEffect(() => {
-    // ✅ CORREÇÃO: Verificar auth imediatamente, sem delay de 5 segundos
+    // ⚡ IMPORTANTE: Só fazer redirect se estivermos EXATAMENTE na rota "/"
+    // Se o usuário está em outra página e atualiza, não interferir
+    if (currentPath !== "/") {
+      console.log("🔵 Splash: Usuário não está em '/', mantendo na página atual:", currentPath);
+      return;
+    }
+
+    // ✅ Verificar auth APENAS quando estamos na rota raiz "/"
     const checkAuthAndRedirect = async () => {
       try {
         console.log("🔵 Splash: Iniciando verificação de autenticação...");
@@ -57,7 +64,7 @@ export default function Splash() {
     };
 
     checkAuthAndRedirect();
-  }, [setLocation]);
+  }, [currentPath, setLocation]);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center">
