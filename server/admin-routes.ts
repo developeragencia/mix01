@@ -1342,40 +1342,29 @@ export function registerAdminRoutes(app: Express) {
 
   app.post("/api/admin/subscription-plans", async (req, res) => {
     try {
-      const { name, description, stripePriceId, price, interval, features, paymentMethods, isActive } = req.body;
+      const { name, description, stripePriceId, price, interval, features, paymentMethods } = req.body;
       
       console.log('➕ Creating new subscription plan:', req.body);
-      
-      // Validar campos obrigatórios
-      if (!name || !price || !interval) {
-        return res.status(400).json({ 
-          error: 'Campos obrigatórios faltando',
-          message: 'Nome, preço e período são obrigatórios'
-        });
-      }
       
       const newPlan = await db.insert(subscriptionPlans)
         .values({
           name,
-          description: description || null,
-          stripePriceId: stripePriceId || `price_${Date.now()}`,
+          description,
+          stripePriceId,
           price: parseInt(price),
           currency: 'brl',
           interval,
-          features: features || [],
+          features,
           paymentMethods: paymentMethods || ['card', 'pix'],
-          isActive: isActive !== undefined ? isActive : true
+          isActive: true
         })
         .returning();
       
-      console.log('✅ Subscription plan created successfully:', newPlan[0].id);
+      console.log('✅ Subscription plan created successfully');
       res.json(newPlan[0]);
     } catch (error) {
       console.error('Error creating subscription plan:', error);
-      res.status(500).json({ 
-        error: 'Failed to create subscription plan',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      });
+      res.status(500).json({ error: 'Failed to create subscription plan' });
     }
   });
 

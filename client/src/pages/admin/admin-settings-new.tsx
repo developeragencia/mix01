@@ -115,12 +115,12 @@ export default function AdminSettingsNew() {
     
     if (type === 'boolean') {
       return (
-        <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800/70 transition-colors">
+        <div className="flex items-center justify-between p-3 bg-blue-700/30 rounded-lg hover:bg-blue-700/40 transition-colors border border-blue-600/30">
           <div className="flex items-center gap-3 flex-1">
-            <Icon className="w-5 h-5 text-blue-400" />
+            <Icon className="w-4 h-4 text-pink-400" />
             <div>
-              <Label className="text-white font-medium">{label}</Label>
-              {description && <p className="text-xs text-gray-400 mt-1">{description}</p>}
+              <Label className="text-white font-medium text-sm">{label}</Label>
+              {description && <p className="text-xs text-blue-200 mt-0.5">{description}</p>}
             </div>
           </div>
           <Switch
@@ -133,17 +133,17 @@ export default function AdminSettingsNew() {
     }
 
     return (
-      <div className="p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800/70 transition-colors">
-        <div className="flex items-center gap-3 mb-2">
-          <Icon className="w-5 h-5 text-blue-400" />
-          <Label className="text-white font-medium">{label}</Label>
+      <div className="p-3 bg-blue-700/30 rounded-lg hover:bg-blue-700/40 transition-colors border border-blue-600/30">
+        <div className="flex items-center gap-2 mb-2">
+          <Icon className="w-4 h-4 text-pink-400" />
+          <Label className="text-white font-medium text-sm">{label}</Label>
         </div>
-        {description && <p className="text-xs text-gray-400 mb-2">{description}</p>}
+        {description && <p className="text-xs text-blue-200 mb-2">{description}</p>}
         <Input
           type={type}
           value={value}
           onChange={(e) => updateSetting(settingKey, e.target.value)}
-          className="bg-gray-700/50 border-gray-600 text-white"
+          className="bg-blue-700/50 border-blue-600/50 text-white placeholder:text-blue-300"
           data-testid={`input-${settingKey}`}
         />
       </div>
@@ -152,31 +152,36 @@ export default function AdminSettingsNew() {
 
   return (
     <AdminLayout title="Configurações do Aplicativo">
-      <div className="space-y-6 pb-20">
+      <div className="space-y-4 w-full max-w-full overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Configurações do App</h1>
-            <p className="text-gray-400 mt-1">Gerencie todas as configurações e limites do MIX</p>
+        <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50 w-full">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <Settings className="w-6 h-6 text-pink-400" />
+                Configurações do Aplicativo
+              </h1>
+              <p className="text-blue-200 mt-1 text-sm">Gerencie todas as configurações e limites do MIX</p>
+            </div>
+            <Button 
+              onClick={saveAllSettings} 
+              disabled={isSaving}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+              data-testid="button-save-all"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Salvando...' : 'Salvar Tudo'}
+            </Button>
           </div>
-          <Button 
-            onClick={saveAllSettings} 
-            disabled={isSaving}
-            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-            data-testid="button-save-all"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Salvar Tudo
-          </Button>
-        </div>
+        </Card>
 
         {/* Grid Layout - 2 colunas em telas grandes */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           
           {/* Configurações Gerais */}
-          <Card className="p-6 bg-gradient-to-br from-blue-900/50 to-blue-800/30 border-blue-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Globe className="w-6 h-6 text-blue-400" />
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Globe className="w-5 h-5 text-pink-400" />
               <h2 className="text-lg font-semibold text-white">Configurações Gerais</h2>
             </div>
             <div className="space-y-3">
@@ -205,9 +210,9 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Limites - Usuários Free */}
-          <Card className="p-6 bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Heart className="w-6 h-6 text-gray-400" />
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Heart className="w-5 h-5 text-pink-400" />
               <h2 className="text-lg font-semibold text-white">Limites - Free</h2>
             </div>
             <div className="space-y-3">
@@ -229,9 +234,9 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Limites - Premium */}
-          <Card className="p-6 bg-gradient-to-br from-pink-900/50 to-pink-800/30 border-pink-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Heart className="w-6 h-6 text-pink-400" />
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Heart className="w-5 h-5 text-pink-400" />
               <h2 className="text-lg font-semibold text-white">Limites - Premium</h2>
             </div>
             <div className="space-y-3">
@@ -253,7 +258,7 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Limites - VIP */}
-          <Card className="p-6 bg-gradient-to-br from-purple-900/50 to-purple-800/30 border-purple-700/50 backdrop-blur-sm">
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
             <div className="flex items-center gap-3 mb-4">
               <Heart className="w-6 h-6 text-purple-400" />
               <h2 className="text-lg font-semibold text-white">Limites - VIP</h2>
@@ -277,9 +282,9 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Configurações de Perfil */}
-          <Card className="p-6 bg-gradient-to-br from-green-900/50 to-green-800/30 border-green-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Image className="w-6 h-6 text-green-400" />
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Image className="w-5 h-5 text-pink-400" />
               <h2 className="text-lg font-semibold text-white">Perfil e Fotos</h2>
             </div>
             <div className="space-y-3">
@@ -308,9 +313,9 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Segurança e Idade */}
-          <Card className="p-6 bg-gradient-to-br from-red-900/50 to-red-800/30 border-red-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Shield className="w-6 h-6 text-red-400" />
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Shield className="w-5 h-5 text-pink-400" />
               <h2 className="text-lg font-semibold text-white">Segurança</h2>
             </div>
             <div className="space-y-3">
@@ -332,9 +337,9 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Recursos e Features */}
-          <Card className="p-6 bg-gradient-to-br from-yellow-900/50 to-yellow-800/30 border-yellow-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Zap className="w-6 h-6 text-yellow-400" />
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="w-5 h-5 text-pink-400" />
               <h2 className="text-lg font-semibold text-white">Recursos</h2>
             </div>
             <div className="space-y-3">
@@ -377,7 +382,7 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Localização */}
-          <Card className="p-6 bg-gradient-to-br from-indigo-900/50 to-indigo-800/30 border-indigo-700/50 backdrop-blur-sm">
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
             <div className="flex items-center gap-3 mb-4">
               <MapPin className="w-6 h-6 text-indigo-400" />
               <h2 className="text-lg font-semibold text-white">Localização</h2>
@@ -401,7 +406,7 @@ export default function AdminSettingsNew() {
           </Card>
 
           {/* Notificações */}
-          <Card className="p-6 bg-gradient-to-br from-cyan-900/50 to-cyan-800/30 border-cyan-700/50 backdrop-blur-sm">
+          <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50">
             <div className="flex items-center gap-3 mb-4">
               <Bell className="w-6 h-6 text-cyan-400" />
               <h2 className="text-lg font-semibold text-white">Notificações</h2>

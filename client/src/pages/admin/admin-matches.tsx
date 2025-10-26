@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
   Heart,
-  Search,
+  Search, 
   Filter,
   Calendar,
   MessageSquare,
@@ -156,7 +156,7 @@ export default function AdminMatches() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-24 bg-blue-800/50 rounded-xl"></div>
-            ))}
+          ))}
           </div>
           <div className="h-96 bg-blue-800/50 rounded-xl"></div>
         </div>
@@ -178,7 +178,7 @@ export default function AdminMatches() {
               <Heart className="w-10 h-10 text-pink-400" />
             </div>
           </Card>
-
+          
           <Card className="p-4 bg-gradient-to-br from-green-900/50 to-green-800/30 backdrop-blur-sm border-green-700/50">
             <div className="flex items-center justify-between">
               <div>
@@ -214,13 +214,13 @@ export default function AdminMatches() {
         <Card className="p-4 bg-blue-900/30 backdrop-blur-sm border-blue-700/50">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-3">
-              <div className="flex-1 relative">
+            <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-400" />
-                <Input
+              <Input
                   type="text"
                   placeholder="Buscar por nome de usuário..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-blue-800/50 border-blue-700/50 text-white placeholder:text-blue-400 h-12"
                 />
                 {searchTerm && (
@@ -231,7 +231,7 @@ export default function AdminMatches() {
                     <X className="w-5 h-5" />
                   </button>
                 )}
-              </div>
+            </div>
 
               <Button
                 onClick={() => setShowFilters(!showFilters)}
@@ -277,7 +277,7 @@ export default function AdminMatches() {
           </div>
         </Card>
 
-        <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
           <p className="text-blue-300 text-sm">
             Mostrando <span className="font-bold text-white">{filteredMatches?.length || 0}</span> de <span className="font-bold text-white">{matches?.length || 0}</span> matches
           </p>
@@ -300,8 +300,8 @@ export default function AdminMatches() {
                       <p className="text-blue-400 text-sm">{formatDate(match.matchedAt)}</p>
                     </div>
                   </div>
-                  {getStatusBadge(match.status)}
-                </div>
+                    {getStatusBadge(match.status)}
+                  </div>
 
                 {/* Users */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -360,8 +360,8 @@ export default function AdminMatches() {
                     </div>
                   </div>
                 )}
-
-                <Button
+                  
+                  <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     setLocation(`/admin/match-details/${match.id}`);
@@ -370,7 +370,7 @@ export default function AdminMatches() {
                 >
                   <Eye className="w-4 h-4 mr-2" />
                   Ver Detalhes
-                </Button>
+                  </Button>
               </Card>
             ))
           ) : (
@@ -384,7 +384,7 @@ export default function AdminMatches() {
                     : 'Não há matches registrados ainda'}
                 </p>
               </Card>
-            </div>
+                </div>
           )}
         </div>
       </div>

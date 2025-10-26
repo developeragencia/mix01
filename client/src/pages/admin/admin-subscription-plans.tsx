@@ -111,37 +111,6 @@ export default function AdminSubscriptionPlans() {
     }
   });
 
-  const createPlanMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await fetch('/api/admin/subscription-plans', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Failed to create plan');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/subscription-plans'] });
-      toast({
-        title: "✅ Plano Criado",
-        description: "O novo plano foi criado com sucesso"
-      });
-      setShowDialog(false);
-      setEditingPlan(null);
-    },
-    onError: () => {
-      toast({
-        title: "❌ Erro",
-        description: "Falha ao criar plano",
-        variant: "destructive"
-      });
-    }
-  });
-
   const handleEdit = (plan: SubscriptionPlan) => {
     setEditingPlan(plan);
     setFormData({
@@ -156,24 +125,13 @@ export default function AdminSubscriptionPlans() {
     setShowDialog(true);
   };
 
-  const handleCreateNew = () => {
-    setEditingPlan(null);
-    setFormData({
-      name: "",
-      description: "",
-      price: "",
-      interval: "month",
-      features: [],
-      paymentMethods: ["card", "pix"],
-      isActive: true
-    });
-    setShowDialog(true);
-  };
-
   const handleSave = () => {
+    if (!editingPlan) return;
+    
     const features = formData.features.filter(f => f.trim() !== "");
     
-    const planData = {
+    updatePlanMutation.mutate({
+      id: editingPlan.id,
       name: formData.name,
       description: formData.description,
       price: parseFloat(formData.price) * 100, // Convert to cents
@@ -181,18 +139,7 @@ export default function AdminSubscriptionPlans() {
       features,
       paymentMethods: formData.paymentMethods,
       isActive: formData.isActive
-    };
-
-    if (editingPlan) {
-      // Editar plano existente
-      updatePlanMutation.mutate({
-        id: editingPlan.id,
-        ...planData
-      });
-    } else {
-      // Criar novo plano
-      createPlanMutation.mutate(planData);
-    }
+    });
   };
 
   const handleFeatureAdd = () => {
@@ -255,28 +202,6 @@ export default function AdminSubscriptionPlans() {
   return (
     <AdminLayout title="Gerenciar Planos de Assinatura">
       <div className="space-y-4 w-full">
-        {/* Header com Botão Criar */}
-        <Card className="p-4 bg-blue-800/50 backdrop-blur-sm border-blue-700/50 w-full">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Crown className="w-5 h-5 text-pink-400" />
-                Planos de Assinatura do Aplicativo
-              </h2>
-              <p className="text-blue-200 text-sm mt-1">
-                Gerencie os planos disponíveis para os usuários
-              </p>
-            </div>
-            <Button
-              onClick={handleCreateNew}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Novo Plano
-            </Button>
-          </div>
-        </Card>
-
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map((plan) => (
@@ -350,18 +275,13 @@ export default function AdminSubscriptionPlans() {
         </div>
       </div>
 
-      {/* Edit/Create Plan Dialog */}
+      {/* Edit Plan Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 border-blue-700 max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white text-xl">
-              {editingPlan ? `Editar Plano: ${editingPlan.name}` : 'Criar Novo Plano'}
-            </DialogTitle>
+            <DialogTitle className="text-white text-xl">Editar Plano: {editingPlan?.name}</DialogTitle>
             <DialogDescription className="text-blue-200">
-              {editingPlan 
-                ? 'Configure todos os detalhes do plano de assinatura'
-                : 'Configure o novo plano de assinatura do aplicativo'
-              }
+              Configure todos os detalhes do plano de assinatura
             </DialogDescription>
           </DialogHeader>
           
@@ -505,15 +425,10 @@ export default function AdminSubscriptionPlans() {
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={updatePlanMutation.isPending || createPlanMutation.isPending}
+                disabled={updatePlanMutation.isPending}
                 className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
               >
-                {updatePlanMutation.isPending || createPlanMutation.isPending 
-                  ? 'Salvando...' 
-                  : editingPlan 
-                    ? 'Salvar Alterações'
-                    : 'Criar Plano'
-                }
+                {updatePlanMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </div>
           </div>

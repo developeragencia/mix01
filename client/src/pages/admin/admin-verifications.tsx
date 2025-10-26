@@ -507,8 +507,8 @@ export default function AdminVerifications() {
                   }}
                   variant="outline"
                   className="flex-1 border-blue-600/50 text-blue-300"
-                >
-                  Cancelar
+              >
+                Cancelar
               </Button>
               <Button
                 onClick={() => {

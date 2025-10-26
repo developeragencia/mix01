@@ -607,7 +607,7 @@ export default function AdminMatchDetail() {
                       <p className="text-blue-400 text-xs mt-1">Atividade mais recente registrada</p>
                     </div>
                   </div>
-                </div>
+              </div>
             </Card>
             )}
           </div>
