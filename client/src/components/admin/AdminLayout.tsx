@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AdminBottomNavigation from "./AdminBottomNavigation";
+import GlobalSearch from "./GlobalSearch";
 
 // PWA Admin Panel Integration - DISABLED to prevent cache issues
 const installAdminPWA = () => {
@@ -200,13 +201,14 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
         <main className="flex-1 min-h-screen w-full max-w-full overflow-x-hidden">
           {/* Header */}
           <header className="bg-blue-800/90 backdrop-blur-sm border-b border-blue-700/50 p-3 md:p-4 w-full">
-            <div className="flex items-center justify-between w-full">
-              <div className="min-w-0 flex-1 mr-3">
+            <div className="flex items-center justify-between w-full gap-3">
+              <div className="min-w-0 flex-1">
                 <h1 className="text-sm md:text-lg font-bold text-white truncate">{title}</h1>
                 <p className="text-blue-200 mt-1 text-xs md:text-sm truncate">Painel de Administração MIX</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+              <div className="flex items-center gap-2 md:gap-3">
+                <GlobalSearch />
+                <Badge variant="secondary" className="hidden md:flex bg-green-500/20 text-green-300 border-green-500/30 text-xs">
                   <Activity className="w-3 h-3 mr-1" />
                   Online
                 </Badge>

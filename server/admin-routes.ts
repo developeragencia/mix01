@@ -1805,4 +1805,114 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Global Search
+  app.get("/api/admin/search", async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string' || q.length < 2) {
+        return res.json([]);
+      }
+
+      const searchTerm = q.toLowerCase();
+      const results: any[] = [];
+
+      // Search users
+      const usersResults = await db.select({
+        id: users.id,
+        email: users.email,
+        username: users.username
+      })
+      .from(users)
+      .where(
+        sql`LOWER(${users.email}) LIKE ${`%${searchTerm}%`} OR LOWER(${users.username}) LIKE ${`%${searchTerm}%`}`
+      )
+      .limit(5);
+
+      usersResults.forEach(user => {
+        results.push({
+          type: 'user',
+          id: user.id,
+          title: user.username || user.email,
+          description: user.email,
+          url: `/admin/users/${user.id}`
+        });
+      });
+
+      // Search matches (by user IDs)
+      const matchesResults = await db.select({
+        id: matches.id,
+        user1Id: matches.user1Id,
+        user2Id: matches.user2Id,
+        matchedAt: matches.matchedAt
+      })
+      .from(matches)
+      .where(
+        sql`${matches.user1Id}::text LIKE ${`%${searchTerm}%`} OR ${matches.user2Id}::text LIKE ${`%${searchTerm}%`}`
+      )
+      .limit(5);
+
+      matchesResults.forEach(match => {
+        results.push({
+          type: 'match',
+          id: match.id,
+          title: `Match #${match.id}`,
+          description: `Usuários ${match.user1Id} e ${match.user2Id}`,
+          url: `/admin/match-details/${match.id}`
+        });
+      });
+
+      // Search verifications
+      const verificationsResults = await db.select({
+        id: verifications.id,
+        userId: verifications.userId,
+        status: verifications.status
+      })
+      .from(verifications)
+      .where(
+        sql`${verifications.status} LIKE ${`%${searchTerm}%`}`
+      )
+      .limit(5);
+
+      verificationsResults.forEach(verification => {
+        results.push({
+          type: 'verification',
+          id: verification.id,
+          title: `Verificação #${verification.id}`,
+          description: `Usuário ${verification.userId} - ${verification.status}`,
+          badge: verification.status,
+          url: `/admin/verifications`
+        });
+      });
+
+      // Search reports
+      const reportsResults = await db.select({
+        id: reports.id,
+        reason: reports.reason,
+        status: reports.status
+      })
+      .from(reports)
+      .where(
+        sql`LOWER(${reports.reason}) LIKE ${`%${searchTerm}%`}`
+      )
+      .limit(5);
+
+      reportsResults.forEach(report => {
+        results.push({
+          type: 'report',
+          id: report.id,
+          title: `Denúncia #${report.id}`,
+          description: report.reason,
+          badge: report.status,
+          url: `/admin/reports`
+        });
+      });
+
+      console.log(`🔍 Global search: "${q}" - ${results.length} results`);
+      res.json(results);
+    } catch (error) {
+      console.error('Error performing global search:', error);
+      res.status(500).json({ error: 'Failed to perform search' });
+    }
+  });
+
 }
