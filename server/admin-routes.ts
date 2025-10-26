@@ -2055,23 +2055,32 @@ export function registerAdminRoutes(app: Express) {
         ? [updateData.interestedIn] 
         : [];
 
+      // Preparar dados para update (usando exatamente os nomes do schema Drizzle)
+      const updateFields: any = {
+        firstName: updateData.firstName,
+        lastName: updateData.lastName,
+        email: updateData.email
+      };
+
+      // Adicionar campos opcionais apenas se fornecidos
+      if (updateData.username) updateFields.username = updateData.username;
+      if (updateData.phone !== undefined) updateFields.phone = updateData.phone || null;
+      if (updateData.city !== undefined) updateFields.city = updateData.city || null;
+      if (updateData.gender !== undefined) updateFields.gender = updateData.gender || null;
+      if (updateData.bio !== undefined) updateFields.bio = updateData.bio || null;
+      if (updateData.interests !== undefined) updateFields.interests = updateData.interests || [];
+      if (updateData.subscriptionType !== undefined) updateFields.subscriptionType = updateData.subscriptionType;
+      if (updateData.isOnline !== undefined) updateFields.isOnline = updateData.isOnline;
+      
+      // Arrays sempre como array
+      if (sexualOrientationArray.length > 0) updateFields.sexualOrientation = sexualOrientationArray;
+      if (interestedInArray.length > 0) updateFields.interestedIn = interestedInArray;
+
+      console.log(`🔍 Update fields prepared:`, JSON.stringify(updateFields, null, 2));
+
       // Atualizar usuário
       const [updatedUser] = await db.update(users)
-        .set({
-          firstName: updateData.firstName,
-          lastName: updateData.lastName,
-          email: updateData.email,
-          username: updateData.username || updateData.email.split('@')[0],
-          phone: updateData.phone || null,
-          city: updateData.city || null,
-          gender: updateData.gender || null,
-          sexualOrientation: sexualOrientationArray,
-          interestedIn: interestedInArray,
-          bio: updateData.bio || null,
-          interests: updateData.interests || [],
-          subscriptionType: updateData.subscriptionType || 'free',
-          isOnline: updateData.isOnline !== undefined ? updateData.isOnline : false
-        })
+        .set(updateFields)
         .where(eq(users.id, parseInt(id)))
         .returning();
 
