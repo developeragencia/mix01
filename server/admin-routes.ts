@@ -1915,4 +1915,118 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Notifications
+  app.get("/api/admin/notifications", async (req, res) => {
+    try {
+      const notifications: any[] = [];
+
+      // Pending verifications
+      const pendingVerifications = await db.select({
+        id: verifications.id,
+        userId: verifications.userId,
+        submittedAt: verifications.submittedAt
+      })
+      .from(verifications)
+      .where(eq(verifications.status, 'pending'))
+      .limit(5);
+
+      pendingVerifications.forEach(verification => {
+        notifications.push({
+          id: `verification-${verification.id}`,
+          type: 'verification',
+          title: 'Nova solicitação de verificação',
+          message: `Verificação #${verification.id} - Usuário ${verification.userId}`,
+          url: '/admin/verifications',
+          isRead: false,
+          createdAt: verification.submittedAt || new Date().toISOString(),
+          priority: 'high'
+        });
+      });
+
+      // Pending reports
+      const pendingReports = await db.select({
+        id: reports.id,
+        reason: reports.reason,
+        createdAt: reports.createdAt,
+        priority: reports.priority
+      })
+      .from(reports)
+      .where(eq(reports.status, 'pending'))
+      .limit(5);
+
+      pendingReports.forEach(report => {
+        notifications.push({
+          id: `report-${report.id}`,
+          type: 'report',
+          title: 'Nova denúncia',
+          message: `${report.reason}`,
+          url: '/admin/reports',
+          isRead: false,
+          createdAt: report.createdAt,
+          priority: report.priority || 'medium'
+        });
+      });
+
+      // Recent users (last 3)
+      const recentUsers = await db.select({
+        id: users.id,
+        email: users.email,
+        createdAt: users.createdAt
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt))
+      .limit(3);
+
+      recentUsers.forEach(user => {
+        notifications.push({
+          id: `user-${user.id}`,
+          type: 'user',
+          title: 'Novo usuário cadastrado',
+          message: `${user.email}`,
+          url: `/admin/users/${user.id}`,
+          isRead: false,
+          createdAt: user.createdAt,
+          priority: 'low'
+        });
+      });
+
+      // Sort by priority and date
+      notifications.sort((a, b) => {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+          return priorityOrder[b.priority] - priorityOrder[a.priority];
+        }
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+      console.log(`🔔 Fetched ${notifications.length} notifications`);
+      res.json(notifications.slice(0, 20)); // Return top 20
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+  });
+
+  // Mark notification as read (mock implementation)
+  app.post("/api/admin/notifications/:id/read", async (req, res) => {
+    try {
+      console.log(`✅ Marked notification ${req.params.id} as read`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      res.status(500).json({ error: 'Failed to mark notification as read' });
+    }
+  });
+
+  // Mark all notifications as read (mock implementation)
+  app.post("/api/admin/notifications/mark-all-read", async (req, res) => {
+    try {
+      console.log('✅ Marked all notifications as read');
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      res.status(500).json({ error: 'Failed to mark all notifications as read' });
+    }
+  });
+
 }

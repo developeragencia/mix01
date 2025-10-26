@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AdminBottomNavigation from "./AdminBottomNavigation";
 import GlobalSearch from "./GlobalSearch";
+import NotificationBell from "./NotificationBell";
 
 // PWA Admin Panel Integration - DISABLED to prevent cache issues
 const installAdminPWA = () => {
@@ -208,6 +209,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
               </div>
               <div className="flex items-center gap-2 md:gap-3">
                 <GlobalSearch />
+                <NotificationBell />
                 <Badge variant="secondary" className="hidden md:flex bg-green-500/20 text-green-300 border-green-500/30 text-xs">
                   <Activity className="w-3 h-3 mr-1" />
                   Online
