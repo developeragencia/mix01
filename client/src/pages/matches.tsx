@@ -161,12 +161,13 @@ export default function Matches() {
                   <div className="relative">
                     <div 
                       className="w-full aspect-square overflow-hidden border-4 border-pink-500"
-                      style={{ borderRadius: '50%' }}
+                      style={{ borderRadius: '9999px', clipPath: 'circle(50%)' }}
                     >
                       <img
                         src={conv.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conv.profile.name}&background=ec4899&color=fff&size=400`}
                         alt={conv.profile.name}
                         className="w-full h-full object-cover"
+                        style={{ borderRadius: '9999px' }}
                       />
                     </div>
                     {conv.profile.isVerified && (
@@ -254,12 +255,13 @@ export default function Matches() {
                         <div className="relative flex-shrink-0">
                           <div 
                             className="w-16 h-16 overflow-hidden"
-                            style={{ borderRadius: '50%' }}
+                            style={{ borderRadius: '9999px', clipPath: 'circle(50%)' }}
                           >
                             <img
                               src={conversation.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conversation.profile.name}&background=ec4899&color=fff&size=100`}
                               alt={conversation.profile.name}
                               className="w-full h-full object-cover"
+                              style={{ borderRadius: '9999px' }}
                             />
                           </div>
                           {isOnline && (
