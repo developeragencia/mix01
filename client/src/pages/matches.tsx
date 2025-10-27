@@ -151,23 +151,33 @@ export default function Matches() {
 
             {/* Grid de cards grandes REDONDOS */}
             <div className="grid grid-cols-2 gap-4">
-              {newMatches.slice(0, 6).map((conv) => (
+              {newMatches.slice(0, 6).map((conv, idx) => (
                 <button
                   key={conv.match.id}
                   onClick={() => openMatchProfile(conv.profile.userId)}
-                  className="relative"
+                  className="relative mix-card-container"
                   data-testid={`new-match-${conv.match.id}`}
                 >
                   <div className="relative">
                     <div 
-                      className="w-full aspect-square overflow-hidden border-4 border-pink-500"
-                      style={{ borderRadius: '9999px', clipPath: 'circle(50%)' }}
+                      className="mix-card-round w-full aspect-square overflow-hidden border-4 border-pink-500"
+                      style={{ 
+                        borderRadius: '50% !important',
+                        WebkitBorderRadius: '50%',
+                        MozBorderRadius: '50%',
+                        clipPath: 'circle(50% at center)',
+                        WebkitClipPath: 'circle(50% at center)'
+                      }}
                     >
                       <img
                         src={conv.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conv.profile.name}&background=ec4899&color=fff&size=400`}
                         alt={conv.profile.name}
                         className="w-full h-full object-cover"
-                        style={{ borderRadius: '9999px' }}
+                        style={{ 
+                          borderRadius: '50%',
+                          width: '100%',
+                          height: '100%'
+                        }}
                       />
                     </div>
                     {conv.profile.isVerified && (
@@ -254,14 +264,19 @@ export default function Matches() {
                       <div className="flex items-center gap-3">
                         <div className="relative flex-shrink-0">
                           <div 
-                            className="w-16 h-16 overflow-hidden"
-                            style={{ borderRadius: '9999px', clipPath: 'circle(50%)' }}
+                            className="mix-profile-round w-16 h-16 overflow-hidden"
+                            style={{ 
+                              borderRadius: '50%',
+                              WebkitBorderRadius: '50%',
+                              clipPath: 'circle(50% at center)',
+                              WebkitClipPath: 'circle(50% at center)'
+                            }}
                           >
                             <img
                               src={conversation.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conversation.profile.name}&background=ec4899&color=fff&size=100`}
                               alt={conversation.profile.name}
                               className="w-full h-full object-cover"
-                              style={{ borderRadius: '9999px' }}
+                              style={{ borderRadius: '50%' }}
                             />
                           </div>
                           {isOnline && (
@@ -314,6 +329,33 @@ export default function Matches() {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        /* FORÇAR CARDS REDONDOS */
+        .mix-card-round {
+          border-radius: 50% !important;
+          -webkit-border-radius: 50% !important;
+          -moz-border-radius: 50% !important;
+          clip-path: circle(50% at center) !important;
+          -webkit-clip-path: circle(50% at center) !important;
+        }
+        
+        .mix-card-round img {
+          border-radius: 50% !important;
+          -webkit-border-radius: 50% !important;
+          -moz-border-radius: 50% !important;
+        }
+        
+        .mix-profile-round {
+          border-radius: 50% !important;
+          -webkit-border-radius: 50% !important;
+          -moz-border-radius: 50% !important;
+          clip-path: circle(50% at center) !important;
+          -webkit-clip-path: circle(50% at center) !important;
+        }
+        
+        .mix-profile-round img {
+          border-radius: 50% !important;
         }
       `}</style>
     </div>
