@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/BottomNavigation";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import mixLogo from "@assets/Logo_MIX_horizontal_1752607947932.png";
 import useEmblaCarousel from 'embla-carousel-react';
 
@@ -134,12 +135,7 @@ export default function Profile() {
 
   if (isLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-          <div className="text-white text-xl font-medium">Carregando perfil...</div>
-        </div>
-      </div>
+      <LoadingSpinner message="Carregando perfil..." />
     );
   }
 

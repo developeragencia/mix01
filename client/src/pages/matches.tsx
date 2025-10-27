@@ -5,6 +5,7 @@ import { Search, Shield, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BottomNavigation from "@/components/BottomNavigation";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import type { Match, Message, Profile } from "@shared/schema";
 import mixLogo from "@assets/Logo_MIX_horizontal_1752607947932.png";
 
@@ -54,14 +55,7 @@ export default function Matches() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white">Carregando matches...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Carregando matches..." />;
   }
 
   if (error) {

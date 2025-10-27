@@ -5,6 +5,7 @@ import { Heart, X, Zap, Settings } from "lucide-react";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import mixLogoIcon from "@assets/Logo_MIX_horizontal_1752607947932.png";
 
 interface Profile {
@@ -168,19 +169,7 @@ export default function Discover() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
-        <div className="text-center px-6">
-          <div className="relative w-20 h-20 mx-auto mb-6">
-            <div className="absolute inset-0 rounded-full border-4 border-pink-500/30"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-pink-500 border-t-transparent animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <img src={mixLogoIcon} alt="MIX" className="w-12 h-12 object-contain" />
-            </div>
-          </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Carregando perfis</h3>
-          <p className="text-blue-200 text-sm">Procurando pessoas incríveis para você...</p>
-        </div>
-      </div>
+      <LoadingSpinner message="Procurando pessoas incríveis para você..." />
     );
   }
 
