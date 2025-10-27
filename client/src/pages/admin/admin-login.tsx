@@ -226,30 +226,6 @@ export default function AdminLogin() {
           </Button>
         </form>
 
-            {/* Informações de desenvolvimento */}
-            <div className="mt-8 p-5 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-2 border-blue-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-2 shadow-lg">
-                  <CheckCircle2 className="w-5 h-5 text-white" />
-                </div>
-                <p className="text-sm font-bold text-blue-900">🔐 Credenciais de Acesso</p>
-              </div>
-              <div className="space-y-2 pl-12">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm text-blue-700">
-                    <span className="font-semibold">Email:</span> admin@mixapp.com
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm text-blue-700">
-                    <span className="font-semibold">Senha:</span> admin123
-                  </p>
-                </div>
-              </div>
-        </div>
-
             {/* Botão de voltar */}
             <div className="mt-8 text-center">
           <Button
