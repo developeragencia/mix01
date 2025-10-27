@@ -1,56 +1,35 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { db } from "./db";
-import { users, matches, messages, swipes, subscriptions, payments, appSettings, reports, subscriptionPlans, verifications, profiles } from "@shared/schema";
+import { users, matches, messages, swipes, subscriptions, payments, appSettings, reports, subscriptionPlans, verifications, profiles, adminUsers } from "@shared/schema";
 import { count, eq, and, gte, sql, desc } from "drizzle-orm";
 
-// 🔒 MIDDLEWARE DE SEGURANÇA: Verificar autenticação admin
+// 🔒 MIDDLEWARE DE SEGURANÇA: Verificar autenticação admin (somente token)
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
-  
   console.log(`🔐 requireAdmin middleware - Path: ${req.path}, Method: ${req.method}`);
   
-  // Check for Bearer token first (modern approach for localStorage-based auth)
+  // Verificar Bearer token
   const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
-    
-    console.log(`🔍 Checking Bearer token: ${token}`);
-    
-    // Simple token validation: check if it's a valid admin email
-    // In production, you'd verify JWT or use a proper token system
-    if (adminEmails.includes(token)) {
-      console.log(`✅ Admin autenticado via Bearer token: ${token}`);
-      // Attach user to request for downstream handlers
-      req.user = { email: token, id: token === 'contato@mixapp.digital' ? 1 : 2 } as any;
-      return next();
-    }
-    
-    console.log(`🔴 ACESSO NEGADO: Token inválido - ${token}`);
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log(`🔴 ACESSO NEGADO: Token não fornecido`);
+    return res.status(401).json({ error: "Não autenticado - token necessário" });
+  }
+  
+  const token = authHeader.substring(7);
+  console.log(`🔍 Checking Bearer token: ${token.substring(0, 20)}...`);
+  
+  // Validar formato do token admin (deve começar com "admin_")
+  if (!token.startsWith('admin_')) {
+    console.log(`🔴 ACESSO NEGADO: Token inválido - formato incorreto`);
     return res.status(401).json({ error: "Token inválido" });
   }
   
-  // Fallback to session-based auth
-  if (!req.isAuthenticated() || !req.user) {
-    console.log(`🔴 ACESSO NEGADO: Tentativa de acesso admin sem autenticação - Path: ${req.path}`);
-    return res.status(401).json({ error: "Não autenticado" });
-  }
-  
-  // Verificar se é admin (email específico)
-  const user = req.user as any;
-  const isAdmin = adminEmails.includes(user.email);
-  
-  if (!isAdmin) {
-    console.log(`🔴 ACESSO NEGADO: ${user.email} tentou acessar endpoint admin`);
-    return res.status(403).json({ error: "Acesso negado: apenas administradores" });
-  }
-  
-  console.log(`✅ Admin autenticado via sessão: ${user.email}`);
+  console.log(`✅ Admin autenticado via Bearer token`);
   next();
 }
 
 export function registerAdminRoutes(app: Express) {
-  // ✅ LOGIN ADMIN - NÃO PROTEGIDO POR MIDDLEWARE
+  // ✅ LOGIN ADMIN - NÃO PROTEGIDO POR MIDDLEWARE - USA TABELA SEPARADA
   app.post("/api/admin/login", async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -63,60 +42,51 @@ export function registerAdminRoutes(app: Express) {
         return res.status(400).json({ message: "Email e senha são obrigatórios" });
       }
       
-      // Verificar se é um dos emails admin permitidos PRIMEIRO
-      const adminEmails = ['contato@mixapp.digital', 'admin@mixapp.digital', 'admin@mixapp.com'];
-      if (!adminEmails.includes(email)) {
-        console.log("❌ Não é admin - email não autorizado:", email);
-        return res.status(403).json({ message: "Acesso negado - apenas administradores" });
+      // Buscar admin na tabela admin_users (NÃO na tabela users)
+      const [admin] = await db.select()
+        .from(adminUsers)
+        .where(eq(adminUsers.email, email))
+        .limit(1);
+      
+      if (!admin) {
+        console.log("❌ Admin não encontrado no banco:", email);
+        return res.status(401).json({ message: "Credenciais inválidas" });
       }
       
-      // Verificar se o usuário existe
-      const user = await storage.getUserByEmail(email);
-      if (!user) {
-        console.log("❌ Usuário admin não encontrado no banco:", email);
-        return res.status(401).json({ message: "Credenciais inválidas - usuário não encontrado" });
+      console.log("👤 Admin encontrado:", admin.id, admin.email, admin.name);
+      console.log("🔑 Hash da senha no banco:", admin.password ? admin.password.substring(0, 30) + "..." : "SENHA VAZIA!");
+      
+      // Verificar se a senha existe
+      if (!admin.password) {
+        console.log("❌ ERRO: Admin sem senha no banco de dados!");
+        return res.status(500).json({ message: "Erro de configuração - admin sem senha" });
       }
       
-      console.log("👤 Usuário admin encontrado:", user.id, user.email);
-      console.log("🔑 Hash da senha no banco:", user.password ? user.password.substring(0, 30) + "..." : "SENHA VAZIA!");
-      
-      // Verificar se a senha existe no banco
-      if (!user.password) {
-        console.log("❌ ERRO: Usuário sem senha no banco de dados!");
-        return res.status(500).json({ message: "Erro de configuração - usuário sem senha" });
-      }
-      
-      // Verificar senha com bcryptjs (compatível com Windows)
+      // Verificar senha com bcryptjs
       const bcrypt = await import('bcryptjs');
-      const validPassword = await bcrypt.compare(password, user.password);
+      const validPassword = await bcrypt.compare(password, admin.password);
       
       console.log("🔐 Resultado da comparação de senha:", validPassword ? "✅ VÁLIDA" : "❌ INVÁLIDA");
       
       if (!validPassword) {
         console.log("❌ Senha incorreta para:", email);
-        return res.status(401).json({ message: "Credenciais inválidas - senha incorreta" });
+        return res.status(401).json({ message: "Credenciais inválidas" });
       }
       
       console.log("✅ Login admin bem-sucedido:", email);
       
-      // Fazer login na sessão
-      req.login(user, (err) => {
-        if (err) {
-          console.error("❌ Erro ao criar sessão:", err);
-          return res.status(500).json({ message: "Erro ao criar sessão", details: err.message });
+      // Criar token admin
+      const adminToken = `admin_${admin.id}_${Date.now()}`;
+      
+      res.json({ 
+        success: true, 
+        token: adminToken,
+        user: {
+          id: admin.id,
+          email: admin.email,
+          name: admin.name || 'Admin',
+          role: admin.role
         }
-        
-        console.log("✅ Sessão criada com sucesso para admin:", email);
-        
-        res.json({ 
-          success: true, 
-          token: email,
-          user: {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName || 'Admin'
-          }
-        });
       });
     } catch (error) {
       console.error("❌ ERRO CRÍTICO no login admin:", error);
