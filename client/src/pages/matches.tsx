@@ -149,7 +149,7 @@ export default function Matches() {
               </h2>
             </div>
 
-            {/* Grid de cards grandes REDONDOS - v2 */}
+            {/* Grid de cards grandes REDONDOS */}
             <div className="grid grid-cols-2 gap-4">
               {newMatches.slice(0, 6).map((conv) => (
                 <button
@@ -159,7 +159,10 @@ export default function Matches() {
                   data-testid={`new-match-${conv.match.id}`}
                 >
                   <div className="relative">
-                    <div className="w-full aspect-square rounded-full overflow-hidden border-4 border-pink-500">
+                    <div 
+                      className="w-full aspect-square overflow-hidden border-4 border-pink-500"
+                      style={{ borderRadius: '50%' }}
+                    >
                       <img
                         src={conv.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conv.profile.name}&background=ec4899&color=fff&size=400`}
                         alt={conv.profile.name}
