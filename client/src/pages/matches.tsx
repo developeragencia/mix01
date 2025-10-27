@@ -65,17 +65,35 @@ export default function Matches() {
   }
 
   if (error) {
+    console.log("❌ Matches - Erro ao carregar:", error);
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center px-4">
-          <p className="text-red-500 mb-4">Erro ao carregar matches</p>
-          <p className="text-white/70 text-sm mb-6">Faça login para ver seus matches</p>
-          <Button 
-            onClick={() => setLocation('/login')}
-            className="bg-gradient-to-r from-pink-500 to-blue-500"
-          >
-            Fazer Login
-          </Button>
+        <div className="text-center px-4 max-w-md">
+          <div className="mb-8">
+            <img src={mixLogo} alt="MIX" className="h-12 w-auto mx-auto mb-6" />
+            <div className="text-6xl mb-6">💬</div>
+          </div>
+          <h1 className="text-white text-2xl font-bold mb-4">
+            Seus Matches Esperam por Você!
+          </h1>
+          <p className="text-gray-400 text-base mb-8 leading-relaxed">
+            Faça login para ver seus matches, conversas e começar a se conectar com pessoas incríveis
+          </p>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => setLocation('/login')}
+              className="w-full bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white font-semibold py-3"
+            >
+              Fazer Login
+            </Button>
+            <Button 
+              onClick={() => setLocation('/')}
+              variant="outline"
+              className="w-full border-gray-700 text-gray-300 hover:bg-gray-900 py-3"
+            >
+              Voltar ao Início
+            </Button>
+          </div>
         </div>
       </div>
     );
