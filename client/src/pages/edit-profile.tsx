@@ -117,56 +117,7 @@ export default function EditProfile() {
   }, [user, isLoading, setLocation]);
 
   // Função para comprimir imagem
-  const compressImage = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          
-          // Redimensionar mantendo proporção (max 1200px)
-          const maxSize = 1200;
-          if (width > height) {
-            if (width > maxSize) {
-              height = (height * maxSize) / width;
-              width = maxSize;
-            }
-          } else {
-            if (height > maxSize) {
-              width = (width * maxSize) / height;
-              height = maxSize;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          // Comprimir até ficar abaixo de 300KB
-          let quality = 0.9;
-          let base64 = canvas.toDataURL('image/jpeg', quality);
-          
-          // Reduzir qualidade até ficar < 300KB
-          while (base64.length > 300 * 1024 && quality > 0.1) {
-            quality -= 0.1;
-            base64 = canvas.toDataURL('image/jpeg', quality);
-          }
-          
-          resolve(base64);
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (photos.length >= 9) {
@@ -178,26 +129,16 @@ export default function EditProfile() {
         return;
       }
 
-      try {
-        toast({
-          title: "Processando imagem...",
-          description: "Comprimindo para melhor performance"
-        });
-
-        const compressedBase64 = await compressImage(file);
-        setPhotos([...photos, compressedBase64]);
-        
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        setPhotos([...photos, base64]);
         toast({
           title: "Foto adicionada!",
-          description: "Imagem comprimida e otimizada com sucesso"
+          description: "Você pode adicionar até 9 fotos"
         });
-      } catch (error) {
-        toast({
-          title: "Erro ao processar imagem",
-          description: "Tente novamente com outra foto",
-          variant: "destructive"
-        });
-      }
+      };
     }
   };
 
@@ -281,30 +222,20 @@ export default function EditProfile() {
       };
 
       if (hasExistingProfile && profileId) {
-        const response = await apiRequest(`/api/profiles/${user?.id}`, {
+        await apiRequest(`/api/profiles/${user?.id}`, {
           method: 'PUT',
           body: profileData
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || "Erro ao atualizar perfil");
-        }
 
         toast({
           title: "Perfil atualizado!",
           description: "Suas alterações foram salvas"
         });
       } else {
-        const response = await apiRequest('/api/profiles', {
+        await apiRequest('/api/profiles', {
           method: 'POST',
           body: profileData
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || "Erro ao criar perfil");
-        }
 
         toast({
           title: "Perfil criado!",
