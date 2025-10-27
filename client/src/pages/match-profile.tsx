@@ -47,23 +47,39 @@ export default function MatchProfile() {
       if (!profile?.userId) {
         throw new Error("Profile userId not found");
       }
-      return await apiRequest(`/api/matches/${profile.userId}`, {
+      
+      console.log("🔴 Desfazendo match com userId:", profile.userId);
+      
+      const result = await apiRequest(`/api/matches/${profile.userId}`, {
         method: "DELETE",
       });
+      
+      console.log("✅ Match desfeito com sucesso:", result);
+      return result;
     },
     onSuccess: () => {
+      console.log("✅ onSuccess - invalidando queries e redirecionando");
+      
       toast({
         title: "Match desfeito",
         description: "O match foi desfeito com sucesso.",
       });
+      
+      // Invalida queries para atualizar a lista
       queryClient.invalidateQueries({ queryKey: ["/api/matches"] });
-      setTimeout(() => setLocation("/matches"), 500);
+      
+      // Redireciona com um pequeno delay
+      setTimeout(() => {
+        console.log("🔄 Redirecionando para /matches");
+        setLocation("/matches");
+      }, 500);
     },
-    onError: (error) => {
-      console.error("Erro ao desfazer match:", error);
+    onError: (error: any) => {
+      console.error("❌ Erro ao desfazer match:", error);
+      
       toast({
         title: "Erro",
-        description: "Não foi possível desfazer o match.",
+        description: error?.message || "Não foi possível desfazer o match.",
         variant: "destructive",
       });
     },
@@ -75,23 +91,37 @@ export default function MatchProfile() {
       if (!profile?.userId) {
         throw new Error("Profile userId not found");
       }
-      return await apiRequest(`/api/block/${profile.userId}`, {
+      
+      console.log("🚫 Bloqueando usuário:", profile.userId);
+      
+      const result = await apiRequest(`/api/block/${profile.userId}`, {
         method: "POST",
       });
+      
+      console.log("✅ Usuário bloqueado:", result);
+      return result;
     },
     onSuccess: () => {
+      console.log("✅ onSuccess - usuário bloqueado, redirecionando");
+      
       toast({
         title: "Usuário bloqueado",
         description: `${profile?.name} foi bloqueado com sucesso.`,
       });
+      
       queryClient.invalidateQueries({ queryKey: ["/api/matches"] });
-      setTimeout(() => setLocation("/matches"), 500);
+      
+      setTimeout(() => {
+        console.log("🔄 Redirecionando para /matches");
+        setLocation("/matches");
+      }, 500);
     },
-    onError: (error) => {
-      console.error("Erro ao bloquear:", error);
+    onError: (error: any) => {
+      console.error("❌ Erro ao bloquear:", error);
+      
       toast({
         title: "Erro",
-        description: "Não foi possível bloquear este usuário.",
+        description: error?.message || "Não foi possível bloquear este usuário.",
         variant: "destructive",
       });
     },
@@ -103,25 +133,38 @@ export default function MatchProfile() {
       if (!profile?.userId) {
         throw new Error("Profile userId not found");
       }
-      return await apiRequest(`/api/report/${profile.userId}`, {
+      
+      console.log("🚩 Denunciando usuário:", profile.userId);
+      
+      const result = await apiRequest(`/api/report/${profile.userId}`, {
         method: "POST",
         body: {
           reason: "Comportamento inapropriado",
         },
       });
+      
+      console.log("✅ Denúncia enviada:", result);
+      return result;
     },
     onSuccess: () => {
+      console.log("✅ onSuccess - denúncia enviada, redirecionando");
+      
       toast({
         title: "Denúncia enviada",
         description: "Obrigado pela sua denúncia. Vamos analisá-la.",
       });
-      setTimeout(() => setLocation("/matches"), 500);
+      
+      setTimeout(() => {
+        console.log("🔄 Redirecionando para /matches");
+        setLocation("/matches");
+      }, 500);
     },
-    onError: (error) => {
-      console.error("Erro ao denunciar:", error);
+    onError: (error: any) => {
+      console.error("❌ Erro ao denunciar:", error);
+      
       toast({
         title: "Erro",
-        description: "Não foi possível enviar a denúncia.",
+        description: error?.message || "Não foi possível enviar a denúncia.",
         variant: "destructive",
       });
     },
@@ -152,12 +195,17 @@ export default function MatchProfile() {
     }
   };
 
-  if (isLoading) {
+  // Loading states
+  const isProcessing = undoMatchMutation.isPending || blockMutation.isPending || reportMutation.isPending;
+
+  if (isLoading || isProcessing) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white">Carregando perfil...</p>
+          <p className="text-white">
+            {isProcessing ? 'Processando...' : 'Carregando perfil...'}
+          </p>
         </div>
       </div>
     );
