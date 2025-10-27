@@ -7,7 +7,7 @@ interface LoadingSpinnerProps {
 
 export function LoadingSpinner({ message = "Carregando...", fullScreen = true }: LoadingSpinnerProps) {
   const containerClasses = fullScreen 
-    ? "min-h-screen bg-black flex items-center justify-center"
+    ? "min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center"
     : "flex items-center justify-center py-20";
 
   return (
