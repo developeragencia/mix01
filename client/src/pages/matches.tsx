@@ -149,50 +149,31 @@ export default function Matches() {
               </h2>
             </div>
 
-            {/* Carrossel horizontal de novos matches */}
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-              {/* Card "+99" se tiver muitos matches */}
-              {newMatches.length > 5 && (
-                <button
-                  onClick={() => setLocation('/discover')}
-                  className="flex-shrink-0"
-                  data-testid="button-see-all-matches"
-                >
-                  <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 border-4 border-yellow-500 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-white">+{newMatches.length - 4}</span>
-                    </div>
-                    <div className="text-center mt-2">
-                      <p className="text-white text-sm font-medium">Curtidas</p>
-                    </div>
-                  </div>
-                </button>
-              )}
-
-              {/* Fotos dos novos matches */}
-              {newMatches.slice(0, newMatches.length > 5 ? 4 : 10).map((conv) => (
+            {/* Grid de cards grandes REDONDOS */}
+            <div className="grid grid-cols-2 gap-4">
+              {newMatches.slice(0, 6).map((conv) => (
                 <button
                   key={conv.match.id}
                   onClick={() => openMatchProfile(conv.profile.userId)}
-                  className="flex-shrink-0"
+                  className="relative"
                   data-testid={`new-match-${conv.match.id}`}
                 >
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-pink-500">
+                    <div className="w-full aspect-square rounded-full overflow-hidden border-4 border-pink-500">
                       <img
-                        src={conv.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conv.profile.name}&background=ec4899&color=fff&size=100`}
+                        src={conv.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conv.profile.name}&background=ec4899&color=fff&size=400`}
                         alt={conv.profile.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     {conv.profile.isVerified && (
-                      <div className="absolute bottom-1 right-1">
-                        <VerifiedBadge className="w-5 h-5" />
+                      <div className="absolute bottom-2 right-2">
+                        <VerifiedBadge className="w-6 h-6" />
                       </div>
                     )}
                   </div>
                   <div className="text-center mt-2">
-                    <p className="text-white text-sm font-medium truncate w-20">
+                    <p className="text-white text-base font-semibold">
                       {conv.profile.name.split(' ')[0]}
                     </p>
                   </div>
