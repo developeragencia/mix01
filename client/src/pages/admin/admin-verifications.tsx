@@ -505,7 +505,7 @@ export default function AdminVerifications() {
                     setSelectedVerification(null);
                     setRejectReason("");
                   }}
-                  variant="outline"
+                variant="outline"
                   className="flex-1 border-blue-600/50 text-blue-300"
               >
                 Cancelar
