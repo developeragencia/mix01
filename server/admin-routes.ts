@@ -77,11 +77,11 @@ export function registerAdminRoutes(app: Express) {
       
       // Criar token admin
       const adminToken = `admin_${admin.id}_${Date.now()}`;
-      
-      res.json({ 
-        success: true, 
+        
+        res.json({ 
+          success: true, 
         token: adminToken,
-        user: {
+          user: {
           id: admin.id,
           email: admin.email,
           name: admin.name || 'Admin',

@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/lib/error-boundary";
 import { setupGlobalErrorHandling } from "@/lib/global-error-handler";
 import { setupPromiseInterceptor } from "@/lib/promise-interceptor";
 import { useMobile } from "@/hooks/use-mobile";
+import { useDevToolsBlocker } from "@/hooks/useDevToolsBlocker";
 
 // Setup global error handling and promise interception on app initialization
 setupGlobalErrorHandling();
@@ -127,6 +128,9 @@ import Tutorial from "@/pages/tutorial";
 
 function Router() {
   const isMobile = useMobile();
+  
+  // Bloqueio de DevTools e Inspeção
+  useDevToolsBlocker();
 
   return (
     <Switch>
