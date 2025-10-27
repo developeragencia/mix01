@@ -149,7 +149,7 @@ export default function Matches() {
               </h2>
             </div>
 
-            {/* Grid de cards grandes REDONDOS */}
+            {/* Grid de cards grandes REDONDOS - v2 */}
             <div className="grid grid-cols-2 gap-4">
               {newMatches.slice(0, 6).map((conv) => (
                 <button
