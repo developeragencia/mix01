@@ -322,7 +322,7 @@ export default function Matches() {
 
       <BottomNavigation />
 
-      <style>{`
+      <style data-version="v3-circles">{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
@@ -331,31 +331,25 @@ export default function Matches() {
           scrollbar-width: none;
         }
         
-        /* FORÇAR CARDS REDONDOS */
-        .mix-card-round {
+        /* FORÇAR CARDS COMPLETAMENTE REDONDOS - V3 */
+        .mix-card-round,
+        .mix-card-round * {
           border-radius: 50% !important;
           -webkit-border-radius: 50% !important;
           -moz-border-radius: 50% !important;
           clip-path: circle(50% at center) !important;
           -webkit-clip-path: circle(50% at center) !important;
+          shape-outside: circle(50%) !important;
         }
         
-        .mix-card-round img {
-          border-radius: 50% !important;
-          -webkit-border-radius: 50% !important;
-          -moz-border-radius: 50% !important;
-        }
-        
-        .mix-profile-round {
+        .mix-profile-round,
+        .mix-profile-round * {
           border-radius: 50% !important;
           -webkit-border-radius: 50% !important;
           -moz-border-radius: 50% !important;
           clip-path: circle(50% at center) !important;
           -webkit-clip-path: circle(50% at center) !important;
-        }
-        
-        .mix-profile-round img {
-          border-radius: 50% !important;
+          shape-outside: circle(50%) !important;
         }
       `}</style>
     </div>
