@@ -252,7 +252,10 @@ export default function Matches() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="relative flex-shrink-0">
-                          <div className="w-16 h-16 rounded-full overflow-hidden">
+                          <div 
+                            className="w-16 h-16 overflow-hidden"
+                            style={{ borderRadius: '50%' }}
+                          >
                             <img
                               src={conversation.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conversation.profile.name}&background=ec4899&color=fff&size=100`}
                               alt={conversation.profile.name}
