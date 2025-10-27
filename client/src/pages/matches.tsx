@@ -159,7 +159,7 @@ export default function Matches() {
                   data-testid="button-see-all-matches"
                 >
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 border-4 border-yellow-500 flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 border-4 border-yellow-500 flex items-center justify-center">
                       <span className="text-2xl font-bold text-white">+{newMatches.length - 4}</span>
                     </div>
                     <div className="text-center mt-2">
@@ -178,7 +178,7 @@ export default function Matches() {
                   data-testid={`new-match-${conv.match.id}`}
                 >
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-pink-500">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-pink-500">
                       <img
                         src={conv.profile.photos?.[0] || `https://ui-avatars.com/api/?name=${conv.profile.name}&background=ec4899&color=fff&size=100`}
                         alt={conv.profile.name}

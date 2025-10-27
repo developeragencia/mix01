@@ -276,12 +276,9 @@ export const appSettings = pgTable("app_settings", {
 // Tabela de usuários admin
 export const adminUsers = pgTable("admin_users", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).unique(), // Nullable - admin pode existir sem user_id
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
   role: text("role").default("moderator").notNull(), // super_admin, admin, moderator
   permissions: text("permissions").array().default([]), // users, matches, messages, reports, settings, analytics
-  email: text("email").unique(), // Email para login direto do admin
-  password: text("password"), // Senha para login direto do admin
-  name: text("name"), // Nome do administrador
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
